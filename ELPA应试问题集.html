@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELPA 应试问题集 · HKUST(GZ) 英语水平考试</title>
+<style>
+  :root {
+    --bg: #f4f6fa;
+    --card: #ffffff;
+    --ink: #111827;
+    --ink-soft: #6b7280;
+    --cn-soft: #9ca3af;
+    --line: #e5e7eb;
+    --brand: #2563eb;
+    --brand-soft: #eff6ff;
+    --accent: #0d9488;
+    --warn: #d97706;
+    --green: #16a34a;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(15, 23, 42, .06), 0 8px 24px -12px rgba(15, 23, 42, .12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    font-size: 15px;
+  }
+
+  /* ===== Header ===== */
+  header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #3b82f6 100%);
+    color: #fff;
+    padding: 40px 24px 34px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 85% 20%, rgba(255,255,255,.18) 0%, transparent 45%);
+    pointer-events: none;
+  }
+  header h1 { font-size: 30px; font-weight: 800; letter-spacing: 1px; }
+  header p { margin-top: 8px; opacity: .92; font-size: 14.5px; }
+  .header-badge {
+    display: inline-block; margin-top: 14px; padding: 5px 14px;
+    background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35);
+    border-radius: 999px; font-size: 12.5px; backdrop-filter: blur(4px);
+  }
+
+  /* ===== Layout ===== */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* ===== Toolbar ===== */
+  .toolbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(244,246,250,.92); backdrop-filter: blur(8px);
+    padding: 12px 0; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+  }
+  .search-box {
+    flex: 1; min-width: 220px; position: relative;
+  }
+  .search-box input {
+    width: 100%; padding: 10px 16px 10px 40px;
+    border: 1px solid var(--line); border-radius: 999px;
+    font-size: 14px; background: #fff; color: var(--ink);
+    outline: none; transition: border .2s, box-shadow .2s;
+  }
+  .search-box input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+  .search-box .icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-soft); font-size: 15px; }
+  .stat-pill {
+    background: #fff; border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 14px; font-size: 13px; color: var(--ink-soft); white-space: nowrap;
+  }
+  .stat-pill b { color: var(--brand); }
+
+  /* ===== Progress ===== */
+  .progress-card {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 16px 20px; margin-bottom: 22px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .progress-card .label { font-size: 13.5px; color: var(--ink-soft); }
+  .progress-bar { flex: 1; min-width: 160px; height: 8px; background: #eef0f4; border-radius: 99px; overflow: hidden; }
+  .progress-bar > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--brand), var(--accent)); border-radius: 99px; transition: width .35s; }
+  .progress-card .pct { font-size: 15px; font-weight: 700; color: var(--brand); min-width: 52px; text-align: right; }
+
+  /* ===== TOC ===== */
+  .toc {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 18px 22px; margin-bottom: 22px;
+  }
+  .toc h2 { font-size: 15px; color: var(--ink-soft); margin-bottom: 10px; font-weight: 600; letter-spacing: .5px; }
+  .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 16px; }
+  .toc a {
+    display: block; padding: 7px 12px; border-radius: 8px; text-decoration: none;
+    color: var(--ink); font-size: 14px; transition: background .15s;
+  }
+  .toc a:hover { background: var(--brand-soft); color: var(--brand); }
+  .toc a .num { color: var(--brand); font-weight: 700; margin-right: 6px; font-size: 12.5px; }
+
+  /* ===== Section ===== */
+  section { margin-bottom: 34px; }
+  .sec-head {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    scroll-margin-top: 70px;
+  }
+  .sec-head .emoji { font-size: 24px; }
+  .sec-head h2 { font-size: 21px; font-weight: 800; }
+  .sec-head .tag {
+    font-size: 12px; background: var(--brand-soft); color: var(--brand);
+    padding: 3px 10px; border-radius: 999px; font-weight: 600;
+  }
+  .sec-desc { color: var(--ink-soft); font-size: 13.5px; margin: -8px 0 16px; }
+
+  /* ===== Process timeline ===== */
+  .timeline { position: relative; padding-left: 26px; }
+  .timeline::before {
+    content: ""; position: absolute; left: 8px; top: 8px; bottom: 8px;
+    width: 2px; background: linear-gradient(180deg, var(--brand), var(--accent));
+    border-radius: 2px;
+  }
+  .step { position: relative; margin-bottom: 18px; }
+  .step::before {
+    content: ""; position: absolute; left: -26px; top: 6px; width: 16px; height: 16px;
+    background: var(--brand); border: 3px solid #fff; border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--brand);
+  }
+  .step h3 { font-size: 15.5px; font-weight: 700; }
+  .step h3 .step-tag {
+    display: inline-block; font-size: 11px; background: #eef2ff; color: #4338ca;
+    border-radius: 6px; padding: 1px 8px; margin-left: 6px; vertical-align: 2px;
+  }
+  .step p, .step ul { margin-top: 5px; color: #374151; font-size: 14px; }
+  .step ul { padding-left: 20px; }
+  .step li { margin-top: 3px; }
+
+  /* ===== FAQ ===== */
+  .faq { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .faq-item { border-bottom: 1px solid var(--line); }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q {
+    padding: 14px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+    font-weight: 600; font-size: 14.5px; user-select: none;
+    transition: background .15s;
+  }
+  .faq-q:hover { background: #f8fafc; }
+  .faq-q .arrow { margin-left: auto; color: var(--ink-soft); transition: transform .2s; font-size: 12px; }
+  .faq-item.open .faq-q .arrow { transform: rotate(180deg); }
+  .faq-q .q-mark { color: var(--brand); font-weight: 800; }
+  .faq-a { display: none; padding: 0 20px 16px 46px; color: #374151; font-size: 14px; }
+  .faq-item.open .faq-a { display: block; }
+  .faq-a ul { padding-left: 20px; margin-top: 4px; }
+  .faq-a li { margin-top: 3px; }
+  .faq-a .tip { background: #fffbeb; border-left: 3px solid var(--warn); padding: 8px 12px; border-radius: 6px; margin-top: 8px; font-size: 13.5px; }
+
+  /* ===== Question cards ===== */
+  .qcard {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 18px 20px; margin-bottom: 14px; border-left: 4px solid transparent;
+    transition: border-color .2s;
+  }
+  .qcard.status-new { border-left-color: var(--line); }
+  .qcard.status-doing { border-left-color: var(--warn); }
+  .qcard.status-done { border-left-color: var(--green); }
+  .qcard .q-top { display: flex; align-items: flex-start; gap: 12px; }
+  .q-num {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px;
+    background: var(--brand-soft); color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px;
+  }
+  .q-title { flex: 1; }
+  .q-title .en { font-size: 16.5px; font-weight: 700; color: var(--ink); line-height: 1.5; }
+  .q-title .cn { font-size: 12.5px; color: var(--cn-soft); margin-top: 4px; line-height: 1.55; }
+  .q-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .status-btn {
+    border: 1px solid var(--line); background: #fff; color: var(--ink-soft);
+    padding: 6px 12px; border-radius: 999px; font-size: 12.5px; cursor: pointer;
+    transition: all .18s; font-family: inherit;
+  }
+  .status-btn:hover { border-color: var(--brand); color: var(--brand); }
+  .status-btn.active-new { background: #f3f4f6; color: var(--ink-soft); border-color: #d1d5db; }
+  .status-btn.active-doing { background: #fffbeb; color: var(--warn); border-color: var(--warn); font-weight: 700; }
+  .status-btn.active-done { background: #f0fdf4; color: var(--green); border-color: var(--green); font-weight: 700; }
+  .copy-btn {
+    border: 1px solid var(--line); background: #fff; color: var(--ink-soft);
+    padding: 6px 10px; border-radius: 999px; font-size: 12px; cursor: pointer;
+    transition: all .18s; font-family: inherit;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ===== 小问（中英双语：英文黑大 + 中文灰小） ===== */
+  .subq { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
+  .subq-head {
+    font-size: 12.5px; font-weight: 700; color: var(--ink-soft);
+    display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;
+    letter-spacing: .5px;
+  }
+  .subq-head .arrow { transition: transform .2s; font-size: 11px; }
+  .subq.open .subq-head .arrow { transform: rotate(90deg); }
+  .subq-list { display: none; margin-top: 10px; }
+  .subq.open .subq-list { display: block; }
+  .subq-list ol { padding-left: 22px; }
+  .subq-list li { margin-top: 8px; font-size: 14.5px; color: var(--ink); }
+  .subq-list li .subq-en { color: var(--ink); font-weight: 500; }
+  .subq-list li .subq-cn { display: block; font-size: 12px; color: var(--cn-soft); margin-top: 1px; }
+
+  /* ===== Empty state ===== */
+  .empty { display: none; text-align: center; padding: 40px 20px; color: var(--ink-soft); }
+
+  /* ===== Footer ===== */
+  footer { text-align: center; color: var(--ink-soft); font-size: 12.5px; padding: 30px 0 10px; }
+
+  .to-top {
+    position: fixed; right: 22px; bottom: 22px; z-index: 60;
+    width: 42px; height: 42px; border-radius: 50%; background: var(--brand); color: #fff;
+    border: none; cursor: pointer; box-shadow: var(--shadow);
+    font-size: 18px; opacity: 0; pointer-events: none; transition: opacity .25s;
+  }
+  .to-top.show { opacity: 1; pointer-events: auto; }
+
+  /* ===== 保存按钮（与回到顶端同风格，悬浮右下角） ===== */
+  .save-btn {
+    position: fixed; right: 22px; bottom: 76px; z-index: 60;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--accent); color: #fff; border: none; cursor: pointer;
+    box-shadow: var(--shadow); font-size: 18px; line-height: 1;
+    transition: transform .2s, background .25s, box-shadow .25s;
+  }
+  .save-btn:hover { transform: scale(1.08); }
+  .save-btn:active { transform: scale(.9); }
+  .save-btn.dirty { background: var(--warn); animation: savePulse 1.6s infinite; }
+  .save-btn.saved { background: var(--green); }
+  @keyframes savePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,.45); }
+    50% { box-shadow: 0 0 0 9px rgba(217,119,6,0); }
+  }
+
+  /* ===== 数据存储提示条 ===== */
+  .storage-banner {
+    display: none; margin-bottom: 14px; padding: 10px 16px; border-radius: 10px;
+    background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 13px;
+  }
+  .storage-banner.show { display: block; }
+  .storage-banner.ok { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+  .storage-banner.err { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+
+  /* ===== 工具栏文件夹按钮 ===== */
+  .folder-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid var(--line); background: #fff; cursor: pointer;
+    font-size: 15px; line-height: 1; transition: all .18s;
+  }
+  .folder-btn:hover { border-color: var(--brand); background: var(--brand-soft); }
+
+  /* ===== 顶栏保存按钮 ===== */
+  .save-top {
+    border: 1px solid var(--line); background: #fff; color: var(--ink);
+    padding: 7px 14px; border-radius: 999px; font-size: 13px; cursor: pointer;
+    font-family: inherit; transition: all .18s; font-weight: 600; white-space: nowrap;
+  }
+  .save-top:hover { border-color: var(--accent); color: var(--accent); background: #f0fdfa; }
+  .save-top:active { transform: scale(.96); }
+  .save-top.dirty { border-color: var(--warn); color: var(--warn); background: #fffbeb; animation: savePulse 1.6s infinite; }
+  .save-top.saved { background: var(--green); border-color: var(--green); color: #fff; animation: none; }
+  .save-top.saving { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; cursor: wait; }
+  .save-top:disabled { opacity: .85; pointer-events: none; }
+
+  /* ===== 自动保存开关 ===== */
+  .auto-switch {
+    display: flex; align-items: center; gap: 7px; cursor: pointer;
+    user-select: none; font-size: 12.5px; color: var(--ink-soft); white-space: nowrap;
+  }
+  .auto-switch input { display: none; }
+  .auto-track {
+    width: 36px; height: 20px; border-radius: 999px; background: #d1d5db;
+    position: relative; transition: background .2s; flex-shrink: 0;
+  }
+  .auto-track::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+    border-radius: 50%; background: #fff; transition: left .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  }
+  .auto-switch input:checked + .auto-track { background: var(--accent); }
+  .auto-switch input:checked + .auto-track::after { left: 18px; }
+  .auto-switch .auto-label { transition: color .2s; }
+  .auto-switch input:checked ~ .auto-label { color: var(--accent); font-weight: 600; }
+
+  /* ===== 快捷键帮助浮层 ===== */
+  .help-mask {
+    position: fixed; inset: 0; z-index: 100; display: none;
+    background: rgba(15, 23, 42, .35); backdrop-filter: blur(2px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .help-mask.show { display: flex; }
+  .help-panel {
+    background: #fff; border-radius: 16px; box-shadow: 0 20px 60px rgba(15,23,42,.25);
+    max-width: 560px; width: 100%; max-height: 85vh; overflow: auto; padding: 22px 26px;
+  }
+  .help-head {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 17px; font-weight: 800; margin-bottom: 14px;
+  }
+  .help-close {
+    border: none; background: #f3f4f6; color: var(--ink-soft); cursor: pointer;
+    width: 28px; height: 28px; border-radius: 50%; font-size: 13px; transition: all .15s;
+  }
+  .help-close:hover { background: #fee2e2; color: var(--danger); }
+  .help-body { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .help-col h4 {
+    font-size: 13px; color: var(--brand); margin-bottom: 6px; letter-spacing: .5px;
+  }
+  .help-col table { width: 100%; border-collapse: collapse; }
+  .help-col td { padding: 5px 4px; font-size: 13px; border-bottom: 1px dashed #f1f2f5; color: #374151; }
+  .help-col td:first-child { width: 46%; white-space: nowrap; }
+  kbd {
+    display: inline-block; padding: 2px 6px; margin: 0 1px;
+    background: #f3f4f6; border: 1px solid #d1d5db; border-bottom-width: 2px;
+    border-radius: 5px; font-size: 11.5px; font-family: ui-monospace, Consolas, monospace; color: #374151;
+  }
+  .help-foot { margin-top: 14px; font-size: 12px; color: var(--ink-soft); background: #f8fafc; padding: 8px 12px; border-radius: 8px; }
+
+  /* ===== 大问题笔记 ===== */
+  .qnote { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+  .qnote .note-area { min-height: 56px; }
+
+  /* ===== 笔记：编辑/预览切换（Markdown 渲染） ===== */
+  .note-toolbar { display: flex; align-items: center; gap: 6px; }
+  .md-tab {
+    border: 1px solid var(--line); background: transparent; color: var(--ink-soft);
+    font-size: 11px; padding: 3px 10px; border-radius: 999px; cursor: pointer;
+    transition: all .15s; font-family: inherit;
+  }
+  .md-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .md-tab.active { background: var(--brand-soft); color: var(--brand); border-color: var(--brand); font-weight: 700; }
+  .md-preview {
+    display: none; margin-top: 6px; padding: 10px 13px;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: #fafbfc; font-size: 13.5px; line-height: 1.7; color: var(--ink);
+    word-break: break-word; overflow: auto;
+    resize: vertical;
+  }
+  .md-preview.show { display: block; }
+  .md-preview p { margin: 6px 0; }
+  .md-preview h1, .md-preview h2, .md-preview h3, .md-preview h4, .md-preview h5, .md-preview h6 { margin: 10px 0 5px; line-height: 1.35; }
+  .md-preview h1 { font-size: 18px; } .md-preview h2 { font-size: 16.5px; }
+  .md-preview h3 { font-size: 15.5px; } .md-preview h4 { font-size: 15px; }
+  .md-preview h5, .md-preview h6 { font-size: 14px; }
+  .md-preview ul, .md-preview ol { padding-left: 22px; margin: 6px 0; }
+  .md-preview li { margin: 3px 0; }
+  .md-preview code { background: #eef0f4; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; font-family: ui-monospace, Consolas, monospace; }
+  .md-preview pre { background: #f1f3f7; padding: 10px 12px; border-radius: 8px; overflow: auto; margin: 8px 0; }
+  .md-preview pre code { background: none; padding: 0; }
+  .md-preview blockquote { border-left: 3px solid #cbd5e1; margin: 6px 0; padding: 2px 12px; color: var(--ink-soft); }
+  .md-preview a { color: var(--brand); }
+  .md-preview del { color: var(--ink-soft); }
+  .md-preview u { text-decoration: underline; }
+  .md-preview table { border-collapse: collapse; margin: 8px 0; }
+  .md-preview th, .md-preview td { border: 1px solid var(--line); padding: 5px 10px; font-size: 13px; }
+  .md-preview th { background: #f3f4f6; }
+
+  /* 演练高亮：边框闪烁 5 次后保持静态高亮 */
+  .qcard.drill-active {
+    border-left-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.45), var(--shadow);
+    transition: box-shadow .3s;
+  }
+  .qcard.drill-flash {
+    animation: drillBlink .6s ease-in-out 5;   /* 闪烁 5 次（约 3 秒） */
+  }
+  @keyframes drillBlink {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(37,99,235,.45), var(--shadow); }
+    50% { box-shadow: 0 0 0 3px rgba(37,99,235,.06), var(--shadow); }
+  }
+
+  /* ===== 搜索框清空按钮 ===== */
+  .search-clear {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    width: 20px; height: 20px; border-radius: 50%; border: none; cursor: pointer;
+    background: #e5e7eb; color: var(--ink-soft); font-size: 11px; line-height: 1;
+    display: none; align-items: center; justify-content: center; padding: 0;
+  }
+  .search-clear.show { display: flex; }
+  .search-clear:hover { background: #d1d5db; color: var(--ink); }
+
+  /* ===== 导出链接 ===== */
+  .export-link {
+    color: var(--brand); background: none; border: none; cursor: pointer;
+    font-size: 12px; font-family: inherit; text-decoration: underline;
+  }
+  .export-link:hover { color: #1d4ed8; }
+
+  /* ===== 计时器面板（贴近顶栏浮出） ===== */
+  .timer-panel {
+    position: fixed; right: 22px; top: 66px; z-index: 70;
+    width: 264px; background: #fff; border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(15,23,42,.28); padding: 14px 16px 16px;
+    display: none;
+  }
+  .timer-panel.show { display: block; }
+  .timer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+  .timer-tabs { display: flex; gap: 6px; }
+  .timer-tab {
+    border: 1px solid var(--line); background: #fff; color: var(--ink-soft);
+    font-size: 12px; padding: 4px 10px; border-radius: 999px; cursor: pointer;
+    transition: all .15s; font-family: inherit;
+  }
+  .timer-tab.active { background: var(--brand-soft); color: var(--brand); border-color: var(--brand); font-weight: 700; }
+  .timer-close {
+    border: none; background: #f3f4f6; color: var(--ink-soft); cursor: pointer;
+    width: 24px; height: 24px; border-radius: 50%; font-size: 11px; flex-shrink: 0;
+  }
+  .timer-close:hover { background: #fee2e2; color: var(--danger); }
+  .timer-set { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 8px; color: var(--ink-soft); font-size: 13px; }
+  .timer-input {
+    width: 62px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px;
+    font-size: 15px; text-align: center; font-family: inherit; color: var(--ink); outline: none;
+  }
+  .timer-input:focus { border-color: var(--brand); }
+  .timer-input:disabled { background: #f3f4f6; color: var(--ink-soft); }
+  .timer-display {
+    text-align: center; font-size: 44px; font-weight: 800; letter-spacing: 2px;
+    font-variant-numeric: tabular-nums; color: var(--ink); line-height: 1.1; margin: 6px 0 2px;
+    transition: color .3s;
+  }
+  .timer-phase {
+    text-align: center; font-size: 12px; font-weight: 700;
+    padding: 3px 14px; border-radius: 999px; margin: 0 auto 10px;
+    width: fit-content; letter-spacing: .5px;
+    background: #f3f4f6; color: var(--ink-soft); border: 1px solid var(--line);
+    transition: all .3s;
+  }
+  .timer-panel.prep .timer-phase { background: #fff7ed; color: var(--warn); border-color: #fdba74; }
+  .timer-panel.prep .timer-display { color: var(--warn); }
+  .timer-panel.speak .timer-phase { background: #eff6ff; color: var(--brand); border-color: #93c5fd; }
+  .timer-panel.speak .timer-display { color: var(--brand); }
+  .timer-panel.finished .timer-phase { background: #fef2f2; color: var(--danger); border-color: #fca5a5; }
+  .timer-display.warn { color: var(--danger); animation: timerBlink .5s step-end infinite; }
+  .timer-panel.finished .timer-display { color: var(--danger); animation: timerBlink .5s step-end infinite; }
+  @keyframes timerBlink { 50% { opacity: .35; } }
+  .timer-status { text-align: center; font-size: 12.5px; color: var(--danger); height: 18px; margin-bottom: 4px; }
+  .timer-actions { display: flex; gap: 8px; }
+  .timer-btn {
+    flex: 1; border: 1px solid var(--line); background: #fff; color: var(--ink);
+    padding: 8px 0; border-radius: 10px; font-size: 13.5px; cursor: pointer;
+    transition: all .15s; font-family: inherit; font-weight: 600;
+  }
+  .timer-btn:hover { border-color: var(--brand); color: var(--brand); }
+  .timer-btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .timer-btn.primary:hover { background: #1d4ed8; }
+  #timerDrill { width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12.5px; }
+
+  /* ===== 小问笔记输入框（可展开 · 可拖拽调高 · 自动保存） ===== */
+  .note-wrap { margin-top: 7px; }
+  .note-toggle {
+    border: 1px dashed #cbd5e1; background: transparent; color: var(--ink-soft);
+    font-size: 11.5px; padding: 3px 11px; border-radius: 999px; cursor: pointer;
+    transition: all .18s; font-family: inherit;
+  }
+  .note-toggle:hover { border-color: var(--accent); color: var(--accent); background: #f0fdfa; }
+  .note-area {
+    display: none; width: 100%; margin-top: 6px;
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 11px; font-size: 13px; font-family: inherit;
+    line-height: 1.5; color: var(--ink); background: #fcfdfe;
+    resize: vertical; min-height: 44px; outline: none;
+    transition: border .2s, box-shadow .2s;
+  }
+  .note-area:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
+  .note-wrap.open .note-area { display: block; }
+  .note-wrap.open .note-toggle { border-style: solid; border-color: var(--accent); color: var(--accent); background: #f0fdfa; }
+
+  /* ===== Print ===== */
+  @media print {
+    .toolbar, .to-top, .save-btn, .q-actions, .toc, .progress-card, .storage-banner, .note-toggle { display: none !important; }
+    body { background: #fff; }
+    .qcard, .faq, .timeline { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    .subq-list { display: block !important; }
+    .note-area { display: block !important; border: none; padding: 2px 0; }
+    header { background: #1e3a8a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .wrap { padding: 12px; }
+  }
+
+  @media (max-width: 640px) {
+    header h1 { font-size: 23px; }
+    .q-actions { width: 100%; justify-content: flex-end; }
+    .qcard .q-top { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📘 ELPA 应试问题集</h1>
+  <p>HKUST(GZ) 英语水平考试 · 考试流程 + 题库大全 + 考场经验</p>
+  <span class="header-badge">🎯 本库整理了25Fall同学们的合力贡献，26Fall感恩前辈们的不断传承！</span>
+</header>
+
+<div class="wrap">
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-box">
+      <span class="icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="搜索题目关键词…（如 AI / research / HKUST / integrity）">
+      <button class="search-clear" id="searchClear" title="清空搜索">✕</button>
+    </div>
+    <span class="stat-pill">共 <b id="totalCount">0</b> 题</span>
+    <span class="stat-pill">已练 <b id="doneCount">0</b> 题</span>
+    <button class="save-top" id="saveTopBtn" title="保存到 elpa_data.json（Ctrl+S）">💾 保存</button>
+    <label class="auto-switch" id="autoSwitch" title="开启后修改自动保存到 elpa_data.json">
+      <input type="checkbox" id="autoSaveToggle" checked>
+      <span class="auto-track"></span>
+      <span class="auto-label">自动保存</span>
+    </label>
+    <button class="folder-btn" id="helpBtn" title="快捷键帮助（按 ? 或 Ctrl+/）">⌨️</button>
+    <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）">⏱️</button>
+    <button class="folder-btn" id="folderBtn" title="重新选择默认数据文件夹（应为本 HTML 所在文件夹，仅选错时使用）">📂</button>
+  </div>
+
+  <!-- 存储状态提示 -->
+  <div class="storage-banner" id="storageTip"></div>
+
+  <!-- 快捷键帮助浮层 -->
+  <div class="help-mask" id="helpMask" onclick="closeHelp()">
+    <div class="help-panel" onclick="event.stopPropagation()">
+      <div class="help-head">⌨️ 文本编辑快捷键
+        <button class="help-close" onclick="closeHelp()">✕</button>
+      </div>
+      <div class="help-body">
+        <div class="help-col">
+          <h4>🌐 全局</h4>
+          <table>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>保存到 elpa_data.json</td></tr>
+            <tr><td><kbd>?</kbd> / <kbd>Ctrl</kbd>+<kbd>/</kbd></td><td>显示 / 隐藏本帮助</td></tr>
+          </table>
+          <h4>📝 笔记框内（聚焦笔记框时）</h4>
+          <table>
+            <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>增加 / 减少缩进（支持多行选区）</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td><td>加粗 <b>**文本**</b></td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>I</kbd></td><td>斜体 <i>*文本*</i></td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>U</kbd></td><td>下划线 &lt;u&gt;文本&lt;/u&gt;</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>删除当前行</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></td><td>删除当前行（VS Code 风格）</td></tr>
+            <tr><td><kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd></td><td>上移 / 下移当前行</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>立即保存</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>撤销 / 重做（浏览器原生）</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="help-foot">提示：格式化快捷键插入的是 Markdown 标记，可配合 Typora / 语雀 / 飞书等直接粘贴使用。</div>
+    </div>
+  </div>
+
+  <!-- 计时器面板 -->
+  <div class="timer-panel" id="timerPanel">
+    <div class="timer-head">
+      <div class="timer-tabs">
+        <button class="timer-tab active" id="tabCountdown">⏳ 倒计时</button>
+        <button class="timer-tab" id="tabStopwatch">⏱️ 正向计时</button>
+      </div>
+      <button class="timer-close" onclick="toggleTimer()" title="关闭">✕</button>
+    </div>
+    <div class="timer-set" id="timerSet">
+      <input type="number" id="timerMin" class="timer-input" min="0" max="180" value="2" title="分钟">
+      <span>分</span>
+      <input type="number" id="timerSec" class="timer-input" min="0" max="59" value="0" title="秒">
+      <span>秒</span>
+    </div>
+    <div class="timer-phase" id="timerPhase">⏳ 倒计时</div>
+    <div class="timer-display" id="timerDisplay">02:00</div>
+    <div class="timer-status" id="timerStatus"></div>
+    <div class="timer-actions">
+      <button class="timer-btn primary" id="timerStartPause">▶ 开始</button>
+      <button class="timer-btn" id="timerReset">↺ 重置</button>
+    </div>
+    <button class="timer-btn" id="timerDrill" style="margin-top:8px" title="随机抽一道题并滚动定位，同时开始 2 分钟陈述倒计时">🎲 随机抽题 · 2 分钟</button>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-card">
+    <span class="label">📈 备考进度</span>
+    <div class="progress-bar"><div id="progressFill"></div></div>
+    <span class="pct" id="progressPct">0%</span>
+    <span class="label" id="progressDetail"></span>
+  </div>
+
+  <!-- TOC -->
+  <nav class="toc" id="toc"></nav>
+
+  <!-- 考试流程 -->
+  <section id="sec-process">
+    <div class="sec-head"><span class="emoji">🗓️</span><h2>考试流程速览</h2><span class="tag">务必熟悉</span></div>
+    <div class="timeline">
+      <div class="step">
+        <h3>Step 1 · 入场分组 <span class="step-tag">Part 1 自我介绍</span></h3>
+        <p>4–5 人一组进入房间，老师安排按顺序坐下。每人桌上有一张草稿纸和铅笔。从第一个人开始轮流给老师看校园卡（学生证/ID卡），并做简短自我介绍（几十秒即可：姓名、来自哪里、本科毕业院校就够）。<b>注意：自我介绍之前没有额外小问答。</b></p>
+      </div>
+      <div class="step">
+        <h3>Step 2 · 抽题与准备 <span class="step-tag">Part 2 抽题陈述</span></h3>
+        <p>老师给每人发一张卡片，卡片上有你自己的 topic 及提示小问题（<b>每个人话题都不一样</b>）。然后有 <b>1 分钟准备时间</b>（不同场次可能为 3 分钟，以现场老师安排为准），期间可以在草稿纸上记笔记。写完后老师会将卡片翻面，<b>只有轮到你回答时才能看题</b>。</p>
+      </div>
+      <div class="step">
+        <h3>Step 3 · 陈述作答 <span class="step-tag">约 2 分钟</span></h3>
+        <p>从第一个人开始轮流答题。老师会先陈述一遍你的问题，然后说「可以开始了」并开始计时，<b>2 分钟后结束</b>。陈述时<b>可以看草稿纸上写的内容</b>。不需要覆盖所有小问，尽量多说、Try your best。时间提示方式因老师而异：有的在会议室大屏计时（自己看得见），有的只在手机计时、时间到响铃。</p>
+      </div>
+      <div class="step">
+        <h3>Step 4 · 提问回答 <span class="step-tag">Part 3 互动</span></h3>
+        <p>陈述结束后，其他同学/老师会就你的回答提问。通常<b>问 1 个问题即可</b>（时间短时可能 2–3 个），问题要尽量针对对方刚讲的内容——可以先简单总结对方内容一两句，再自然转入提问，不要生硬。回答时间没有硬性规定，简单回答即可。老师也可能追加提问，但考官普遍很 nice，不会像雅思考官那样板脸；时间剩余较多时老师会示意你继续说。</p>
+      </div>
+      <div class="step">
+        <h3>Step 5 · 结束离场</h3>
+        <p>最后一个人回答完毕，考试结束。整个流程：<b>看 ID 卡 → 抽题 → 准备（1–3 分钟）→ 陈述（2 分钟）→ 提问回答 → 下一个人</b>。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="sec-faq">
+    <div class="sec-head"><span class="emoji">💬</span><h2>常见问题 FAQ</h2><span class="tag">考场经验</span></div>
+    <div class="faq" id="faqList"></div>
+  </section>
+
+  <!-- 题库A -->
+  <section id="sec-bankA">
+    <div class="sec-head"><span class="emoji">📚</span><h2>题库一 · HKUST 正式题库</h2><span class="tag">7 题 · 带详细小问</span></div>
+    <p class="sec-desc">有考生反馈此套题中的第 7 题（Describe a time when you attended an interview）在 2025.9.10 场次以原题出现，务必重点准备。</p>
+    <div id="bankA"></div>
+  </section>
+
+  <!-- 题库B -->
+  <section id="sec-bankB">
+    <div class="sec-head"><span class="emoji">🗂️</span><h2>题库二 · ELPA 补充题库</h2><span class="tag">13 题</span></div>
+    <p class="sec-desc">来源标注为「ELPA 补充题库」，与题库一部分重复，建议与题库三交叉比对。</p>
+    <div id="bankB"></div>
+  </section>
+
+  <!-- 题库C -->
+  <section id="sec-bankC">
+    <div class="sec-head"><span class="emoji">🧠</span><h2>题库三 · 历年真题反馈</h2><span class="tag">带小问 · 含新增题</span></div>
+    <p class="sec-desc">来自 8.25 / 8.26 场次考生反馈整理的题库，含各题提示小问，其中含 AI 与语言学习等新增题；建议新旧题库都过一遍。</p>
+    <div id="bankC"></div>
+  </section>
+
+  <div class="empty" id="emptyState">😕 没有找到匹配「<span id="emptyKeyword"></span>」的题目，换个关键词试试？</div>
+
+  <footer>仅供备考参考，具体以考场现场安排为准<br>感谢历届同学分享题目与备考经验<br>共勉！祝大家ELPA一把过~<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
+</div>
+
+<button class="save-btn" id="saveBtn" title="保存进度与笔记到 elpa_data.json">💾</button>
+<button class="to-top" id="toTop" title="回到顶部">↑</button>
+
+<script>
+/* ============ 数据 ============ */
+const FAQS = [
+  { q: "往年旧题今年还会考吗？", a: [
+      "最新场次反馈：暂未出现旧题。",
+      "但 2025.9.10 场次有考生明确抽到旧题库第 7 题原题（Describe a time when you attended an interview），几乎一模一样。",
+      "结论：旧题库仍是高价值备考素材，务必准备；同时留意新增题。"
+    ]},
+  { q: "有哪些新增题？", a: [
+      "新增：AI 对语言学习的帮助（How can AI help language learning?）。",
+      "另一题：Describe an event or situation where you were required to speak in English as a research postgraduate（与正式题库第 3 题相同，再次出现）。"
+    ]},
+  { q: "Part 3 提问环节需要给对方提几个问题？", a: [
+      "一般 1 个即可；如果大家陈述时间偏短，可能问 2–3 个。",
+      "可以提前和组员商量一个问题，但别太生硬——先对对方讲过的内容做一两句总结，再自然转到问题。"
+    ]},
+  { q: "提问必须围绕对方的回答吗？", a: [
+      "是的，最好就着对方 P2 的回答来问。",
+      "但并非必须，也有组直接问 general 问题。"
+    ]},
+  { q: "陈述时可以看准备时写的东西吗？", a: [
+      "可以。草稿纸和笔记在陈述时允许查看。"
+    ]},
+  { q: "Part 3 的回答需要说多长时间？", a: [
+      "没有硬性规定，简单回答即可。",
+      "注意：老师可能在回答后再追加一个问题，属于正常情况，考官很 nice。"
+    ]},
+  { q: "2 分钟内需要把所有小问都覆盖吗？", a: [
+      "不需要，Try your best 即可。时间还剩很多时老师会示意你继续说。"
+    ]},
+  { q: "怎么知道还剩多少时间？", a: [
+      "有的老师会在会议室大屏计时（自己看得见还剩多少）；有的老师只在手机上计时，时间到响铃（自己看不见）。"
+    ]},
+  { q: "一个时间段有多少人？", a: [
+      "一个时间段有多个组，每个组 4 人（也有一组 4–5 人的说法）。",
+      "同组每个人话题都不同。"
+    ]},
+  { q: "考完多久出结果？没过怎么申诉？", a: [
+      "例：25 号上午考，28 号一早出结果。",
+      "申诉可以等其他同学出结果后一起进行。"
+    ]},
+  { q: "第二轮（9.1）和第一轮的题一样吗？", a: [
+      "目前所知都是一样的，没有新题。"
+    ]},
+  { q: "自我介绍需要说很多吗？", a: [
+      "不需要，有考生只念了姓名和学号即可。一般说姓名、来自哪里、本科毕业院校就够。"
+    ]}
+];
+
+const BANKS = {
+  A: {
+    name: "题库一 · HKUST 正式题库",
+    items: [
+      { num: 1, en: "Describe and reflect upon your experience of undergraduate study.",
+        cn: "描述并反思你的本科学习经历",
+        subs: [
+          { en: "What was your degree / major?", cn: "专业是什么" },
+          { en: "Why did you study this?", cn: "为什么学这个专业" },
+          { en: "What do you think about the courses you took?", cn: "上过的课程怎么样" },
+          { en: "What is one thing you would change in your courses if you could?", cn: "如果可以，你会改变课程的什么" },
+          { en: "What is one thing you would keep in the course?", cn: "课程中你会保留什么" },
+          { en: "What course did you enjoy the most as an undergraduate? Why?", cn: "最喜欢的课程及原因" },
+          { en: "If you were going to study as an undergraduate again, what would you do differently?", cn: "重读本科会怎么做" },
+          { en: "What classes have you taken?", cn: "上过哪些课" },
+          { en: "What is your favorite class?", cn: "最喜欢的课" },
+          { en: "Which class did you not like?", cn: "不喜欢的课" },
+          { en: "What do you want to do if you restart your undergraduate life?", cn: "重启大学生活想做什么" }
+        ]},
+      { num: 2, en: "Describe your research using clear and simple language. If you use complex terminology, be sure to explain them so that others can understand.",
+        cn: "用清晰简单的语言描述你的研究；使用专业术语时务必解释清楚",
+        subs: [
+          { en: "What is the general topic of your research?", cn: "研究主题" },
+          { en: "What is your research project about?", cn: "研究是关于什么的" },
+          { en: "Why are you interested in this area of research?", cn: "为什么对这个领域感兴趣" },
+          { en: "Why is research in your area important to society? Can you give an example of a real-world application of your research?", cn: "为什么对社会重要？举一个实际应用例子" },
+          { en: "What main challenges have you faced in research you have done until now?", cn: "目前研究遇到的挑战" },
+          { en: "What do you hope to achieve in your research?", cn: "研究的期望目标" },
+          { en: "Your general research problem?", cn: "研究问题" },
+          { en: "Your research topic in detail?", cn: "课题细节" },
+          { en: "Prospects of your research?", cn: "研究前景" }
+        ]},
+      { num: 3, en: "Describe an event (or situation) where you were required to speak in English as a research postgraduate.",
+        cn: "描述一个作为研究型研究生必须用英语发言的事件或场合",
+        subs: [
+          { en: "What was the event and where did it take place?", cn: "什么事件？在哪里发生" },
+          { en: "How long was / will it be?", cn: "持续多长时间" },
+          { en: "Why did / will you attend it?", cn: "为什么参加" },
+          { en: "Were / will you be able to prepare in advance for it? If so, in what way?", cn: "能否提前准备？怎么准备" },
+          { en: "Who were / will be the other people present?", cn: "在场的其他人是谁" },
+          { en: "What did / will you talk about? Were you successful? Why / Why not?", cn: "讲了什么？成功吗？为什么" },
+          { en: "Did / Will the event require much conversation and/or exchange of information with others? Or was / will it require you to speak on your own?", cn: "需要交流互动还是独自陈述" },
+          { en: "When will you speak? / To whom will you speak? / Where will you speak?", cn: "何时 / 对谁 / 在哪里发言" },
+          { en: "Any details? / Any difficulties?", cn: "其他细节？困难？" }
+        ]},
+      { num: 4, en: "Describe your experience of speaking or presenting your research in English.",
+        cn: "描述你用英语演讲或展示研究的经历",
+        subs: [
+          { en: "When did you speak about your research / academic areas of interest?", cn: "什么时候讲过自己的研究" },
+          { en: "Have you had much chance to speak about your research in English?", cn: "用英语讲研究的机会多吗" },
+          { en: "If not, have you had opportunities to speak about academic topics in English?", cn: "如果没有，有讲过英语学术话题吗" },
+          { en: "What do you find most challenging about speaking about your research and/or academic topics in English?", cn: "最有挑战的是什么" },
+          { en: "What do you like about presenting your research in English?", cn: "喜欢用英语展示研究吗" },
+          { en: "What would you like to improve about your English presenting skills?", cn: "想提升哪些方面" },
+          { en: "When / To whom / Where do you speak?", cn: "何时 / 对谁 / 何地" },
+          { en: "Other details? / Any difficulties?", cn: "其他细节？困难？" }
+        ]},
+      { num: 5, en: "Describe why you chose to study at HKUST.",
+        cn: "描述你为什么选择来香港科技大学读书（有考生考场抽到）",
+        subs: [
+          { en: "What did you hear about HKUST before you came here?", cn: "来之前听说过科大什么" },
+          { en: "What attracted you to study at HKUST?", cn: "什么吸引你来科大" },
+          { en: "What are your first impression of the campus?", cn: "对校园的初印象" },
+          { en: "How does HKUST compare to the university of your undergraduate studies?", cn: "科大与本科学校相比如何" },
+          { en: "What do you know about your research department at HKUST?", cn: "对科大的研究部门了解多少" },
+          { en: "Which professors will you be working with?", cn: "想跟哪位教授 / 在哪个部门" },
+          { en: "Aside from studies, what else do you hope to achieve at HKUST?", cn: "除了学业还想收获什么" }
+        ]},
+      { num: 6, en: "Describe a challenge you faced in your studies or at work. How did you overcome it?",
+        cn: "描述一个学习或工作中遇到的挑战，以及你是如何克服的（有考生考场抽到）",
+        subs: [
+          { en: "What was the challenge?", cn: "什么挑战" },
+          { en: "Why was it a challenge?", cn: "为什么是挑战" },
+          { en: "What did you do to overcome it?", cn: "如何克服" },
+          { en: "Did you handle it well? Why?", cn: "处理好了吗？为什么" },
+          { en: "What did you learn from this challenge?", cn: "从中学到了什么" },
+          { en: "Would you deal with it differently now?", cn: "现在会换一种方式处理吗" }
+        ]},
+      { num: 7, en: "Describe a time when you attended an interview (e.g. job, university etc.)",
+        cn: "描述一次你参加面试的经历（工作、升学等）—— 2025.9.10 场次原题出现，重点准备！",
+        subs: [
+          { en: "What type of interview did you attend?", cn: "什么类型的面试" },
+          { en: "Did you do well? Why?", cn: "表现好吗？为什么" },
+          { en: "What did you learn from this interview?", cn: "从中学到了什么" },
+          { en: "Do you think presentation skills are important for interviews? Why?", cn: "展示/表达技巧对面试重要吗" },
+          { en: "How can these skills be improved?", cn: "如何提高这些技巧" },
+          { en: "Should universities teach students such skills?", cn: "大学应该教这些技巧吗" }
+        ]},
+      { num: "附", en: "What can you learn from the Internet?",
+        cn: "描述一下你在互联网中能学到什么？（有考生考场抽到的补充题）",
+        subs: []}
+    ]
+  },
+  B: {
+    name: "题库二 · ELPA 补充题库",
+    items: [
+      { num: 1, en: "How would you explain a technical term to the first-year UG?",
+        cn: "你会如何向大一本科生解释一个专业术语？", subs: []},
+      { num: 2, en: "Talk about your academic subject and why did you enjoy it?",
+        cn: "谈谈你的学科，以及你为什么喜欢它", subs: []},
+      { num: 3, en: "Why is interdisciplinary studies so important?",
+        cn: "为什么交叉学科研究如此重要？", subs: []},
+      { num: 4, en: "As a teaching assistant, how do you plan to guide the UG student to use AI ethically?",
+        cn: "作为助教，你计划如何引导学生合乎伦理地使用 AI？", subs: []},
+      { num: 5, en: "Explain a core concept or technique in your research in simple terms, give an example of its application, and explain its limitations.",
+        cn: "用简而易懂的话解释你研究中的核心概念或技术，举例说明应用并说明它的局限性。", subs: []},
+      { num: 6, en: "Briefly introduce the problems encountered in academic research, how you solved them through innovation, what the results were.",
+        cn: "简要介绍研究中遇到的问题、你如何通过创新解决、结果如何", subs: []},
+      { num: 7, en: "Discuss the challenges of remote learning, and how to overcome it?",
+        cn: "讨论远程学习的挑战以及如何克服", subs: []},
+      { num: 8, en: "Discuss the role of mentorship in academic success.",
+        cn: "讨论导师制在学术成功中的作用", subs: []},
+      { num: 9, en: "How can PG students leverage AI to improve their language proficiency?",
+        cn: "研究生如何利用 AI 提升语言能力？（重点新增方向）", subs: []},
+      { num: 10, en: "Why is integrity important for your academic discipline?",
+        cn: "为什么诚信对你的学科很重要？", subs: []},
+      { num: 11, en: "How do PG students leverage digital tools?",
+        cn: "研究生如何利用数字工具？", subs: []},
+      { num: 12, en: "Talk about the importance of feedback, including receiving and giving feedback.",
+        cn: "谈谈反馈的重要性，包括接受和给予反馈", subs: []},
+      { num: 13, en: "Describe a time when you used creative approaches to solve a problem in academic research.",
+        cn: "描述一个在学术研究中，你应用创造性手段解决什么问题。", subs: []}
+    ]
+  },
+  C: {
+    name: "题库三 · 历年真题反馈",
+    items: [
+      { num: 1, en: "How would you explain a technical term to the first-year undergraduate?",
+        cn: "如何向大一新生解释一个专业术语",
+        subs: [
+          { en: "How to define a technical term", cn: "如何定义这个术语" },
+          { en: "Give an example", cn: "举一个例子" },
+          { en: "Challenge when explaining to the first-year undergraduate", cn: "向大一新生解释的挑战" },
+          { en: "How to get feedback", cn: "如何获得反馈" }
+        ]},
+      { num: 2, en: "Why is interdisciplinary studies so important?",
+        cn: "描述为什么交叉学科（interdisciplinary）很重要",
+        subs: [
+          { en: "What is interdisciplinary studies?", cn: "介绍交叉学科是什么" },
+          { en: "Why is interdisciplinary studies important?", cn: "为什么交叉学科重要？" },
+          { en: "Give an example of disciplinary integration related to your subject", cn: "举例学科融合（关于你的 subject）" },
+          { en: "What can you gain from collaborating with others? (collaborative creation)", cn: "从 collaborating 中可以得到什么" }
+        ]},
+      { num: 3, en: "Talk about your academic subject and why you enjoy it.",
+        cn: "讲讲你的 academic subject，并说你为什么 enjoy",
+        subs: [
+          { en: "What subject do you plan to study?", cn: "计划学什么科目" },
+          { en: "Why do you like this subject?", cn: "你为什么喜欢这个科目" },
+          { en: "How does this subject influence your academic and career choices?", cn: "这个科目对你学术和就业的选择有什么影响" },
+          { en: "What are you currently passionate about in this subject?", cn: "这个科目现在热衷什么" }
+        ]},
+      { num: 4, en: "As a teaching assistant, how do you guide the undergraduate student to use AI ethically?",
+        cn: "作为助教，如何引导本科生合乎伦理地使用 AI",
+        subs: [
+          { en: "How do you distinguish what is ethical?", cn: "怎么区分是否合乎伦理" },
+          { en: "How do you tell whether the information provided by AI is true or false?", cn: "怎么分辨 AI 提供信息的真假" },
+          { en: "Mainly focus on how to use AI ethically", cn: "主要围绕怎么用才算合乎伦理" }
+        ]},
+      { num: 5, en: "Explain a core concept or technique in your research field in simple terms, give an example of its application, and explain its limitations.",
+        cn: "用简而易懂的话解释你研究（field）中的核心概念或技术，举例说明应用并说明它的局限性（与题库二第 5 题相同）",
+        subs: []},
+      { num: 6, en: "Briefly introduce the problems you encountered in academic research, how you solved them, and what the results were.",
+        cn: "简要介绍学术研究遇到的问题，你如何解决，结果怎么样",
+        subs: [
+          { en: "Briefly describe the problem", cn: "简要描述问题" },
+          { en: "How did you implement / approach it?", cn: "你如何实施它" },
+          { en: "What were the results?", cn: "结果怎么样" }
+        ]},
+      { num: 7, en: "Discuss the challenges of remote or blended learning, and how to overcome it?",
+        cn: "讨论远程/混合式学习的挑战及克服方法",
+        subs: [
+          { en: "Describe the challenge", cn: "描述一下这个挑战" },
+          { en: "Did this challenge affect you?", cn: "这个挑战是否对你造成了影响" },
+          { en: "How did you overcome the difficulty?", cn: "你是怎么克服这个困难的" },
+          { en: "Give some advice / methods to people facing the same difficulty", cn: "对和你面临同样困境的人提出一些建议/方法" }
+        ]},
+      { num: 8, en: "Discuss the role of mentorship in academic success.",
+        cn: "讨论导师制在学术成功中的作用",
+        subs: [
+          { en: "The importance of mentorship", cn: "导师的重要性" },
+          { en: "Have you ever had a mentor? How?", cn: "你有没有过 mentor？怎么找的" },
+          { en: "What qualities should a good mentor have / what should a good mentor do?", cn: "好的 mentor 需要有什么品质/需要做到什么" },
+          { en: "Where can students get mentorship?", cn: "学生可以从哪里获取 mentorship" }
+        ]},
+      { num: 9, en: "Why is integrity important for your academic discipline?",
+        cn: "为什么诚信对你的学科很重要？",
+        subs: [
+          { en: "Why is integrity important in research and education?", cn: "为什么诚信在研究和教育中很重要" },
+          { en: "How to maintain academic integrity?", cn: "如何维护学术诚信" }
+        ]},
+      { num: 10, en: "How do postgraduate students leverage digital tools (e.g. AI)?",
+        cn: "研究生如何利用数字工具（如 AI）？", subs: []},
+      { num: 11, en: "Importance of feedback, including receiving and giving feedback.",
+        cn: "反馈的重要性，包括接受和给予反馈",
+        subs: [
+          { en: "Why is feedback important?", cn: "为什么重要" },
+          { en: "Have you used feedback in your work?", cn: "你的 work 有没有用到 feedback" },
+          { en: "What kind of feedback do you think is most important?", cn: "什么反馈最重要" },
+          { en: "What is the most effective way to give / receive feedback?", cn: "什么方式的反馈最有效" }
+        ]},
+      { num: 12, en: "Describe a time when you used creative approaches to solve a problem in academic research.",
+        cn: "描述一个在学术研究中，你应用创造性手段解决什么问题（与题库二第 13 题相同）",
+        subs: []},
+      { num: 13, en: "Is AI dangerous or helpful?",
+        cn: "AI 是危险的还是有益的？", subs: []},
+      { num: 14, en: "What are the benefits and challenges of collaborating with people from different fields?",
+        cn: "与不同领域的人合作的好处与挑战？", subs: []},
+      { num: 15, en: "Talk about your experience of taking online courses.",
+        cn: "网课经验", subs: []},
+      { num: 16, en: "What can you learn from the Internet?",
+        cn: "描述一下你在互联网中能学到什么？（与题库一附加题相同）", subs: []},
+      { num: 17, en: "How can AI help language learning?",
+        cn: "AI 对语言学习的帮助（新增题）", subs: []},
+      { num: 18, en: "Describe an event or situation where you were required to speak in English as a research postgraduate.",
+        cn: "新增题（与正式题库第 3 题相同，重点关注）", subs: []}
+    ]
+  }
+};
+
+/* ============ 数据持久化：同目录 JSON 文件 ============ */
+const DATA_FILE = 'elpa_data.json';
+const LS_KEY = 'elpa-q-status-v1';
+const LS_NOTES = 'elpa-notes-v1';
+const IDB_NAME = 'elpa-fs-db';
+const IDB_STORE = 'handles';
+const IDB_DIR_KEY = 'data-dir';
+
+let statuses = {};   // { "A-1": "new|doing|done", ... }
+let notes = {};      // { "A-1-0": "用户笔记", ... }
+let dirHandle = null; // FileSystemDirectoryHandle（记住的文件夹）
+let dirty = false;   // 是否有未保存的修改
+const fsSupported = !!(window.showDirectoryPicker && window.showOpenFilePicker);
+
+/* ---- IndexedDB：记住文件夹句柄（刷新/重开后仍有效） ---- */
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = e => { e.target.result.createObjectStore(IDB_STORE); };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e);
+  });
+}
+async function idbSet(key, val) {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(val, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = e => reject(e);
+  });
+}
+async function idbGet(key) {
+  const db = await idbOpen();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const rq = tx.objectStore(IDB_STORE).get(key);
+    rq.onsuccess = () => resolve(rq.result || null);
+    rq.onerror = e => reject(e);
+  });
+}
+
+/* ---- 存储提示条 ---- */
+function setTip(msg, cls) {
+  const el = document.getElementById('storageTip');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'storage-banner show' + (cls ? ' ' + cls : '');
+}
+
+/* ---- 保存按钮状态 ---- */
+function updateSaveBtn() {
+  const btn = document.getElementById('saveBtn');
+  if (!btn) return;
+  btn.classList.remove('saved', 'dirty');
+  if (dirty) btn.classList.add('dirty');
+}
+function flashSaveBtn() {
+  const btn = document.getElementById('saveBtn');
+  const top = document.getElementById('saveTopBtn');
+  // 右下角悬浮按钮：变绿闪烁
+  btn.classList.add('saved');
+  setTimeout(() => btn.classList.remove('saved'), 1500);
+  // 顶栏按钮：短暂显示「✅ 已保存」并变绿
+  if (top) {
+    const old = top.innerHTML;
+    top.classList.add('saved');
+    top.innerHTML = '✅ 已保存';
+    setTimeout(() => { top.classList.remove('saved'); top.innerHTML = old; }, 1500);
+  }
+}
+/* ---- 保存中状态（按钮禁用 + 变色，不改变文字） ---- */
+function setSaving(flag) {
+  const top = document.getElementById('saveTopBtn');
+  if (!top) return;
+  top.disabled = flag;
+  top.classList.toggle('saving', flag);
+}
+
+/* ---- 写入 JSON（或降级 localStorage） ---- */
+async function writeData() {
+  const payload = { version: 1, updatedAt: new Date().toISOString(), statuses, notes };
+  if (fsSupported && dirHandle) {
+    const fh = await dirHandle.getFileHandle(DATA_FILE, { create: true });
+    const w = await fh.createWritable();
+    await w.write(JSON.stringify(payload, null, 2));
+    await w.close();
+  } else {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(statuses));
+      localStorage.setItem(LS_NOTES, JSON.stringify(notes));
+    } catch (e) { console.error('保存失败', e); }
+  }
+}
+
+/* ---- 从已关联文件夹读取（无 JSON 则自动生成） ---- */
+async function loadFromDir() {
+  let fh = null;
+  try { fh = await dirHandle.getFileHandle(DATA_FILE, { create: false }); } catch (e) { fh = null; }
+  if (fh) {
+    const f = await fh.getFile();
+    const data = JSON.parse(await f.text());
+    statuses = (data && data.statuses) || {};
+    notes = (data && data.notes) || {};
+    setTip('💾 已读取 ' + DATA_FILE + '（进度 ' + Object.keys(statuses).length + ' 题 · 笔记 ' + Object.keys(notes).length + ' 条）', 'ok');
+  } else {
+    await writeData();
+    setTip('✅ 未找到 ' + DATA_FILE + '，已自动生成', 'ok');
+  }
+  dirty = false;
+  updateSaveBtn();
+}
+
+/* ---- 标记有未保存修改 ---- */
+let autoSaveOn = true;
+let autoSaveTimer = null;
+function markDirty() {
+  if (!fsSupported || !dirHandle) { writeData(); return; } // 降级模式直接自动保存
+  dirty = true;
+  updateSaveBtn();
+  if (autoSaveOn) {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(async () => {
+      try {
+        await writeData();
+        dirty = false;
+        updateSaveBtn();
+        setTip('✅ 已自动保存到 ' + DATA_FILE + '（' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) + '）', 'ok');
+      } catch (e) {
+        setTip('❌ 自动保存失败：' + e.message + '，请点击 💾 手动保存', 'err');
+      }
+    }, 1500);
+  }
+}
+
+/* ---- 打开页面时自动读取 ---- */
+async function initStorage() {
+  if (!fsSupported) {
+    try {
+      statuses = JSON.parse(localStorage.getItem(LS_KEY)) || {};
+      notes = JSON.parse(localStorage.getItem(LS_NOTES)) || {};
+    } catch (e) { statuses = {}; notes = {}; }
+    setTip('当前浏览器不支持直接读写文件，进度与笔记已自动保存在浏览器本地（建议使用 Chrome / Edge）', 'ok');
+    return;
+  }
+  try { dirHandle = await idbGet(IDB_DIR_KEY); } catch (e) { dirHandle = null; }
+  if (dirHandle) {
+    try { await loadFromDir(); }
+    catch (e) {
+      dirHandle = null;
+      setTip('❌ 无法访问已记住的笔记数据文件夹（可能被移动、重命名或删除）。请点击 📂 重新选择笔记数据 JSON 所在文件夹，即可继续自动保存。如果是初次使用，点击保存选择位置即可', 'err');
+    }
+  }
+}
+
+/* ---- 保存（右下角 💾 与顶栏「💾 保存」共用） ---- */
+async function handleSave() {
+  setSaving(true);
+  try {
+    if (!fsSupported) {
+      await writeData();
+      setTip('✅ 已保存到浏览器本地', 'ok');
+    } else if (!dirHandle) {
+      try {
+        dirHandle = await window.showDirectoryPicker({ id: 'elpa-data-dir', mode: 'readwrite' });
+        await idbSet(IDB_DIR_KEY, dirHandle);
+      } catch (e) { setTip('已取消选择文件夹，数据未保存', 'err'); return; }
+      let exists = false;
+      try { await dirHandle.getFileHandle(DATA_FILE, { create: false }); exists = true; } catch (e) { exists = false; }
+      if (exists) {
+        await loadFromDir();
+        renderAll();
+        setTip('✅ 已关联文件夹并读取 ' + DATA_FILE, 'ok');
+      } else {
+        await writeData();
+        setTip('✅ 已自动创建并保存 ' + DATA_FILE, 'ok');
+      }
+    } else {
+      await writeData();
+      setTip('✅ 已保存到 ' + DATA_FILE, 'ok');
+    }
+    dirty = false;
+    updateSaveBtn();
+    flashSaveBtn();
+  } catch (e) {
+    setTip('❌ 保存失败：' + e.message + '，请重试', 'err');
+  } finally {
+    setSaving(false);
+  }
+}
+document.getElementById('saveBtn').addEventListener('click', handleSave);
+document.getElementById('saveTopBtn').addEventListener('click', handleSave);
+
+/* ---- 自动保存开关 ---- */
+try { autoSaveOn = localStorage.getItem('elpa-autosave') !== '0'; } catch (e) { autoSaveOn = true; }
+const autoSaveToggle = document.getElementById('autoSaveToggle');
+autoSaveToggle.checked = autoSaveOn;
+autoSaveToggle.addEventListener('change', () => {
+  autoSaveOn = autoSaveToggle.checked;
+  try { localStorage.setItem('elpa-autosave', autoSaveOn ? '1' : '0'); } catch (e) {}
+  if (autoSaveOn && dirty) {
+    writeData().then(() => { dirty = false; updateSaveBtn(); setTip('✅ 已自动保存到 ' + (dirHandle ? DATA_FILE : '浏览器本地'), 'ok'); });
+  }
+  setTip(autoSaveOn ? '🔁 自动保存已开启，修改后 1.5 秒自动写入 ' + DATA_FILE : '⏸ 自动保存已关闭，请手动点击保存（Ctrl+S）', 'ok');
+  setTimeout(() => { const el = document.getElementById('storageTip'); if (el) el.className = 'storage-banner'; }, 3000);
+});
+
+/* ---- 更换/重新选择数据文件夹 ---- */
+document.getElementById('folderBtn').addEventListener('click', async () => {
+  if (!fsSupported) { setTip('当前浏览器不支持选择文件夹，请使用 Chrome / Edge', 'err'); return; }
+  try {
+    dirHandle = await window.showDirectoryPicker({ id: 'elpa-data-dir', mode: 'readwrite' });
+    await idbSet(IDB_DIR_KEY, dirHandle);
+    let exists = false;
+    try { await dirHandle.getFileHandle(DATA_FILE, { create: false }); exists = true; } catch (e) { exists = false; }
+    if (exists) {
+      await loadFromDir();
+      renderAll();
+      setTip('✅ 已读取 ' + DATA_FILE, 'ok');
+    } else {
+      await writeData();
+      setTip('✅ 该文件夹没有数据文件，已自动生成 ' + DATA_FILE, 'ok');
+    }
+    dirty = false;
+    updateSaveBtn();
+  } catch (e) { setTip('已取消选择文件夹', 'err'); }
+});
+
+function qId(bank, num) { return bank + '-' + num; }
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderTOC() {
+  const items = [
+    ['sec-process', '🗓️', '考试流程速览'],
+    ['sec-faq', '💬', '常见问题 FAQ'],
+    ['sec-bankA', '📚', '题库一 · HKUST 正式题库'],
+    ['sec-bankB', '🗂️', '题库二 · ELPA 补充题库'],
+    ['sec-bankC', '🧠', '题库三 · 历年真题反馈']
+  ];
+  document.getElementById('toc').innerHTML =
+    '<h2>📑 内容目录</h2><div class="toc-grid">' +
+    items.map(i => `<a href="#${i[0]}"><span class="num">${i[1]}</span>${esc(i[2])}</a>`).join('') +
+    '</div>';
+}
+
+function renderFAQ() {
+  document.getElementById('faqList').innerHTML = FAQS.map((f, i) => `
+    <div class="faq-item" id="faq-${i}">
+      <div class="faq-q" onclick="toggleFaq(${i})">
+        <span class="q-mark">Q</span>${esc(f.q)}<span class="arrow">▼</span>
+      </div>
+      <div class="faq-a">
+        ${f.a.map(a => `<p style="margin-top:6px">${esc(a)}</p>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function toggleFaq(i) {
+  document.getElementById('faq-' + i).classList.toggle('open');
+}
+
+function renderBank(bankKey) {
+  const bank = BANKS[bankKey];
+  const container = document.getElementById('bank' + bankKey);
+  container.innerHTML = bank.items.map((item, idx) => {
+    const id = qId(bankKey, item.num);
+    const st = statuses[id] || 'new';
+    const stMap = { new: ['未练', 'active-new'], doing: ['练习中', 'active-doing'], done: ['已掌握', 'active-done'] };
+    const hasSubs = item.subs && item.subs.length > 0;
+    const qnoteKey = 'qn-' + id;
+    const qnoteSaved = notes[qnoteKey] || '';
+    const searchText = (item.en + ' ' + (item.cn||'') + ' ' + (item.subs||[]).map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
+    return `
+    <div class="qcard status-${st}" id="q-${id}" data-search="${esc(searchText)}">
+      <div class="q-top">
+        <div class="q-num">${esc(String(item.num))}</div>
+        <div class="q-title">
+          <div class="en">${esc(item.en)}</div>
+          ${item.cn ? `<div class="cn">${esc(item.cn)}</div>` : ''}
+        </div>
+        <div class="q-actions">
+          <button class="copy-btn" onclick="copyQuestion('${id}')" title="复制题目">📋 复制</button>
+          <button class="status-btn ${stMap[st][1]}" onclick="cycleStatus('${id}', this)">${stMap[st][0]}</button>
+        </div>
+      </div>
+      ${hasSubs ? `
+      <div class="subq" id="subq-${id}">
+        <div class="subq-head" onclick="toggleSub('${id}')">
+          <span class="arrow">▶</span>查看提示小问（${item.subs.length} 个）
+        </div>
+        <div class="subq-list"><ol>
+          ${item.subs.map((s, si) => {
+            const nk = id + '-' + si;
+            const saved = notes[nk] || '';
+            return `
+            <li>
+              <span class="subq-en">${esc(s.en)}</span>
+              ${s.cn ? `<span class="subq-cn">${esc(s.cn)}</span>` : ''}
+              <div class="note-wrap" id="nw-${nk}">
+                <div class="note-toolbar">
+                  <button class="note-toggle" onclick="toggleNote('${nk}')" title="记录灵感/答案（保存到 elpa_data.json）">📝 记笔记</button>
+                  <button class="md-tab active" id="mdt-prev-${nk}" onclick="togglePreview('${nk}')" title="显示/隐藏 Markdown 预览">👁 预览</button>
+                </div>
+                <textarea class="note-area" id="note-${nk}" rows="1" placeholder="写下你的灵感或答案…支持 Markdown（**加粗**、*斜体*、行内 code、# 标题、- 列表、| 表格 |），高度自动适配，下方实时预览" oninput="saveNote('${nk}', this.value); autoResize(this)">${esc(saved)}</textarea>
+                <div class="md-preview" id="mdp-${nk}"></div>
+              </div>
+            </li>`;}).join('')}
+        </ol></div>
+      </div>` : ''}
+      <div class="qnote">
+        <div class="note-wrap" id="nw-${qnoteKey}">
+          <div class="note-toolbar">
+            <button class="note-toggle" onclick="toggleNote('${qnoteKey}')" title="记录本题的整体思路/答题要点（保存到 elpa_data.json）">📝 大问题笔记</button>
+            <button class="md-tab" id="mdt-edit-${qnoteKey}" onclick="switchNoteMode('${qnoteKey}','edit')">✏️ 编辑</button>
+            <button class="md-tab" id="mdt-prev-${qnoteKey}" onclick="switchNoteMode('${qnoteKey}','preview')">👁 预览</button>
+          </div>
+          <textarea class="note-area" id="note-${qnoteKey}" rows="3" placeholder="记录本题的整体思路、答题要点、练习反馈…支持 Markdown 语法" oninput="saveNote('${qnoteKey}', this.value)">${esc(qnoteSaved)}</textarea>
+          <div class="md-preview" id="mdp-${qnoteKey}"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSub(id) {
+  const el = document.getElementById('subq-' + id);
+  if (el) el.classList.toggle('open');
+}
+
+/* ---- 小问笔记：展开/收起 + 自动标记修改 ---- */
+/* ---- 笔记框高度自适应（展开时 & 输入时） ---- */
+function autoResize(ta, force) {
+  if (!ta) return;
+  const userH = ta.clientHeight;         // 当前渲染高度（含用户手动拖拽的结果）
+  ta.style.height = 'auto';
+  const h = ta.scrollHeight + 2;         // 完全按内容高度，无上限
+  // 只在「展开/切回编辑时强制适配」或「内容比当前高」时调整高度；
+  // 否则保持用户手动拖拽的高度，避免输入时高度被弹回造成卡顿
+  if (force || h > userH) {
+    ta.style.height = h + 'px';
+  } else {
+    ta.style.height = userH + 'px';
+  }
+  ta.style.overflowY = 'hidden';
+}
+
+function toggleNote(nk) {
+  const wrap = document.getElementById('nw-' + nk);
+  if (!wrap) return;
+  wrap.classList.toggle('open');
+  if (wrap.classList.contains('open')) {
+    autoResize(document.getElementById('note-' + nk), true);
+    const ta = wrap.querySelector('.note-area');
+    if (ta) ta.focus();
+  }
+}
+function saveNote(nk, val) {
+  notes[nk] = val;
+  autoResize(document.getElementById('note-' + nk));
+  markDirty();
+}
+
+/* ---- Markdown 渲染器（轻量、无依赖） ---- */
+function renderMarkdown(src) {
+  if (!src || !src.trim()) return '<p style="color:#9ca3af">（暂无内容，点击 ✏️ 编辑开始记录）</p>';
+  let html = src;
+  // 先保护 <u>下划线</u> 标签（避免被转义），还原时再对内容做转义
+  const uls = [];
+  html = html.replace(/<u>([\s\S]*?)<\/u>/gi, (m, c) => {
+    uls.push(c);
+    return '\x00U' + (uls.length - 1) + '\x00';
+  });
+  html = html
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // 代码块
+  html = html.replace(/```([\s\S]*?)```/g, (m, c) => '<pre><code>' + c.replace(/\n$/, '').trim() + '</code></pre>');
+  // 表格 | a | b |
+  html = html.replace(/(^\|.*\|[ \t]*(?:\n|$)(?:\|[^\n]*\|[ \t]*(?:\n|$))+)/gm, block => {
+    const rows = block.trim().split('\n').filter(Boolean);
+    const parse = r => r.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+    let out = '<table>';
+    const header = parse(rows[0]);
+    out += '<thead><tr>' + header.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+    rows.slice(1).forEach(r => {
+      if (/^[\s:\-|]+$/.test(r.replace(/\s/g, '').replace(/:/g, '').replace(/-/g, ''))) return; // 分隔行
+      out += '<tr>' + parse(r).map(c => '<td>' + c + '</td>').join('') + '</tr>';
+    });
+    return out + '</tbody></table>';
+  });
+  // 标题
+  html = html.replace(/^######\s+(.*)$/gm, '<h6>$1</h6>');
+  html = html.replace(/^#####\s+(.*)$/gm, '<h5>$1</h5>');
+  html = html.replace(/^####\s+(.*)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^###\s+(.*)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^##\s+(.*)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^#\s+(.*)$/gm, '<h1>$1</h1>');
+  // 引用
+  html = html.replace(/^&gt;\s?(.*)$/gm, '<blockquote>$1</blockquote>');
+  // 水平线 ---
+  html = html.replace(/^-{3,}\s*$/gm, '<hr>');
+  // 无序列表
+  html = html.replace(/(?:^|\n)((?:[-*]\s+.*(?:\n|$))+)/g, (m, block) => {
+    const items = block.trim().split('\n').map(l => '<li>' + l.replace(/^[-*]\s+/, '') + '</li>').join('');
+    return '\n<ul>' + items + '</ul>\n';
+  });
+  // 有序列表
+  html = html.replace(/(?:^|\n)((?:\d+[.)]\s+.*(?:\n|$))+)/g, (m, block) => {
+    const items = block.trim().split('\n').map(l => '<li>' + l.replace(/^\d+[.)]\s+/, '') + '</li>').join('');
+    return '\n<ol>' + items + '</ol>\n';
+  });
+  // 行内代码
+  html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  // 粗斜体 ***text***
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  // 加粗（非贪婪，支持内部含单个 *）
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // 删除线
+  html = html.replace(/~~([^~\n]+)~~/g, '<del>$1</del>');
+  // 链接
+  html = html.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  // 斜体（边界含中英文标点）
+  html = html.replace(/(^|[\s(（【\[「『])\*([^*\n]+)\*(?=[\s)）】」』\].:：;；,，!！?？、]|$)/g, '$1<em>$2</em>');
+  // 保护块级元素（避免被 <p> 包裹）
+  const blocks = [];
+  html = html.replace(/(<pre>[\s\S]*?<\/pre>|<table>[\s\S]*?<\/table>|<ul>[\s\S]*?<\/ul>|<ol>[\s\S]*?<\/ol>|<blockquote>[\s\S]*?<\/blockquote>|<h[1-6]>.*?<\/h[1-6]>|<hr>)/g, m => {
+    blocks.push(m);
+    return '\x00B' + (blocks.length - 1) + '\x00';
+  });
+  // 段落与换行
+  html = html.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>');
+  html = '<p>' + html + '</p>';
+  // 还原块级元素：将其从 <p> 内拆出（闭合上一段 → 块 → 重新开段）
+  html = html.replace(/\x00B(\d+)\x00/g, (m, i) => '</p>' + (blocks[+i] || '') + '<p>');
+  // 还原 <u> 下划线标签（内容做 HTML 转义）
+  html = html.replace(/\x00U(\d+)\x00/g, (m, i) =>
+    '<u>' + String(uls[+i] || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</u>');
+  return html;
+}
+
+/* ---- 笔记编辑/预览模式切换 ---- */
+function switchNoteMode(nk, mode) {
+  const ta = document.getElementById('note-' + nk);
+  const pv = document.getElementById('mdp-' + nk);
+  const te = document.getElementById('mdt-edit-' + nk);
+  const tp = document.getElementById('mdt-prev-' + nk);
+  if (!ta || !pv) return;
+  if (mode === 'preview') {
+    pv.innerHTML = renderMarkdown(notes[nk] || ta.value);
+    pv.classList.add('show');
+    ta.style.display = 'none';
+    te.classList.remove('active');
+    tp.classList.add('active');
+  } else {
+    pv.classList.remove('show');
+    ta.style.display = '';
+    autoResize(ta, true);
+    te.classList.add('active');
+    tp.classList.remove('active');
+  }
+}
+
+const STATUS_ORDER = ['new', 'doing', 'done'];
+const STATUS_LABEL = { new: '未练', doing: '练习中', done: '已掌握' };
+function cycleStatus(id, btn) {
+  const cur = statuses[id] || 'new';
+  const next = STATUS_ORDER[(STATUS_ORDER.indexOf(cur) + 1) % 3];
+  statuses[id] = next;
+  markDirty();
+  const card = document.getElementById('q-' + id);
+  card.className = 'qcard status-' + next;
+  btn.className = 'status-btn active-' + next;
+  btn.textContent = STATUS_LABEL[next];
+  updateProgress();
+}
+
+function copyQuestion(id) {
+  const bankKey = id.split('-')[0];
+  const bank = BANKS[bankKey];
+  const item = bank.items.find(i => qId(bankKey, i.num) === id);
+  if (!item) return;
+  let text = `【${bank.name} · 第 ${item.num} 题】\n${item.en}\n`;
+  if (item.cn) text += `（${item.cn}）\n`;
+  if (item.subs && item.subs.length) {
+    text += '\n提示小问：\n' + item.subs.map(s => '• ' + s.en + (s.cn ? '  (' + s.cn + ')' : '')).join('\n');
+  }
+  const doCopy = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => flash(btnOf(id))).catch(() => fallbackCopy(text, id));
+    } else {
+      fallbackCopy(text, id);
+    }
+  };
+  doCopy();
+}
+function fallbackCopy(text, id) {
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  flash(btnOf(id));
+}
+function btnOf(id) {
+  const card = document.getElementById('q-' + id);
+  return card ? card.querySelector('.copy-btn') : null;
+}
+function flash(btn) {
+  if (!btn) return;
+  const old = btn.textContent;
+  btn.textContent = '✅ 已复制';
+  setTimeout(() => btn.textContent = old, 1200);
+}
+
+function updateProgress() {
+  let total = 0, done = 0, doing = 0, fresh = 0;
+  for (const bk in BANKS) {
+    total += BANKS[bk].items.length;
+    for (const it of BANKS[bk].items) {
+      const st = statuses[qId(bk, it.num)] || 'new';
+      if (st === 'done') done++;
+      else if (st === 'doing') doing++;
+      else fresh++;
+    }
+  }
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressDetail').textContent = '未练 ' + fresh + ' · 练习中 ' + doing + ' · 已掌握 ' + done;
+}
+
+/* ============ 搜索 ============ */
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', function() {
+  const kw = this.value.trim().toLowerCase();
+  document.getElementById('searchClear').classList.toggle('show', !!this.value);
+  let visible = 0;
+  document.querySelectorAll('.qcard').forEach(card => {
+    const hit = !kw || card.dataset.search.includes(kw);
+    card.style.display = hit ? '' : 'none';
+    if (hit) visible++;
+  });
+  document.getElementById('emptyState').style.display = visible ? 'none' : 'block';
+  document.getElementById('emptyKeyword').textContent = this.value.trim();
+});
+
+/* ============ 快捷键：文本编辑 + 保存 + 帮助 ============ */
+function toggleHelp() {
+  document.getElementById('helpMask').classList.toggle('show');
+}
+function closeHelp() {
+  document.getElementById('helpMask').classList.remove('show');
+}
+document.getElementById('helpBtn').addEventListener('click', toggleHelp);
+
+/* ---- textarea 行/选区操作工具 ---- */
+function getLineInfo(ta) {
+  const val = ta.value;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const before = val.slice(0, start), after = val.slice(end);
+  const lineStart = before.lastIndexOf('\n') + 1;
+  let lineEnd = after.indexOf('\n');
+  if (lineEnd === -1) lineEnd = val.length; else lineEnd = end + lineEnd;
+  return { val, start, end, lineStart, lineEnd };
+}
+function fireInput(ta) { ta.dispatchEvent(new Event('input', { bubbles: true })); }
+
+/* ---- 通过 execCommand 提交编辑（可被 Ctrl+Z 撤销） ---- */
+function commitEdit(ta, from, to, newText, caret) {
+  if (!ta) return;
+  ta.focus();
+  ta.setSelectionRange(from, to);
+  try {
+    document.execCommand('insertText', false, newText);
+  } catch (e) {
+    ta.value = ta.value.slice(0, from) + newText + ta.value.slice(to);
+  }
+  if (caret) ta.setSelectionRange(caret[0], caret[1]);
+  fireInput(ta);
+}
+
+function applyIndent(ta, shift) {
+  const { val, start, end, lineStart } = getLineInfo(ta);
+  const selected = val.slice(start, end);
+  if (selected.includes('\n')) {
+    const lines = selected.split('\n');
+    const newSel = shift
+      ? lines.map(l => l.startsWith('  ') ? l.slice(2) : l.startsWith('\t') ? l.slice(1) : l).join('\n')
+      : lines.map(l => '  ' + l).join('\n');
+    commitEdit(ta, start, end, newSel, [start, start + newSel.length]);
+  } else if (shift) {
+    let n = 0;
+    while (n < 2 && (val[lineStart + n] === ' ' || val[lineStart + n] === '\t')) n++;
+    commitEdit(ta, lineStart, lineStart + n, '', [Math.max(start - n, lineStart), Math.max(end - n, lineStart)]);
+  } else {
+    commitEdit(ta, lineStart, lineStart, '  ', [start + 2, end + 2]);
+  }
+}
+function wrapSelection(ta, before, after) {
+  const { val, start, end } = getLineInfo(ta);
+  const sel = val.slice(start, end) || 'text';
+  commitEdit(ta, start, end, before + sel + after, [start + before.length, start + before.length + sel.length]);
+}
+function deleteLine(ta) {
+  const { val, lineStart, lineEnd } = getLineInfo(ta);
+  let start = lineStart, end = lineEnd;
+  if (val[lineEnd] === '\n') end = lineEnd + 1;      // 普通行：连行尾换行一起删
+  else if (lineStart > 0) start = lineStart - 1;      // 最后一行无换行：删掉前一行的换行
+  commitEdit(ta, start, end, '', [start, start]);
+}
+function moveLine(ta, dir) {
+  const { val, start, end } = getLineInfo(ta);
+  const selLen = end - start;
+  const lines = val.split('\n');
+  const lineNo = val.slice(0, start).split('\n').length - 1;
+  const target = lineNo + dir;
+  if (target < 0 || target >= lines.length) return;
+  const a = Math.min(lineNo, target), b = Math.max(lineNo, target);
+  const lineStarts = [];
+  let pos = 0;
+  for (let i = 0; i < lines.length; i++) { lineStarts.push(pos); pos += lines[i].length + 1; }
+  const spanStart = lineStarts[a];
+  const spanEnd = (b < lines.length - 1) ? lineStarts[b] + lines[b].length : val.length;
+  const spanText = val.slice(spanStart, spanEnd);
+  const spanLines = spanText.split('\n');
+  const within = lineNo - a;
+  const [l] = spanLines.splice(within, 1);
+  spanLines.splice(within + dir, 0, l);
+  const newText = spanLines.join('\n');
+  const lineOff = start - val.slice(0, start).lastIndexOf('\n') - 1;
+  const tIdx = within + dir;
+  const caretStart = spanStart + spanLines.slice(0, tIdx).join('\n').length + (tIdx > 0 ? 1 : 0) + Math.min(lineOff, lines[target].length);
+  commitEdit(ta, spanStart, spanEnd, newText, [caretStart, caretStart + selLen]);
+}
+
+/* ---- 全局 + 笔记框快捷键 ---- */
+document.addEventListener('keydown', e => {
+  const isTa = e.target && e.target.tagName === 'TEXTAREA';
+  const mod = e.ctrlKey || e.metaKey;
+  // Ctrl+S：保存（全局生效）
+  if (mod && !e.shiftKey && !e.altKey && (e.key === 's' || e.key === 'S')) {
+    e.preventDefault();
+    handleSave();
+    return;
+  }
+  // '?'：显示帮助（输入框外）
+  if (e.key === '?' && !e.ctrlKey && !e.altKey && !isTa && !(e.target && e.target.tagName === 'INPUT')) {
+    toggleHelp();
+    return;
+  }
+  if (!isTa) return; // 以下快捷键仅在笔记框内生效
+  if (mod && !e.shiftKey && e.key === '/') { e.preventDefault(); toggleHelp(); return; }
+  if (e.key === 'Tab') { e.preventDefault(); applyIndent(e.target, e.shiftKey); return; }
+  if (mod && !e.shiftKey && !e.altKey && (e.key === 'b' || e.key === 'B')) { e.preventDefault(); wrapSelection(e.target, '**', '**'); return; }
+  if (mod && !e.shiftKey && !e.altKey && (e.key === 'i' || e.key === 'I')) { e.preventDefault(); wrapSelection(e.target, '*', '*'); return; }
+  if (mod && !e.shiftKey && !e.altKey && (e.key === 'u' || e.key === 'U')) { e.preventDefault(); wrapSelection(e.target, '<u>', '</u>'); return; }
+  if (mod && !e.shiftKey && !e.altKey && (e.key === 'd' || e.key === 'D')) { e.preventDefault(); deleteLine(e.target); return; }
+  if (mod && e.shiftKey && !e.altKey && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); deleteLine(e.target); return; }
+  if (mod && e.key === 'Enter') { e.preventDefault(); handleSave(); return; }
+  if (e.altKey && !mod && e.key === 'ArrowUp') { e.preventDefault(); moveLine(e.target, -1); return; }
+  if (e.altKey && !mod && e.key === 'ArrowDown') { e.preventDefault(); moveLine(e.target, 1); return; }
+});
+
+/* ============ 计时器（倒计时 / 正向计时） ============ */
+const timerPanel = document.getElementById('timerPanel');
+let timerMode = 'countdown';      // countdown | stopwatch
+let timerRunning = false;
+let timerRemain = 120;            // 倒计时剩余秒数
+let timerEndAt = 0;               // 倒计时结束时间戳
+let timerElapsed = 0;             // 正向计时累计毫秒（暂停保留）
+let timerStartStamp = 0;          // 正向计时开始时间戳
+let timerInterval = null;
+let timerPhase = 'idle';          // idle | prep(准备) | speak(陈述) | done
+
+/* ---- 阶段徽章与配色 ---- */
+function setPhase(phase, label) {
+  timerPhase = phase;
+  timerPanel.classList.toggle('prep', phase === 'prep');
+  timerPanel.classList.toggle('speak', phase === 'speak');
+  timerPanel.classList.toggle('finished', phase === 'done');
+  const badge = document.getElementById('timerPhase');
+  if (badge && label !== undefined) badge.textContent = label;
+}
+
+function toggleTimer() {
+  timerPanel.classList.toggle('show');
+  if (timerPanel.classList.contains('show')) {
+    document.getElementById('timerStatus').textContent = '';
+    timerPanel.classList.remove('finished');
+  }
+}
+document.getElementById('timerBtn').addEventListener('click', toggleTimer);
+
+function fmtTime(totalSec) {
+  const s = Math.max(0, Math.floor(totalSec));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  const mm = String(m).padStart(2, '0'), ss = String(sec).padStart(2, '0');
+  return h > 0 ? h + ':' + mm + ':' + ss : mm + ':' + ss;
+}
+function syncDisplay() {
+  const d = document.getElementById('timerDisplay');
+  if (timerMode === 'countdown') {
+    d.textContent = fmtTime(timerRemain);
+  } else {
+    d.textContent = fmtTime(timerElapsed / 1000);
+  }
+}
+function readInput() {
+  const min = parseInt(document.getElementById('timerMin').value, 10) || 0;
+  const sec = parseInt(document.getElementById('timerSec').value, 10) || 0;
+  return min * 60 + sec;
+}
+function beep(times) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    let n = 0;
+    const tick = () => {
+      if (n >= times) { ctx.close(); return; }
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.25, ctx.currentTime);
+      o.start(); o.stop(ctx.currentTime + 0.25);
+      n++;
+      setTimeout(tick, 350);
+    };
+    tick();
+  } catch (e) {}
+}
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerRunning = false;
+  document.getElementById('timerStartPause').textContent = '▶ 开始';
+  document.getElementById('timerMin').disabled = false;
+  document.getElementById('timerSec').disabled = false;
+  timerPanel.classList.remove('finished');
+}
+function startTimer() {
+  if (timerMode === 'countdown') {
+    if (timerRemain <= 0) timerRemain = Math.max(1, readInput());
+    timerEndAt = Date.now() + timerRemain * 1000;
+  } else {
+    timerStartStamp = Date.now() - timerElapsed;
+  }
+  timerRunning = true;
+  document.getElementById('timerStartPause').textContent = '⏸ 暂停';
+  document.getElementById('timerMin').disabled = true;
+  document.getElementById('timerSec').disabled = true;
+  timerInterval = setInterval(() => {
+    if (timerMode === 'countdown') {
+      timerRemain = (timerEndAt - Date.now()) / 1000;
+      const d = document.getElementById('timerDisplay');
+      if (timerRemain <= 0) {
+        if (timerPhase === 'prep') {
+          // 准备阶段结束 → 自动进入 2 分钟陈述
+          beep(2);
+          timerRemain = 120;
+          timerEndAt = Date.now() + 120000;
+          document.getElementById('timerMin').value = 2;
+          document.getElementById('timerSec').value = 0;
+          setPhase('speak', '🎤 陈述 2:00');
+          d.classList.remove('warn');
+          document.getElementById('timerStatus').textContent = '✍️ 准备结束，开始 2 分钟陈述！';
+          return;
+        }
+        timerRemain = 0;
+        d.textContent = '00:00';
+        stopTimer();
+        clearDrill();
+        setPhase('done', '⏰ 时间到');
+        document.getElementById('timerStatus').textContent = '⏰ 时间到！';
+        beep(3);
+        return;
+      }
+      d.textContent = fmtTime(timerRemain);
+      d.classList.toggle('warn', timerRemain <= 10);
+    } else {
+      timerElapsed = Date.now() - timerStartStamp;
+      document.getElementById('timerDisplay').textContent = fmtTime(timerElapsed / 1000);
+    }
+  }, 250);
+}
+document.getElementById('timerStartPause').addEventListener('click', () => {
+  if (timerRunning) {
+    if (timerMode === 'countdown') timerRemain = (timerEndAt - Date.now()) / 1000;
+    stopTimer();
+  } else {
+    startTimer();
+  }
+});
+document.getElementById('timerReset').addEventListener('click', () => {
+  stopTimer();
+  clearDrill();
+  setPhase('idle', '⏳ 倒计时');
+  document.getElementById('timerDisplay').classList.remove('warn');
+  document.getElementById('timerStatus').textContent = '';
+  if (timerMode === 'countdown') {
+    timerRemain = Math.max(1, readInput());
+  } else {
+    timerElapsed = 0;
+  }
+  syncDisplay();
+});
+document.getElementById('timerMin').addEventListener('input', () => {
+  if (!timerRunning) { timerRemain = readInput(); syncDisplay(); }
+});
+document.getElementById('timerSec').addEventListener('input', () => {
+  if (!timerRunning) { timerRemain = readInput(); syncDisplay(); }
+});
+function switchTimerMode(mode) {
+  stopTimer();
+  clearDrill();
+  setPhase('idle', '⏳ 倒计时');
+  timerMode = mode;
+  document.getElementById('tabCountdown').classList.toggle('active', mode === 'countdown');
+  document.getElementById('tabStopwatch').classList.toggle('active', mode === 'stopwatch');
+  document.getElementById('timerSet').style.display = mode === 'countdown' ? '' : 'none';
+  document.getElementById('timerDisplay').classList.remove('warn');
+  document.getElementById('timerStatus').textContent = '';
+  if (mode === 'countdown') {
+    timerRemain = Math.max(1, readInput());
+  } else {
+    timerElapsed = 0;
+  }
+  syncDisplay();
+}
+document.getElementById('tabCountdown').addEventListener('click', () => switchTimerMode('countdown'));
+document.getElementById('tabStopwatch').addEventListener('click', () => switchTimerMode('stopwatch'));
+
+/* ---- 随机抽题 · 模拟考试（60s 准备 → 2 分钟陈述，题目蓝框常驻闪烁） ---- */
+function clearDrill() {
+  document.querySelectorAll('.qcard.drill-active, .qcard.drill-flash').forEach(c =>
+    c.classList.remove('drill-active', 'drill-flash'));
+}
+document.getElementById('timerDrill').addEventListener('click', () => {
+  const keys = [];
+  for (const bk in BANKS) for (const it of BANKS[bk].items) keys.push(qId(bk, it.num));
+  if (!keys.length) return;
+  const pick = keys[Math.floor(Math.random() * keys.length)];
+  const card = document.getElementById('q-' + pick);
+  if (!card) return;
+  // 演练模式：60 秒准备 → 自动进入 2 分钟陈述（先切模式，其内部会 clearDrill）
+  switchTimerMode('countdown');
+  document.getElementById('timerMin').value = 1;
+  document.getElementById('timerSec').value = 0;
+  timerRemain = 60;
+  setPhase('prep', '📝 准备 1:00');
+  syncDisplay();
+  if (!timerPanel.classList.contains('show')) toggleTimer();
+  // 标记当前题：滚动定位 + 闪烁 5 次后保持常亮
+  clearDrill();
+  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  card.classList.add('drill-active');          // 静态高亮（闪烁结束后保持）
+  card.classList.add('drill-flash');           // 边框闪烁 5 次
+  card.addEventListener('animationend', function h(e) {
+    if (e.animationName === 'drillBlink') {
+      card.classList.remove('drill-flash');    // 动画结束移除闪烁类，保留常亮
+      card.removeEventListener('animationend', h);
+    }
+  });
+  startTimer();
+  setTip('🎲 随机抽到：' + pick + ' —— 先 60 秒准备，随后自动开始 2 分钟陈述！', 'ok');
+});
+
+/* ============ 导出全部笔记（Markdown 下载） ============ */
+document.getElementById('exportBtn').addEventListener('click', () => {
+  let md = '# ELPA 备考笔记导出\n\n> 导出时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
+  for (const bk in BANKS) {
+    md += '\n## ' + BANKS[bk].name + '\n\n';
+    for (const it of BANKS[bk].items) {
+      const id = qId(bk, it.num);
+      const st = statuses[id] || 'new';
+      const stLabel = { new: '未练', doing: '练习中', done: '已掌握' }[st];
+      md += '### ' + it.num + '. ' + it.en + '\n';
+      if (it.cn) md += '> ' + it.cn + '\n';
+      md += '*状态：' + stLabel + '*\n\n';
+      const qn = notes['qn-' + id];
+      if (qn && qn.trim()) md += '**大问题笔记：**\n\n' + qn.trim() + '\n\n';
+      if (it.subs && it.subs.length) {
+        md += '**提示小问：**\n\n';
+        it.subs.forEach((s, si) => {
+          const n = notes[id + '-' + si];
+          md += '- ' + s.en + (s.cn ? '（' + s.cn + '）' : '');
+          if (n && n.trim()) md += '\n  > 笔记：' + n.trim().replace(/\n/g, '\n  > ');
+          md += '\n';
+        });
+        md += '\n';
+      }
+    }
+  }
+  const blob = new Blob(['\ufeff' + md], { type: 'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ELPA备考笔记_' + new Date().toISOString().slice(0, 10) + '.md';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  setTip('📤 已导出全部题目与笔记为 Markdown 文件', 'ok');
+});
+
+/* ============ 搜索：清空 + 计数 ============ */
+const searchClear = document.getElementById('searchClear');
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  searchInput.dispatchEvent(new Event('input'));
+  searchInput.focus();
+});
+
+/* ============ 回到顶部 ============ */
+const toTop = document.getElementById('toTop');
+window.addEventListener('scroll', () => {
+  toTop.classList.toggle('show', window.scrollY > 400);
+});
+toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ============ 渲染（读取数据后统一执行） ============ */
+function renderAll() {
+  renderBank('A');
+  renderBank('B');
+  renderBank('C');
+  updateProgress();
+}
+
+/* ============ 初始化：先读取同目录 JSON，再渲染 ============ */
+(async function init() {
+  renderTOC();
+  renderFAQ();
+  await initStorage();
+  renderAll();
+})();
+</script>
+</body>
+</html>
