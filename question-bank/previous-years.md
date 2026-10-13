@@ -82,7 +82,7 @@
 - Which professors will you be working with? — 计划与哪位老师合作？
 - Aside from studies, what else do you hope to achieve at HKUST? — 学业之外想收获什么？
 
-*注意：这组来源使用“HKUST”的原有写法；不要擅自把所有原题替换成“HKUST(GZ)”。2026 年校园体验相关反馈另见[2026 Fall](./2026-fall.md#2026-09-0109-02-分享的四道校园相关问题)。*
+*注意：这组来源使用“HKUST”的原有写法；不要擅自把所有原题替换成“HKUST(GZ)”。2026 年校园体验相关反馈另见[2026 Fall](./2026-fall.md)。*
 
 ## Q06｜A study or work challenge
 
