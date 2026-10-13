@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ELPA 应试问题集 · HKUST(GZ) 英语水平考试</title>
+<title>HKUST(GZ) ELPA｜口语备考题库与模拟练习</title>
+<meta name="description" content="非官方 HKUST(GZ) ELPA 口语备考资源：历年题目、2026 Fall 考生反馈、关键词检索、模拟计时与本地学习笔记。">
+<meta name="theme-color" content="#1e3a8a">
 <style>
   :root {
     --bg: #f4f6fa;
@@ -492,36 +494,87 @@
     .q-actions { width: 100%; justify-content: flex-end; }
     .qcard .q-top { flex-wrap: wrap; }
   }
+  /* ===== 资源入口、可访问性与移动端 ===== */
+  .resource-links { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+  .resource-links a { color:#fff; border:1px solid rgba(255,255,255,.5); border-radius:999px;
+    padding:7px 15px; text-decoration:none; font-size:13px; background:rgba(255,255,255,.12); }
+  .resource-links a:hover { background:rgba(255,255,255,.22); }
+  .source-notice { padding:13px 17px; border:1px solid #dbeafe; border-radius:12px; margin-bottom:18px;
+    background:#eff6ff; color:#334155; font-size:13px; line-height:1.7; }
+  .source-notice a { color:#1d4ed8; }
+  .filter-select { border:1px solid var(--line); background:#fff; border-radius:999px; padding:8px 12px;
+    color:var(--ink); font-size:13px; min-height:36px; max-width:140px; }
+  .toolbar-action { border:1px solid var(--line); background:#fff; color:var(--ink);
+    border-radius:999px; padding:8px 12px; cursor:pointer; font-size:12.5px; white-space:nowrap; }
+  .toolbar-action:hover { border-color:var(--brand); color:var(--brand); }
+  .faq-q { width:100%; border:0; background:transparent; color:inherit; text-align:left; font-family:inherit; }
+  .subq-head { border:0; background:transparent; width:100%; text-align:left; padding:5px 0; font-family:inherit; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible,
+  textarea:focus-visible { outline:3px solid #0d9488; outline-offset:3px; }
+  .progress-bar { position:relative; }
+  @media (max-width:640px) {
+    .wrap { padding:14px 12px 70px; }
+    header { padding:30px 15px 28px; }
+    .toolbar { gap:8px; position:relative; }
+    .search-box { min-width:100%; }
+    .filter-select { flex:1; max-width:none; }
+    .stat-pill { padding:7px 10px; }
+    .qcard { padding:14px 13px; }
+    .q-title .en { font-size:15px; overflow-wrap:anywhere; }
+    .q-actions { justify-content:flex-start; padding-left:46px; }
+    .timer-panel { right:12px; left:12px; top:12px; width:auto; max-width:360px; margin-left:auto; }
+    .save-btn { right:14px; bottom:72px; }
+    .to-top { right:14px; bottom:17px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior:auto !important; animation:none !important; transition:none !important; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>📘 ELPA 应试问题集</h1>
-  <p>HKUST(GZ) 英语水平考试 · 考试流程 + 题库大全 + 考场经验</p>
-  <span class="header-badge">🎯 本库整理了25Fall同学们的合力贡献，26Fall感恩前辈们的不断传承！</span>
+  <h1>📘 HKUST(GZ) ELPA</h1>
+  <p>口语备考题库 · 考生经验 · 模拟练习</p>
+  <span class="header-badge">非官方整理 · 感谢 25Fall 与 26Fall 同学分享</span>
+  <nav class="resource-links" aria-label="学习资源">
+    <a href="#sec-bankD">2026 Fall 题目反馈</a>
+    <a href="./question-bank/README.md">独立题库与资料来源 ↗</a>
+    <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA" target="_blank" rel="noopener noreferrer">GitHub 项目 ↗</a>
+  </nav>
 </header>
 
 <div class="wrap">
+  <aside class="source-notice" role="note">
+    本站是学生维护的<strong>非官方备考资料</strong>，包含不同年份的考生回忆、整理表达与重复主题；并非 HKUST(GZ) 公布的正式题库。题目与实际场次可能存在差异，请以学校通知为准。<a href="./question-bank/README.md">查看题目来源与分类说明</a>。
+  </aside>
 
   <!-- Toolbar -->
   <div class="toolbar">
     <div class="search-box">
       <span class="icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="搜索题目关键词…（如 AI / research / HKUST / integrity）">
+      <input type="search" id="searchInput" aria-label="搜索题目" placeholder="搜索题目关键词…（如 AI / research / HKUST / integrity）">
       <button class="search-clear" id="searchClear" title="清空搜索">✕</button>
     </div>
-    <span class="stat-pill">共 <b id="totalCount">0</b> 题</span>
-    <span class="stat-pill">已练 <b id="doneCount">0</b> 题</span>
-    <button class="save-top" id="saveTopBtn" title="保存到 elpa_data.json（Ctrl+S）">💾 保存</button>
-    <label class="auto-switch" id="autoSwitch" title="开启后修改自动保存到 elpa_data.json">
+    <label for="statusFilter" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">练习状态筛选</label>
+    <select id="statusFilter" class="filter-select" aria-label="练习状态筛选">
+      <option value="all">全部状态</option><option value="new">未练</option>
+      <option value="doing">练习中</option><option value="done">已掌握</option>
+    </select>
+    <span class="stat-pill">显示 <b id="matchCount">0</b> / <b id="totalCount">0</b> 条</span>
+    <span class="stat-pill">已掌握 <b id="doneCount">0</b> 条</span>
+    <button class="save-top" id="saveTopBtn" title="手动保存；未关联文件夹时学习记录仍自动保存在本浏览器">💾 保存</button>
+    <button class="toolbar-action" id="backupBtn" type="button" title="下载独立的 JSON 备份文件">⬇ 备份</button>
+    <button class="toolbar-action" id="restoreBtn" type="button" title="从已有 JSON 文件恢复学习记录">⬆ 恢复</button>
+    <input id="restoreInput" type="file" accept=".json,application/json" hidden aria-label="选择备份 JSON">
+    <label class="auto-switch" id="autoSwitch" title="开启时自动同步到已关联的 JSON 文件；浏览器本地学习记录始终自动保存">
       <input type="checkbox" id="autoSaveToggle" checked>
       <span class="auto-track"></span>
-      <span class="auto-label">自动保存</span>
+      <span class="auto-label">自动同步文件</span>
     </label>
     <button class="folder-btn" id="helpBtn" title="快捷键帮助（按 ? 或 Ctrl+/）">⌨️</button>
     <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）">⏱️</button>
-    <button class="folder-btn" id="folderBtn" title="重新选择默认数据文件夹（应为本 HTML 所在文件夹，仅选错时使用）">📂</button>
+    <button class="folder-btn" id="folderBtn" title="关联／更换 JSON 数据文件夹（可选）" aria-label="关联或更换 JSON 数据文件夹">📂</button>
   </div>
 
   <!-- 存储状态提示 -->
@@ -586,7 +639,7 @@
   <!-- Progress -->
   <div class="progress-card">
     <span class="label">📈 备考进度</span>
-    <div class="progress-bar"><div id="progressFill"></div></div>
+    <div class="progress-bar" role="progressbar" id="progressBar" aria-label="已掌握题目比例" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressFill"></div></div>
     <span class="pct" id="progressPct">0%</span>
     <span class="label" id="progressDetail"></span>
   </div>
@@ -629,7 +682,7 @@
 
   <!-- 题库A -->
   <section id="sec-bankA">
-    <div class="sec-head"><span class="emoji">📚</span><h2>题库一 · HKUST 正式题库</h2><span class="tag">7 题 · 带详细小问</span></div>
+    <div class="sec-head"><span class="emoji">📚</span><h2>题库一 · 往年主题题库</h2><span class="tag">7 条 · 带提示小问</span></div>
     <p class="sec-desc">有考生反馈此套题中的第 7 题（Describe a time when you attended an interview）在 2025.9.10 场次以原题出现，务必重点准备。</p>
     <div id="bankA"></div>
   </section>
@@ -643,14 +696,20 @@
 
   <!-- 题库C -->
   <section id="sec-bankC">
-    <div class="sec-head"><span class="emoji">🧠</span><h2>题库三 · 历年真题反馈</h2><span class="tag">带小问 · 含新增题</span></div>
+    <div class="sec-head"><span class="emoji">🧠</span><h2>题库三 · 考生回忆与补充主题</h2><span class="tag">汇总记录</span></div>
     <p class="sec-desc">来自 8.25 / 8.26 场次考生反馈整理的题库，含各题提示小问，其中含 AI 与语言学习等新增题；建议新旧题库都过一遍。</p>
     <div id="bankC"></div>
   </section>
 
+  <section id="sec-bankD">
+    <div class="sec-head"><span class="emoji">🎓</span><h2>题库四 · 2026 Fall 场次反馈</h2><span class="tag">12 条 · 按场次</span></div>
+    <p class="sec-desc">2026 年 8 月与 9 月初的考生回忆，含不完整题干和整理译文；与旧题库部分重叠。<a href="./question-bank/2026-fall.md">查看场次、来源与核实说明 ↗</a></p>
+    <div id="bankD"></div>
+  </section>
+
   <div class="empty" id="emptyState">😕 没有找到匹配「<span id="emptyKeyword"></span>」的题目，换个关键词试试？</div>
 
-  <footer>仅供备考参考，具体以考场现场安排为准<br>Made by 26Fall LuoXuanling, nice to meet you~ 🎓<br>共勉！祝大家ELPA一把过~<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
+  <footer>学生维护的非官方备考资源 · 原题出处和补充资料见 <a href="./question-bank/README.md">独立题库</a><br>原网页整理致谢：26Fall LuoXuanling · 感谢历届考生分享<br>具体考试要求以 HKUST(GZ) 官方通知为准<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
 </div>
 
 <button class="save-btn" id="saveBtn" title="保存进度与笔记到 elpa_data.json">💾</button>
@@ -666,7 +725,7 @@ const FAQS = [
     ]},
   { q: "有哪些新增题？", a: [
       "新增：AI 对语言学习的帮助（How can AI help language learning?）。",
-      "另一题：Describe an event or situation where you were required to speak in English as a research postgraduate（与正式题库第 3 题相同，再次出现）。"
+      "另一题：Describe an event or situation where you were required to speak in English as a research postgraduate（与往年题库第 3 题相同，再次出现）。"
     ]},
   { q: "Part 3 提问环节需要给对方提几个问题？", a: [
       "一般 1 个即可；如果大家陈述时间偏短，可能问 2–3 个。",
@@ -707,7 +766,7 @@ const FAQS = [
 
 const BANKS = {
   A: {
-    name: "题库一 · HKUST 正式题库",
+    name: "题库一 · 往年主题题库",
     items: [
       { num: 1, en: "Describe and reflect upon your experience of undergraduate study.",
         cn: "描述并反思你的本科学习经历",
@@ -830,7 +889,7 @@ const BANKS = {
     ]
   },
   C: {
-    name: "题库三 · 历年真题反馈",
+    name: "题库三 · 考生回忆与补充主题",
     items: [
       { num: 1, en: "How would you explain a technical term to the first-year undergraduate?",
         cn: "如何向大一新生解释一个专业术语",
@@ -919,9 +978,28 @@ const BANKS = {
       { num: 17, en: "How can AI help language learning?",
         cn: "AI 对语言学习的帮助（新增题）", subs: []},
       { num: 18, en: "Describe an event or situation where you were required to speak in English as a research postgraduate.",
-        cn: "新增题（与正式题库第 3 题相同，重点关注）", subs: []}
+        cn: "新增题（与往年题库第 3 题相同，重点关注）", subs: []}
     ]
   }
+};
+
+/* 2026 Fall 场次回忆：在原 A/B/C 题目 ID 后增补，保留已有进度映射 */
+BANKS.D = {
+  name: '题库四 · 2026 Fall 场次反馈',
+  items: [
+    { num:1, en:'How would you explain a term such as supply chain or fluid dynamics to undergraduates?', cn:'8.24 09:30｜向本科生解释专业术语；考生英文回忆经轻微规范化，非核实原文', subs:[] },
+    { num:2, en:'How would you guide students to use AI?', cn:'8.24 09:30｜指导学生使用 AI；考生英文回忆', subs:[] },
+    { num:3, en:'What do you think AI can do for your studies?', cn:'8.24 09:30｜AI 如何帮助学习；考生英文回忆经轻微规范化', subs:[] },
+    { num:4, en:'Explain one of your projects.', cn:'8.24 09:30｜介绍个人项目；考生英文回忆经轻微规范化', subs:[] },
+    { num:5, en:'If you were a teaching assistant and discovered that a student had used AI for an assignment where AI was not permitted, how would you respond?', cn:'8.28 16:40｜如何处理学生违规使用 AI 的情况；考生英文回忆经轻微规范化', subs:[] },
+    { num:6, en:'Introduce a term from your field of study and explain it using an analogy.', cn:'8.28 16:40｜用类比解释专业术语；考生英文回忆', subs:[] },
+    { num:7, en:'[整理译文] How would you interpret two studies that reach different conclusions on the same issue?', cn:'9 月初反馈｜同一问题的两项研究为何结论不同？仅记录中文题意，小问未记录', subs:[] },
+    { num:8, en:'[整理译文] How would you explain a difficult academic concept to undergraduates from different cultural and academic backgrounds?', cn:'9 月初反馈｜向跨文化、跨专业学生解释复杂学术概念；仅记录中文题意', subs:[] },
+    { num:9, en:'What was your first impression of HKUST(GZ) when you arrived?', cn:'9 月初校园题｜初到学校的印象；分享英文问法经轻微规范化', subs:[] },
+    { num:10, en:'How could you use the unique platform of HKUST(GZ) to achieve your personal goals?', cn:'9 月初校园题｜如何利用学校资源实现个人目标；分享英文问法经轻微规范化', subs:[] },
+    { num:11, en:'What place at HKUST(GZ) would you most like to visit or experience, and why?', cn:'9 月初校园题｜最想参观或体验的校园地点及原因；分享英文问法', subs:[] },
+    { num:12, en:'What kind of skills do you hope to develop at HKUST(GZ)?', cn:'9 月初校园题｜希望在学校提升什么技能；分享英文问法', subs:[] }
+  ]
 };
 
 /* ============ 数据持久化：同目录 JSON 文件 ============ */
@@ -1162,9 +1240,10 @@ function renderTOC() {
   const items = [
     ['sec-process', '🗓️', '考试流程速览'],
     ['sec-faq', '💬', '常见问题 FAQ'],
-    ['sec-bankA', '📚', '题库一 · HKUST 正式题库'],
+    ['sec-bankA', '📚', '题库一 · 往年主题题库'],
     ['sec-bankB', '🗂️', '题库二 · ELPA 补充题库'],
-    ['sec-bankC', '🧠', '题库三 · 历年真题反馈']
+    ['sec-bankC', '🧠', '题库三 · 考生回忆与补充主题'],
+    ['sec-bankD', '🎓', '题库四 · 2026 Fall 场次反馈']
   ];
   document.getElementById('toc').innerHTML =
     '<h2>📑 内容目录</h2><div class="toc-grid">' +
@@ -1175,16 +1254,18 @@ function renderTOC() {
 function renderFAQ() {
   document.getElementById('faqList').innerHTML = FAQS.map((f, i) => `
     <div class="faq-item" id="faq-${i}">
-      <div class="faq-q" onclick="toggleFaq(${i})">
+      <button type="button" class="faq-q" onclick="toggleFaq(${i})" aria-expanded="false" aria-controls="faq-answer-${i}">
         <span class="q-mark">Q</span>${esc(f.q)}<span class="arrow">▼</span>
-      </div>
-      <div class="faq-a">
+      </button>
+      <div class="faq-a" id="faq-answer-${i}">
         ${f.a.map(a => `<p style="margin-top:6px">${esc(a)}</p>`).join('')}
       </div>
     </div>`).join('');
 }
 function toggleFaq(i) {
-  document.getElementById('faq-' + i).classList.toggle('open');
+  const item = document.getElementById('faq-' + i);
+  const expanded = item.classList.toggle('open');
+  item.querySelector('.faq-q').setAttribute('aria-expanded', String(expanded));
 }
 
 function renderBank(bankKey) {
@@ -1213,10 +1294,10 @@ function renderBank(bankKey) {
       </div>
       ${hasSubs ? `
       <div class="subq" id="subq-${id}">
-        <div class="subq-head" onclick="toggleSub('${id}')">
+        <button type="button" class="subq-head" onclick="toggleSub('${id}')" aria-expanded="false" aria-controls="subq-list-${id}">
           <span class="arrow">▶</span>查看提示小问（${item.subs.length} 个）
-        </div>
-        <div class="subq-list"><ol>
+        </button>
+        <div class="subq-list" id="subq-list-${id}"><ol>
           ${item.subs.map((s, si) => {
             const nk = id + '-' + si;
             const saved = notes[nk] || '';
@@ -1252,7 +1333,10 @@ function renderBank(bankKey) {
 
 function toggleSub(id) {
   const el = document.getElementById('subq-' + id);
-  if (el) el.classList.toggle('open');
+  if (el) {
+    const expanded = el.classList.toggle('open');
+    el.querySelector('.subq-head').setAttribute('aria-expanded', String(expanded));
+  }
 }
 
 /* ---- 小问笔记：展开/收起 + 自动标记修改 ---- */
@@ -1399,6 +1483,7 @@ function cycleStatus(id, btn) {
   btn.className = 'status-btn active-' + next;
   btn.textContent = STATUS_LABEL[next];
   updateProgress();
+  applyFilters();
 }
 
 function copyQuestion(id) {
@@ -1453,24 +1538,32 @@ function updateProgress() {
   document.getElementById('totalCount').textContent = total;
   document.getElementById('doneCount').textContent = done;
   document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressBar').setAttribute('aria-valuenow', String(pct));
   document.getElementById('progressPct').textContent = pct + '%';
   document.getElementById('progressDetail').textContent = '未练 ' + fresh + ' · 练习中 ' + doing + ' · 已掌握 ' + done;
 }
 
-/* ============ 搜索 ============ */
+/* ============ 组合筛选（关键词 + 练习状态） ============ */
 const searchInput = document.getElementById('searchInput');
-searchInput.addEventListener('input', function() {
-  const kw = this.value.trim().toLowerCase();
-  document.getElementById('searchClear').classList.toggle('show', !!this.value);
+const statusFilter = document.getElementById('statusFilter');
+function applyFilters() {
+  const kw = searchInput.value.trim().toLowerCase();
+  const filter = statusFilter.value;
+  document.getElementById('searchClear').classList.toggle('show', !!searchInput.value);
   let visible = 0;
   document.querySelectorAll('.qcard').forEach(card => {
-    const hit = !kw || card.dataset.search.includes(kw);
+    const id = card.id.slice(2);
+    const state = statuses[id] || 'new';
+    const hit = (!kw || card.dataset.search.includes(kw)) && (filter === 'all' || state === filter);
     card.style.display = hit ? '' : 'none';
     if (hit) visible++;
   });
+  document.getElementById('matchCount').textContent = String(visible);
   document.getElementById('emptyState').style.display = visible ? 'none' : 'block';
-  document.getElementById('emptyKeyword').textContent = this.value.trim();
-});
+  document.getElementById('emptyKeyword').textContent = kw || statusFilter.options[statusFilter.selectedIndex].text;
+}
+searchInput.addEventListener('input', applyFilters);
+statusFilter.addEventListener('change', applyFilters);
 
 /* ============ 快捷键：文本编辑 + 保存 + 帮助 ============ */
 function toggleHelp() {
@@ -1763,8 +1856,12 @@ function clearDrill() {
 }
 document.getElementById('timerDrill').addEventListener('click', () => {
   const keys = [];
-  for (const bk in BANKS) for (const it of BANKS[bk].items) keys.push(qId(bk, it.num));
-  if (!keys.length) return;
+  for (const bk in BANKS) for (const it of BANKS[bk].items) {
+    const id = qId(bk, it.num);
+    const card = document.getElementById('q-' + id);
+    if (card && card.style.display !== 'none') keys.push(id);
+  }
+  if (!keys.length) { setTip('当前筛选条件下没有可抽取的题目，请调整关键词或状态。', 'err'); return; }
   const pick = keys[Math.floor(Math.random() * keys.length)];
   const card = document.getElementById('q-' + pick);
   if (!card) return;
@@ -1847,7 +1944,9 @@ function renderAll() {
   renderBank('A');
   renderBank('B');
   renderBank('C');
+  renderBank('D');
   updateProgress();
+  applyFilters();
 }
 
 /* ============ 初始化：先读取同目录 JSON，再渲染 ============ */
