@@ -5,6 +5,7 @@ on:
     paths:
       - 'index.html'
       - 'question-bank/questions.js'
+      - 'assets/hkustgz-campus.webp'
       - '.github/workflows/site-checks.yml'
   push:
     branches: [main]
@@ -53,6 +54,26 @@ jobs:
           data = Path('question-bank/questions.js').read_text(encoding='utf-8')
           assert 'BANKS.D = {' in data, '2026 Fall drills not included'
           print(f'HTML smoke checks passed ({len(collector.ids)} IDs).')
+          from base64 import b64encode
+          from struct import unpack
+          image = Path('assets/hkustgz-campus.webp').read_bytes()
+          assert image[:4] == b'RIFF' and image[8:12] == b'WEBP', 'Invalid WebP image header'
+          encoded = b64encode(image).decode('ascii')
+          anchors = ["UklGRt4lAABXRUJQVlA4INIl", "/7IQ/Tzpm+oun1NWeNDcU3Dq",
+              "FP9wXxfZ0vG9xKZJBtiKeT2W", "WdZJsUGIcSXBoZLqv9UWsBMA",
+              "58MIrg+8Tu5V2Ot85JKZoFJw", "CoIikV1a84wnYBmZXnGuz3RZ",
+              "niUSlaDGa3+BaEXwnlcR6ZeB", "GgBvpNk8pyWMzm4/Ckf4S8Ud",
+              "BDkMeTWrZPFGdJjza051nfYF", "UVLNxXbyGWO+vNR6DINTidoj",
+              "lEQ2tlK3CGDib2AnJhvgqjkI", "s8elRy9plG4Y6M3OZ5/ZzjmE",
+              "v3cuBCMdJLlYtXIEtRC7I74c", "fKXYzY0WcLXF6tFpqcO5Hg2d",
+              "csj6lb5sk9ox2KzhNV1AoFAR", "CoJd/lhroANuhAn7WJ/6rgkS",
+              "7gxrVgRkZdXGbLQhoBRSpwYb", "tQYGZ6BRsSoP5eBZpMZhwp4w",
+              "F6bslL4P3VcsRUmCcpJeb7wd", "o1010tJhnZmON2lCPklx/zo1",
+              "ZNDdznmUJHA99C+N63gzi4MK", "2xytuZRkcF8XKrjkdwgUAq0d",
+              "QLOT2QotAnrJk5ry6Q6HGEpp", "sitIOgEvzqBS/0JG8LcXjVYo",
+              "a7MbnvFKX/cJ4vZNQ1obmKyH", "KElkUerNYebR4RWWuGsjUyZZ"]
+          print('Asset diagnostics:', len(image), len(encoded), [encoded.find(t) for t in anchors])
+          assert len(image) == unpack('<I', image[4:8])[0] + 8, 'Truncated image data'
           PY
       - name: Check JavaScript syntax
         run: |
