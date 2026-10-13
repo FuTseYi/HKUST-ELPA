@@ -222,7 +222,7 @@
   .subq-list li .subq-cn { display: block; font-size: 12px; color: var(--cn-soft); margin-top: 1px; }
 
   /* ===== Empty state ===== */
-  .empty { display: none; text-align: center; padding: 40px 20px; color: var(--ink-soft); }
+  .empty { display: none; flex-basis: 100%; text-align: center; padding: 10px 14px; color: var(--ink-soft); background: #fff; border: 1px solid var(--line); border-radius: 12px; }
 
   /* ===== Footer ===== */
   footer { text-align: center; color: var(--ink-soft); font-size: 12.5px; padding: 30px 0 10px; }
@@ -242,10 +242,11 @@
     background: var(--accent); color: #fff; border: none; cursor: pointer;
     box-shadow: var(--shadow); font-size: 18px; line-height: 1;
     transition: transform .2s, background .25s, box-shadow .25s;
+    opacity: 0; pointer-events: none;
   }
   .save-btn:hover { transform: scale(1.08); }
   .save-btn:active { transform: scale(.9); }
-  .save-btn.dirty { background: var(--warn); animation: savePulse 1.6s infinite; }
+  .save-btn.dirty { opacity: 1; pointer-events: auto; background: var(--warn); animation: savePulse 1.6s infinite; }
   .save-btn.saved { background: var(--green); }
   @keyframes savePulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,.45); }
@@ -407,7 +408,7 @@
 
   /* ===== 计时器面板（贴近顶栏浮出） ===== */
   .timer-panel {
-    position: fixed; right: 22px; top: 66px; z-index: 70;
+    position: fixed; right: 22px; top: 84px; z-index: 110;
     width: 264px; background: #fff; border-radius: 16px;
     box-shadow: 0 20px 60px rgba(15,23,42,.28); padding: 14px 16px 16px;
     display: none;
@@ -530,12 +531,19 @@
     .qcard { padding:14px 13px; }
     .q-title .en { font-size:15px; overflow-wrap:anywhere; }
     .q-actions { justify-content:flex-start; padding-left:46px; }
-    .timer-panel { right:12px; left:12px; top:12px; width:auto; max-width:360px; margin-left:auto; }
+    .timer-panel { right:12px; left:12px; top:108px; width:auto; max-width:360px; margin-left:auto; }
     .save-btn { right:14px; bottom:72px; }
     .to-top { right:14px; bottom:17px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior:auto !important; animation:none !important; transition:none !important; }
+  }
+  @media (min-width:981px) {
+    html { scroll-padding-top:200px; }
+    .toolbar { top:73px; }
+  }
+  @media (min-width:641px) and (max-width:980px) {
+    .toolbar { position:relative; }
   }
 
   /* ===== HKUST-inspired campus hero ===== */
@@ -671,6 +679,7 @@
       <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）" aria-label="打开或关闭练习计时器">⏱️</button>
       <button class="folder-btn" id="folderBtn" title="关联／更换 JSON 数据文件夹（可选）" aria-label="关联或更换 JSON 数据文件夹">📂</button>
     </span>
+    <div class="empty" id="emptyState" role="status">😕 没有找到匹配「<span id="emptyKeyword"></span>」的题目，换个关键词试试？</div>
   </div>
 
   <!-- 存储状态提示 -->
@@ -686,7 +695,7 @@
         <div class="help-col">
           <h4>🌐 全局</h4>
           <table>
-            <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>保存到 elpa_data.json</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>保存到浏览器；已关联文件夹时同步 JSON</td></tr>
             <tr><td><kbd>?</kbd> / <kbd>Ctrl</kbd>+<kbd>/</kbd></td><td>显示 / 隐藏本帮助</td></tr>
           </table>
           <h4>📝 笔记框内（聚焦笔记框时）</h4>
@@ -756,8 +765,6 @@
     <div id="bankD"></div>
     <nav class="bank-pagination" id="pagerFall" aria-label="2026 Fall 新题库分页"></nav>
   </section>
-
-    <div class="empty" id="emptyState">😕 没有找到匹配「<span id="emptyKeyword"></span>」的题目，换个关键词试试？</div>
 
   <footer>学生维护的非官方备考资源 · 原题出处和补充资料见 <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">独立题库</a><br>感谢历届同学分享题目与备考经验<br>具体考试要求以 HKUST(GZ) 官方通知为准<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
 </div>
@@ -1041,24 +1048,18 @@ async function connectDirectory() {
 async function handleSave() {
   setSaving(true);
   try {
-    if (!dirHandle && fsSupported) {
-      const linked = await connectDirectory();
-      if (!linked) { setTip('浏览器学习记录已保留，未连接新的 JSON 文件夹。', 'ok'); return; }
+    const savedRevision = revision;
+    await writeData();
+    if (savedRevision === revision) {
+      dirty = false;
+      updateSaveBtn();
     } else {
-      const savedRevision = revision;
-      await writeData();
-      if (savedRevision === revision) {
-        dirty = false;
-        updateSaveBtn();
-      } else {
-        scheduleFileSync();
-      }
-      setTip('✅ 已保存' + (dirHandle ? '至浏览器并同步 ' + DATA_FILE : '到浏览器本地'), 'ok');
+      scheduleFileSync();
     }
+    setTip('✅ 已保存' + (dirHandle ? '至浏览器并同步 ' + DATA_FILE : '到浏览器本地'), 'ok');
     flashSaveBtn();
   } catch (e) {
-    if (e.name === 'AbortError') setTip('已取消选择文件夹；浏览器中的学习记录不受影响。', 'ok');
-    else setTip('⚠️ 文件保存失败：' + e.message + '；浏览器本地记录仍然保留。', 'err');
+    setTip('⚠️ 文件保存失败：' + e.message + '；请确认浏览器本地记录或使用 JSON 备份。', 'err');
   } finally {
     setSaving(false);
   }
@@ -1599,13 +1600,17 @@ document.addEventListener('keydown', e => {
     handleSave();
     return;
   }
+  if (mod && !e.shiftKey && !e.altKey && e.key === '/') {
+    e.preventDefault();
+    toggleHelp();
+    return;
+  }
   // '?'：显示帮助（输入框外）
   if (e.key === '?' && !e.ctrlKey && !e.altKey && !isTa && !(e.target && e.target.tagName === 'INPUT')) {
     toggleHelp();
     return;
   }
   if (!isTa) return; // 以下快捷键仅在笔记框内生效
-  if (mod && !e.shiftKey && e.key === '/') { e.preventDefault(); toggleHelp(); return; }
   if (e.key === 'Tab') { e.preventDefault(); applyIndent(e.target, e.shiftKey); return; }
   if (mod && !e.shiftKey && !e.altKey && (e.key === 'b' || e.key === 'B')) { e.preventDefault(); wrapSelection(e.target, '**', '**'); return; }
   if (mod && !e.shiftKey && !e.altKey && (e.key === 'i' || e.key === 'I')) { e.preventDefault(); wrapSelection(e.target, '*', '*'); return; }
