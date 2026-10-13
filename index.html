@@ -539,14 +539,14 @@
   <span class="header-badge">非官方整理 · 感谢 25Fall 与 26Fall 同学分享</span>
   <nav class="resource-links" aria-label="学习资源">
     <a href="#sec-bankD">2026 Fall 题目反馈</a>
-    <a href="./question-bank/README.md">独立题库与资料来源 ↗</a>
+    <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">独立题库与资料来源 ↗</a>
     <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA" target="_blank" rel="noopener noreferrer">GitHub 项目 ↗</a>
   </nav>
 </header>
 
 <div class="wrap">
   <aside class="source-notice" role="note">
-    本站是学生维护的<strong>非官方备考资料</strong>，包含不同年份的考生回忆、整理表达与重复主题；并非 HKUST(GZ) 公布的正式题库。题目与实际场次可能存在差异，请以学校通知为准。<a href="./question-bank/README.md">查看题目来源与分类说明</a>。
+    本站是学生维护的<strong>非官方备考资料</strong>，包含不同年份的考生回忆、整理表达与重复主题；并非 HKUST(GZ) 公布的正式题库。题目与实际场次可能存在差异，请以学校通知为准。<a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">查看题目来源与分类说明</a>。
   </aside>
 
   <!-- Toolbar -->
@@ -572,8 +572,8 @@
       <span class="auto-track"></span>
       <span class="auto-label">同步文件</span>
     </label>
-    <button class="folder-btn" id="helpBtn" title="快捷键帮助（按 ? 或 Ctrl+/）">⌨️</button>
-    <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）">⏱️</button>
+    <button class="folder-btn" id="helpBtn" title="快捷键帮助（按 ? 或 Ctrl+/）" aria-label="查看快捷键帮助">⌨️</button>
+    <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）" aria-label="打开或关闭练习计时器">⏱️</button>
     <button class="folder-btn" id="folderBtn" title="关联／更换 JSON 数据文件夹（可选）" aria-label="关联或更换 JSON 数据文件夹">📂</button>
   </div>
 
@@ -703,17 +703,17 @@
 
   <section id="sec-bankD">
     <div class="sec-head"><span class="emoji">🎓</span><h2>题库四 · 2026 Fall 场次反馈</h2><span class="tag">12 条 · 按场次</span></div>
-    <p class="sec-desc">2026 年 8 月与 9 月初的考生回忆，含不完整题干和整理译文；与旧题库部分重叠。<a href="./question-bank/2026-fall.md">查看场次、来源与核实说明 ↗</a></p>
+    <p class="sec-desc">2026 年 8 月与 9 月初的考生回忆，含不完整题干和整理译文；与旧题库部分重叠。<a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/blob/main/question-bank/2026-fall.md">查看场次、来源与核实说明 ↗</a></p>
     <div id="bankD"></div>
   </section>
 
   <div class="empty" id="emptyState">😕 没有找到匹配「<span id="emptyKeyword"></span>」的题目，换个关键词试试？</div>
 
-  <footer>学生维护的非官方备考资源 · 原题出处和补充资料见 <a href="./question-bank/README.md">独立题库</a><br>原网页整理致谢：26Fall LuoXuanling · 感谢历届考生分享<br>具体考试要求以 HKUST(GZ) 官方通知为准<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
+  <footer>学生维护的非官方备考资源 · 原题出处和补充资料见 <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">独立题库</a><br>原网页整理致谢：26Fall LuoXuanling · 感谢历届考生分享<br>具体考试要求以 HKUST(GZ) 官方通知为准<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
 </div>
 
-<button class="save-btn" id="saveBtn" title="保存进度与笔记到 elpa_data.json">💾</button>
-<button class="to-top" id="toTop" title="回到顶部">↑</button>
+<button class="save-btn" id="saveBtn" title="保存进度与笔记（可选关联 JSON 文件夹）" aria-label="保存学习进度与笔记">💾</button>
+<button class="to-top" id="toTop" title="回到顶部" aria-label="返回页面顶部">↑</button>
 
 <script>
 /* ============ 数据 ============ */
@@ -1135,8 +1135,9 @@ async function writeData() {
   if (!persistBrowser(data)) throw new Error('浏览器存储失败');
   if (fsSupported && dirHandle) {
     const content = JSON.stringify(data, null, 2);
+    const selectedDir = dirHandle;
     const task = async () => {
-      const fh = await dirHandle.getFileHandle(DATA_FILE, { create: true });
+      const fh = await selectedDir.getFileHandle(DATA_FILE, { create: true });
       const w = await fh.createWritable();
       try { await w.write(content); await w.close(); }
       catch (e) { try { await w.abort(); } catch (_) {} throw e; }
@@ -1355,6 +1356,9 @@ function qId(bank, num) { return bank + '-' + num; }
 function esc(s) {
   return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+function escAttr(s) {
+  return esc(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 function renderTOC() {
   const items = [
@@ -1400,7 +1404,7 @@ function renderBank(bankKey) {
     const qnoteSaved = notes[qnoteKey] || '';
     const searchText = (item.en + ' ' + (item.cn||'') + ' ' + (item.subs||[]).map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
     return `
-    <div class="qcard status-${st}" id="q-${id}" data-search="${esc(searchText)}">
+    <div class="qcard status-${st}" id="q-${id}" data-search="${escAttr(searchText)}">
       <div class="q-top">
         <div class="q-num">${esc(String(item.num))}</div>
         <div class="q-title">
@@ -1428,7 +1432,7 @@ function renderBank(bankKey) {
               <div class="note-wrap" id="nw-${nk}">
                 <div class="note-toolbar">
                   <button class="note-toggle" onclick="toggleNote('${nk}')" title="记录灵感/答案（保存到 elpa_data.json）">📝 记笔记</button>
-                  <button class="md-tab active" id="mdt-prev-${nk}" onclick="togglePreview('${nk}')" title="显示/隐藏 Markdown 预览">👁 预览</button>
+                  <button class="md-tab" aria-pressed="false" id="mdt-prev-${nk}" onclick="togglePreview('${nk}')" title="显示/隐藏 Markdown 预览">👁 预览</button>
                 </div>
                 <textarea class="note-area" id="note-${nk}" rows="1" placeholder="写下你的灵感或答案…支持 Markdown（**加粗**、*斜体*、行内 code、# 标题、- 列表、| 表格 |），高度自动适配，下方实时预览" oninput="saveNote('${nk}', this.value); autoResize(this)">${esc(saved)}</textarea>
                 <div class="md-preview" id="mdp-${nk}"></div>
@@ -1548,8 +1552,14 @@ function renderMarkdown(src) {
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   // 删除线
   html = html.replace(/~~([^~\n]+)~~/g, '<del>$1</del>');
-  // 链接
-  html = html.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  // 仅允许 http(s) 链接；URL 必须编码为安全的 HTML 属性值
+  html = html.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/gi, (match, label, href) => {
+    try {
+      const url = new URL(href.replace(/&amp;/g, '&'));
+      if (!['https:', 'http:'].includes(url.protocol)) return label;
+      return '<a href="' + escAttr(url.href) + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
+    } catch (e) { return label; }
+  });
   // 斜体（边界含中英文标点）
   html = html.replace(/(^|[\s(（【\[「『])\*([^*\n]+)\*(?=[\s)）】」』\].:：;；,，!！?？、]|$)/g, '$1<em>$2</em>');
   // 保护块级元素（避免被 <p> 包裹）
@@ -1567,6 +1577,19 @@ function renderMarkdown(src) {
   html = html.replace(/\x00U(\d+)\x00/g, (m, i) =>
     '<u>' + String(uls[+i] || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</u>');
   return html;
+}
+
+/* ---- 提示小问笔记：预览开关（修复原页面未定义的 togglePreview） ---- */
+function togglePreview(nk) {
+  const ta = document.getElementById('note-' + nk);
+  const pv = document.getElementById('mdp-' + nk);
+  const btn = document.getElementById('mdt-prev-' + nk);
+  if (!ta || !pv || !btn) return;
+  const show = !pv.classList.contains('show');
+  if (show) pv.innerHTML = renderMarkdown(ta.value);
+  pv.classList.toggle('show', show);
+  btn.classList.toggle('active', show);
+  btn.setAttribute('aria-pressed', String(show));
 }
 
 /* ---- 笔记编辑/预览模式切换 ---- */
