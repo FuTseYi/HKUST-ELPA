@@ -4,23 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HKUST(GZ) ELPA｜口语备考题库与模拟练习</title>
+<link rel="preload" as="image" href="./assets/hkustgz-campus.webp">
 <meta name="description" content="非官方 HKUST(GZ) ELPA 口语备考资源：历年题目、2026 Fall 考生反馈、关键词检索、模拟计时与本地学习笔记。">
 <meta name="theme-color" content="#1e3a8a">
 <style>
   :root {
-    --bg: #f4f6fa;
+    --bg: #f5f8fc;
     --card: #ffffff;
-    --ink: #111827;
-    --ink-soft: #6b7280;
-    --cn-soft: #9ca3af;
-    --line: #e5e7eb;
-    --brand: #2563eb;
-    --brand-soft: #eff6ff;
-    --accent: #0d9488;
-    --warn: #d97706;
-    --green: #16a34a;
-    --radius: 14px;
-    --shadow: 0 1px 3px rgba(15, 23, 42, .06), 0 8px 24px -12px rgba(15, 23, 42, .12);
+    --ink: #172940;
+    --ink-soft: #5d6b7c;
+    --cn-soft: #798b9e;
+    --line: #dbe5f0;
+    --brand: #003e74;
+    --brand-2: #1763a3;
+    --brand-soft: #eaf2fa;
+    --accent: #ad740b;
+    --gold: #f2be48;
+    --gold-soft: #fff6df;
+    --warn: #b8750c;
+    --green: #167853;
+    --radius: 16px;
+    --shadow: 0 6px 20px rgba(10, 36, 68, .06), 0 18px 42px -20px rgba(10, 36, 68, .17);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -529,25 +533,135 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior:auto !important; animation:none !important; transition:none !important; }
   }
+
+  /* ===== HKUST-inspired campus hero ===== */
+  .campus-hero {
+    position: relative;
+    isolation: isolate;
+    min-height: 392px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 62px clamp(22px, 5vw, 72px) 58px;
+    background: linear-gradient(90deg, rgba(0,33,63,.89) 0%, rgba(0,48,91,.75) 33%, rgba(0,47,88,.31) 72%, rgba(0,47,88,.17) 100%), url('./assets/hkustgz-campus.webp') center 55% / cover no-repeat;
+    text-align: left;
+  }
+  .campus-hero::after {
+    position: absolute;
+    inset: auto 0 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--gold) 0 18%, #f8d67d 18% 24%, transparent 24%);
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; z-index: 1; width: min(100%, 1140px); margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-block; margin-bottom: 18px;
+    border: 1px solid rgba(255,255,255,.48); padding: 7px 13px;
+    border-radius: 999px; background: rgba(0,45,87,.31);
+    color: #fff; font-size: 12px; font-weight: 650; letter-spacing: .065em;
+  }
+  .campus-hero h1 { margin: 0; font-size: clamp(34px, 4.5vw, 54px); line-height: 1.12; font-weight: 800; letter-spacing: -.025em; }
+  .hero-highlight { color: #f8d176; }
+  .campus-hero .hero-lead { max-width: 690px; margin-top: 19px; font-size: clamp(17px, 2.1vw, 21px); font-weight: 600; opacity: 1; }
+  .campus-hero .hero-description { max-width: 720px; margin-top: 12px; font-size: 13.5px; line-height: 1.7; opacity: .9; }
+  .hero-actions { display: flex; gap: 11px; align-items: center; flex-wrap: wrap; margin-top: 28px; }
+  .hero-action {
+    display: inline-flex; align-items: center; gap: 9px; min-height: 43px;
+    border: 1px solid transparent; border-radius: 999px; padding: 11px 19px;
+    font-weight: 700; font-size: 13.5px; text-decoration: none;
+    transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+  .hero-action:hover { transform: translateY(-2px); }
+  .hero-primary { color: #19314b; background: #f8c95c; box-shadow: 0 8px 20px rgba(9,22,43,.16); }
+  .hero-primary:hover { background: #ffd77a; }
+  .hero-secondary { color: #fff; border-color: rgba(255,255,255,.52); background: rgba(255,255,255,.12); }
+  .hero-secondary:hover { background: rgba(255,255,255,.2); }
+  .hero-text-link { color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; margin-left: 7px; border-bottom: 1px solid rgba(255,255,255,.5); }
+  .hero-text-link:hover { color: #ffdc86; }
+  .hero-caption { position: absolute; z-index: 1; right: 25px; bottom: 20px; font-size: 11px; color: rgba(255,255,255,.85); letter-spacing: .06em; }
+  /* ===== Easy-access feature tiles ===== */
+  .quick-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 25px; }
+  .quick-tile { display: flex; align-items: center; gap: 12px; padding: 17px 14px; min-width: 0; min-height: 92px; text-align: left;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+    color: var(--ink); text-decoration: none; transition: border-color .18s, transform .18s, box-shadow .18s; }
+  .quick-tile:hover { transform: translateY(-2px); border-color: #99b9db; box-shadow: 0 12px 32px rgba(0,48,91,.1); }
+  .quick-tile-button { font: inherit; width: 100%; cursor: pointer; }
+  .quick-symbol { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; background: var(--brand-soft); font-size: 20px; }
+  .quick-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .quick-copy strong { font-size: 14px; color: var(--brand); font-weight: 750; }
+  .quick-copy small { font-size: 11.5px; color: var(--ink-soft); line-height: 1.55; }
+  .quick-arrow { margin-left: auto; font-size: 15px; color: var(--accent); align-self: flex-start; }
+  .toolbar { border: 1px solid var(--line); border-radius: 16px; padding: 12px; box-shadow: 0 4px 20px rgba(0,48,91,.06); background: rgba(255,255,255,.95); }
+  .sec-head h2 { color: var(--brand); }
+  .sec-head .tag { background: var(--gold-soft); color: #815411; border: 1px solid #f2dc9b; }
+  .q-num { background: var(--brand-soft); color: var(--brand); }
+  .progress-bar > div { background: linear-gradient(90deg, var(--brand), #3d81b9); }
+  .qcard:hover { box-shadow: 0 8px 28px rgba(0,48,91,.1); }
+  @media (max-width: 980px) { .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) {
+    .campus-hero { min-height: 320px; padding: 43px 20px 48px;
+      background: linear-gradient(90deg, rgba(0,33,63,.85) 0%, rgba(0,48,91,.58) 80%, rgba(0,48,91,.43) 100%), url('./assets/hkustgz-campus.webp') 55% center / cover no-repeat; }
+    .campus-hero h1 { font-size: clamp(29px, 7vw, 37px); }
+    .hero-eyebrow { font-size: 10px; margin-bottom: 13px; }
+    .campus-hero .hero-description { font-size: 12px; }
+    .hero-actions { margin-top: 22px; gap: 9px; }
+    .hero-action { min-height: 42px; padding: 10px 13px; }
+    .hero-text-link { margin-left: 2px; }
+    .hero-caption { right: 16px; bottom: 11px; font-size: 9px; }
+    .quick-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+    .quick-tile { gap: 8px; padding: 12px 10px; align-items: flex-start; min-height: 104px; }
+    .quick-symbol { width: 32px; height: 32px; font-size: 17px; }
+    .quick-copy strong { font-size: 12px; }
+    .quick-copy small { font-size: 10.5px; }
+    .quick-arrow { display: none; }
+  }
+  @media (max-width: 360px) { .quick-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>📘 HKUST(GZ) ELPA</h1>
-  <p>口语备考题库 · 考生经验 · 模拟练习</p>
-  <span class="header-badge">非官方整理 · 感谢 25Fall 与 26Fall 同学分享</span>
-  <nav class="resource-links" aria-label="学习资源">
-    <a href="#sec-bankD">2026 Fall 题目反馈</a>
-    <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">独立题库与资料来源 ↗</a>
-    <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA" target="_blank" rel="noopener noreferrer">GitHub 项目 ↗</a>
-  </nav>
+<header class="campus-hero">
+  <div class="hero-inner">
+    <span class="hero-eyebrow">HKUST(GZ) · English Language Proficiency Assessment</span>
+    <h1>ELPA <span class="hero-highlight">Speaking Practice</span></h1>
+    <p class="hero-lead">从历年题目到模拟练习，让每一次准备都更有方向。</p>
+    <p class="hero-description">非官方口语备考资源 · 考生回忆题库 · 2026 Fall 场次反馈 · 学习记录</p>
+    <nav class="hero-actions" aria-label="开始学习">
+      <a class="hero-action hero-primary" href="#sec-bankD">查看 2026 Fall 题目 <span aria-hidden="true">↗</span></a>
+      <a class="hero-action hero-secondary" href="#sec-bankA">开始练习 <span aria-hidden="true">↓</span></a>
+      <a class="hero-text-link" href="https://github.com/FuTseYi/HKUST-GZ-ELPA" target="_blank" rel="noopener noreferrer">GitHub 项目 <span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+  <div class="hero-caption">Student-maintained · Unofficial resource</div>
 </header>
 
 <div class="wrap">
   <aside class="source-notice" role="note">
     本站是学生维护的<strong>非官方备考资料</strong>，包含不同年份的考生回忆、整理表达与重复主题；并非 HKUST(GZ) 公布的正式题库。题目与实际场次可能存在差异，请以学校通知为准。<a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">查看题目来源与分类说明</a>。
   </aside>
+
+  <nav class="quick-grid" aria-label="常用功能">
+    <a class="quick-tile" href="#sec-bankA">
+      <span class="quick-symbol" aria-hidden="true">📚</span>
+      <span class="quick-copy"><strong>往年主题题库</strong><small>基础话题与提示小问</small></span>
+      <span class="quick-arrow" aria-hidden="true">↗</span>
+    </a>
+    <a class="quick-tile" href="#sec-bankD">
+      <span class="quick-symbol" aria-hidden="true">🎓</span>
+      <span class="quick-copy"><strong>2026 Fall 反馈</strong><small>最新收集的场次回忆</small></span>
+      <span class="quick-arrow" aria-hidden="true">↗</span>
+    </a>
+    <a class="quick-tile" href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank" target="_blank" rel="noopener noreferrer">
+      <span class="quick-symbol" aria-hidden="true">🗂️</span>
+      <span class="quick-copy"><strong>独立题库</strong><small>查看来源与长期维护资料</small></span>
+      <span class="quick-arrow" aria-hidden="true">↗</span>
+    </a>
+    <button class="quick-tile quick-tile-button" type="button" id="quickBackup">
+      <span class="quick-symbol" aria-hidden="true">💾</span>
+      <span class="quick-copy"><strong>备份学习记录</strong><small>下载个人进度与笔记 JSON</small></span>
+      <span class="quick-arrow" aria-hidden="true">↗</span>
+    </button>
+  </nav>
 
   <!-- Toolbar -->
   <div class="toolbar">
@@ -1795,6 +1909,8 @@ document.getElementById('timerDrill').addEventListener('click', () => {
   startTimer();
   setTip('🎲 随机抽到：' + pick + ' —— 先 60 秒准备，随后自动开始 2 分钟陈述！', 'ok');
 });
+
+document.getElementById('quickBackup').addEventListener('click', () => document.getElementById('backupBtn').click());
 
 /* ============ 导出全部笔记（Markdown 下载） ============ */
 document.getElementById('exportBtn').addEventListener('click', () => {
