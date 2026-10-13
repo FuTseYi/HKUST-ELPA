@@ -70,6 +70,8 @@
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     border-bottom: 1px solid var(--line);
   }
+  .toolbar .search-box { flex: 1 0 100%; }
+  .toolbar-icons { display: inline-flex; align-items: center; gap: 12px; margin-left: auto; }
   .search-box {
     flex: 1; min-width: 220px; position: relative;
   }
@@ -521,6 +523,7 @@
     .wrap { padding:14px 12px 70px; }
     header { padding:30px 15px 28px; }
     .toolbar { gap:8px; position:relative; }
+    .toolbar-icons { gap:8px; margin-left:0; }
     .search-box { min-width:100%; }
     .filter-select { flex:1; max-width:none; }
     .stat-pill { padding:7px 10px; }
@@ -663,9 +666,11 @@
       <span class="auto-track"></span>
       <span class="auto-label">同步文件</span>
     </label>
-    <button class="folder-btn" id="helpBtn" title="快捷键帮助（按 ? 或 Ctrl+/）" aria-label="查看快捷键帮助">⌨️</button>
-    <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）" aria-label="打开或关闭练习计时器">⏱️</button>
-    <button class="folder-btn" id="folderBtn" title="关联／更换 JSON 数据文件夹（可选）" aria-label="关联或更换 JSON 数据文件夹">📂</button>
+    <span class="toolbar-icons">
+      <button class="folder-btn" id="helpBtn" title="快捷键帮助（按 ? 或 Ctrl+/）" aria-label="查看快捷键帮助">⌨️</button>
+      <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）" aria-label="打开或关闭练习计时器">⏱️</button>
+      <button class="folder-btn" id="folderBtn" title="关联／更换 JSON 数据文件夹（可选）" aria-label="关联或更换 JSON 数据文件夹">📂</button>
+    </span>
   </div>
 
   <!-- 存储状态提示 -->
@@ -1894,6 +1899,10 @@ function renderAll() {
   renderTOC();
   await initStorage();
   renderAll();
+  if (location.hash) {
+    const target = document.getElementById(location.hash.slice(1));
+    if (target) requestAnimationFrame(() => target.scrollIntoView({ behavior: 'instant', block: 'start' }));
+  }
 })();
 </script>
 </body>

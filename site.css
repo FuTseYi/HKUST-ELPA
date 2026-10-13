@@ -85,6 +85,7 @@ body { margin:0; }
 .elpa-nav a:focus-visible,.bank-pagination button:focus-visible,.elpa-body a:focus-visible,.elpa-guide-faq summary:focus-visible {outline:3px solid #e5a921;outline-offset:3px;}
 @media(max-width:900px){.elpa-feature-grid {grid-template-columns:repeat(2,minmax(0,1fr));} .elpa-nav-inner {gap:15px;padding:0 15px;}}
 @media(max-width:650px){
+ html {scroll-padding-top:112px;}
  .elpa-nav-inner {min-height:62px; flex-wrap:wrap; align-items:center; justify-content:space-between; padding:10px 13px 0; row-gap:6px;}
  .elpa-brand {font-size:12px;}
  .elpa-brand small {font-size:9px;}
