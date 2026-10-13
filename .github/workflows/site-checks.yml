@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'index.html'
+      - 'question-bank/questions.js'
       - '.github/workflows/site-checks.yml'
   push:
     branches: [main]
     paths:
       - 'index.html'
+      - 'question-bank/questions.js'
       - '.github/workflows/site-checks.yml'
 
 permissions:
@@ -47,8 +49,12 @@ jobs:
               assert key in collector.ids, f'Missing required DOM ID: {key}'
           assert len(collector.ids) == len(set(collector.ids)), 'Duplicate DOM IDs'
           assert 'HKUST 正式题库' not in html, 'Unverified official question-bank claim'
-          assert 'BANKS.D = {' in html, '2026 Fall drills not included'
+          assert 'src="./question-bank/questions.js"' in html, 'Missing question data source'
+          data = Path('question-bank/questions.js').read_text(encoding='utf-8')
+          assert 'BANKS.D = {' in data, '2026 Fall drills not included'
           print(f'HTML smoke checks passed ({len(collector.ids)} IDs).')
           PY
       - name: Check JavaScript syntax
-        run: node --check /tmp/elpa-app.js
+        run: |
+          node --check /tmp/elpa-app.js
+          node --check question-bank/questions.js
