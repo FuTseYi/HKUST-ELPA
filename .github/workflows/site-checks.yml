@@ -45,14 +45,18 @@ jobs:
           collector = IdCollector()
           collector.feed(html)
           for key in ['searchInput', 'statusFilter', 'matchCount', 'backupBtn',
-                      'restoreBtn', 'restoreInput', 'bankA', 'bankB', 'bankC',
-                      'bankD', 'progressBar', 'saveBtn', 'saveTopBtn']:
+                      'restoreBtn', 'restoreInput', 'bankPast', 'bankD',
+                      'progressBar', 'saveBtn', 'saveTopBtn']:
               assert key in collector.ids, f'Missing required DOM ID: {key}'
           assert len(collector.ids) == len(set(collector.ids)), 'Duplicate DOM IDs'
           assert 'HKUST 正式题库' not in html, 'Unverified official question-bank claim'
           assert 'src="./question-bank/questions.js"' in html, 'Missing question data source'
           data = Path('question-bank/questions.js').read_text(encoding='utf-8')
           assert 'BANKS.D = {' in data, '2026 Fall drills not included'
+          assert 'PAST_QUESTION_IDS' in data, 'Merged past question index missing'
+          assert 'LEGACY_QUESTION_ALIASES' in data, 'Legacy note mapping missing'
+          assert 'sec-bankB' not in html and 'sec-bankC' not in html, 'Old section still visible'
+          assert html.count('<section id="sec-bank') == 2, 'Expected two banks'
           print(f'HTML smoke checks passed ({len(collector.ids)} IDs).')
           image = Path('assets/Administration-Building-14-1536x864.jpg').read_bytes()
           assert image[:3] == b'\xff\xd8\xff', 'Invalid JPEG signature'

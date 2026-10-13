@@ -175,6 +175,7 @@
   .qcard.status-new { border-left-color: var(--line); }
   .qcard.status-doing { border-left-color: var(--warn); }
   .qcard.status-done { border-left-color: var(--green); }
+  .recall-mark { display:inline-block; padding:2px 8px; margin-top:6px; border-radius:999px; background:#fff6df; color:#876015; border:1px solid #f0d9a0; font-size:11px; font-weight:600; }
   .qcard .q-top { display: flex; align-items: flex-start; gap: 12px; }
   .q-num {
     flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px;
@@ -625,9 +626,9 @@
     <span class="hero-eyebrow">HKUST(GZ) · English Language Proficiency Assessment</span>
     <h1>ELPA <span class="hero-highlight">Speaking Practice</span></h1>
     <p class="hero-lead">从历年题目到模拟练习，让每一次准备都更有方向。</p>
-    <p class="hero-description">非官方口语备考资源 · 考生回忆题库 · 2026 Fall 场次反馈 · 学习记录</p>
+    <p class="hero-description">非官方口语备考资源 · 往年题库 · 2026 Fall 新题库 · 模拟练习</p>
     <nav class="hero-actions" aria-label="开始学习">
-      <a class="hero-action hero-primary" href="#sec-bankD">查看 2026 Fall 题目 <span aria-hidden="true">↗</span></a>
+      <a class="hero-action hero-primary" href="#sec-bankD">2026 Fall 新题库 <span aria-hidden="true">↗</span></a>
       <a class="hero-action hero-secondary" href="#sec-bankA">开始练习 <span aria-hidden="true">↓</span></a>
       <a class="hero-text-link" href="https://github.com/FuTseYi/HKUST-GZ-ELPA" target="_blank" rel="noopener noreferrer">GitHub 项目 <span aria-hidden="true">↗</span></a>
     </nav>
@@ -637,18 +638,18 @@
 
 <div class="wrap">
   <aside class="source-notice" role="note">
-    本站是学生维护的<strong>非官方备考资料</strong>，包含不同年份的考生回忆、整理表达与重复主题；并非 HKUST(GZ) 公布的正式题库。题目与实际场次可能存在差异，请以学校通知为准。<a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">查看题目来源与分类说明</a>。
+    本站为学生维护的<strong>非官方备考资料</strong>。题库可以直接用于模拟练习；少数回忆不完整的题目会单独标注。考试信息以学校当期通知为准。<a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">查看题目来源与分类说明</a>。
   </aside>
 
   <nav class="quick-grid" aria-label="常用功能">
     <a class="quick-tile" href="#sec-bankA">
       <span class="quick-symbol" aria-hidden="true">📚</span>
-      <span class="quick-copy"><strong>往年主题题库</strong><small>基础话题与提示小问</small></span>
+      <span class="quick-copy"><strong>往年题库</strong><small>去重整理，可直接练习</small></span>
       <span class="quick-arrow" aria-hidden="true">↗</span>
     </a>
     <a class="quick-tile" href="#sec-bankD">
       <span class="quick-symbol" aria-hidden="true">🎓</span>
-      <span class="quick-copy"><strong>2026 Fall 反馈</strong><small>最新收集的场次回忆</small></span>
+      <span class="quick-copy"><strong>2026 Fall 新题库</strong><small>本年度新增题目</small></span>
       <span class="quick-arrow" aria-hidden="true">↗</span>
     </a>
     <a class="quick-tile" href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank" target="_blank" rel="noopener noreferrer">
@@ -794,34 +795,19 @@
     <div class="faq" id="faqList"></div>
   </section>
 
-  <!-- 题库A -->
   <section id="sec-bankA">
-    <div class="sec-head"><span class="emoji">📚</span><h2>题库一 · 往年主题题库</h2><span class="tag">7 条 · 带提示小问</span></div>
-    <p class="sec-desc">有考生反馈此套题中的第 7 题（Describe a time when you attended an interview）在 2025.9.10 场次以原题出现，务必重点准备。</p>
-    <div id="bankA"></div>
-  </section>
-
-  <!-- 题库B -->
-  <section id="sec-bankB">
-    <div class="sec-head"><span class="emoji">🗂️</span><h2>题库二 · ELPA 补充题库</h2><span class="tag">13 题</span></div>
-    <p class="sec-desc">来源标注为「ELPA 补充题库」，与题库一部分重复，建议与题库三交叉比对。</p>
-    <div id="bankB"></div>
-  </section>
-
-  <!-- 题库C -->
-  <section id="sec-bankC">
-    <div class="sec-head"><span class="emoji">🧠</span><h2>题库三 · 考生回忆与补充主题</h2><span class="tag">汇总记录</span></div>
-    <p class="sec-desc">来自 8.25 / 8.26 场次考生反馈整理的题库，含各题提示小问，其中含 AI 与语言学习等新增题；建议新旧题库都过一遍。</p>
-    <div id="bankC"></div>
+    <div class="sec-head"><span class="emoji">📚</span><h2>往年题库</h2><span class="tag">25 题 · 合并去重</span></div>
+    <p class="sec-desc">涵盖本科经历、研究介绍、学术诚信、跨学科、AI 等话题，可直接抽题练习。少数回忆信息不完整的条目会简要标注。</p>
+    <div id="bankPast"></div>
   </section>
 
   <section id="sec-bankD">
-    <div class="sec-head"><span class="emoji">🎓</span><h2>题库四 · 2026 Fall 场次反馈</h2><span class="tag">12 条 · 按场次</span></div>
-    <p class="sec-desc">2026 年 8 月与 9 月初的考生回忆，含不完整题干和整理译文；与旧题库部分重叠。<a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/blob/main/question-bank/2026-fall.md">查看场次、来源与核实说明 ↗</a></p>
+    <div class="sec-head"><span class="emoji">🎓</span><h2>2026 Fall 新题库</h2><span class="tag">12 题 · 本年度更新</span></div>
+    <p class="sec-desc">本年度的新题与校园相关问法，可直接练习；英文为整理译文的题目会单独标注。<a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/blob/main/question-bank/2026-fall.md">查看场次与来源 ↗</a></p>
     <div id="bankD"></div>
   </section>
 
-  <div class="empty" id="emptyState">😕 没有找到匹配「<span id="emptyKeyword"></span>」的题目，换个关键词试试？</div>
+    <div class="empty" id="emptyState">😕 没有找到匹配「<span id="emptyKeyword"></span>」的题目，换个关键词试试？</div>
 
   <footer>学生维护的非官方备考资源 · 原题出处和补充资料见 <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">独立题库</a><br>感谢历届考生分享<br>具体考试要求以 HKUST(GZ) 官方通知为准<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
 </div>
@@ -908,10 +894,10 @@ function normalizePayload(data) {
   const cleanStatuses = {};
   const cleanNotes = {};
   for (const [key, value] of Object.entries(data.statuses)) {
-    if (/^[A-D]-\d+$/.test(key) && ['new', 'doing', 'done'].includes(value)) cleanStatuses[key] = value;
+    if ((/^[A-D]-\d+$/.test(key) || key === 'A-附') && ['new', 'doing', 'done'].includes(value)) cleanStatuses[key] = value;
   }
   for (const [key, value] of Object.entries(data.notes)) {
-    if (/^(?:qn-)?[A-D]-\d+(?:-\d+)?$/.test(key) && typeof value === 'string' && value.length <= 200000) {
+    if ((/^(?:qn-)?[A-D]-\d+(?:-\d+)?$/.test(key) || key === 'qn-A-附') && typeof value === 'string' && value.length <= 200000) {
       cleanNotes[key] = value;
     }
   }
@@ -1243,10 +1229,8 @@ function renderTOC() {
   const items = [
     ['sec-process', '🗓️', '考试流程速览'],
     ['sec-faq', '💬', '常见问题 FAQ'],
-    ['sec-bankA', '📚', '题库一 · 往年主题题库'],
-    ['sec-bankB', '🗂️', '题库二 · ELPA 补充题库'],
-    ['sec-bankC', '🧠', '题库三 · 考生回忆与补充主题'],
-    ['sec-bankD', '🎓', '题库四 · 2026 Fall 场次反馈']
+    ['sec-bankA', '📚', '往年题库'],
+    ['sec-bankD', '🎓', '2026 Fall 新题库']
   ];
   document.getElementById('toc').innerHTML =
     '<h2>📑 内容目录</h2><div class="toc-grid">' +
@@ -1271,10 +1255,25 @@ function toggleFaq(i) {
   item.querySelector('.faq-q').setAttribute('aria-expanded', String(expanded));
 }
 
-function renderBank(bankKey) {
-  const bank = BANKS[bankKey];
-  const container = document.getElementById('bank' + bankKey);
-  container.innerHTML = bank.items.map((item, idx) => {
+function questionById(id) {
+  const key = id.split('-')[0];
+  return BANKS[key].items.find(it => qId(key, it.num) === id);
+}
+function allPracticeIds() {
+  return PAST_QUESTION_IDS.concat(BANKS.D.items.map(it => qId('D', it.num)));
+}
+function migrateLegacyPractice() {
+  let changed = false;
+  for (const [oldId, newId] of Object.entries(LEGACY_QUESTION_ALIASES)) {
+    if (!statuses[newId] && statuses[oldId]) { statuses[newId] = statuses[oldId]; changed = true; }
+    if (!notes['qn-' + newId] && notes['qn-' + oldId]) {
+      notes['qn-' + newId] = notes['qn-' + oldId]; changed = true;
+    }
+  }
+  return changed;
+}
+function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
+  return items.map((item, idx) => {
     const id = qId(bankKey, item.num);
     const st = statuses[id] || 'new';
     const stMap = { new: ['未练', 'active-new'], doing: ['练习中', 'active-doing'], done: ['已掌握', 'active-done'] };
@@ -1285,9 +1284,10 @@ function renderBank(bankKey) {
     return `
     <div class="qcard status-${st}" id="q-${id}" data-search="${escAttr(searchText)}">
       <div class="q-top">
-        <div class="q-num">${esc(String(item.num))}</div>
+        <div class="q-num">${idx + startIndex + 1}</div>
         <div class="q-title">
           <div class="en">${esc(item.en)}</div>
+          ${item.recallTag ? `<span class="recall-mark">${esc(item.recallTag)}</span>` : ""}
           ${item.cn ? `<div class="cn">${esc(item.cn)}</div>` : ''}
         </div>
         <div class="q-actions">
@@ -1510,10 +1510,12 @@ function cycleStatus(id, btn) {
 
 function copyQuestion(id) {
   const bankKey = id.split('-')[0];
-  const bank = BANKS[bankKey];
-  const item = bank.items.find(i => qId(bankKey, i.num) === id);
+  const item = questionById(id);
   if (!item) return;
-  let text = `【${bank.name} · 第 ${item.num} 题】\n${item.en}\n`;
+  const pastIndex = PAST_QUESTION_IDS.indexOf(id);
+  const section = pastIndex >= 0 ? '往年题库' : '2026 Fall 新题库';
+  const number = pastIndex >= 0 ? pastIndex + 1 : BANKS.D.items.findIndex(it => qId('D', it.num) === id) + 1;
+  let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
   if (item.cn) text += `（${item.cn}）\n`;
   if (item.subs && item.subs.length) {
     text += '\n提示小问：\n' + item.subs.map(s => '• ' + s.en + (s.cn ? '  (' + s.cn + ')' : '')).join('\n');
@@ -1547,14 +1549,12 @@ function flash(btn) {
 
 function updateProgress() {
   let total = 0, done = 0, doing = 0, fresh = 0;
-  for (const bk in BANKS) {
-    total += BANKS[bk].items.length;
-    for (const it of BANKS[bk].items) {
-      const st = statuses[qId(bk, it.num)] || 'new';
-      if (st === 'done') done++;
-      else if (st === 'doing') doing++;
-      else fresh++;
-    }
+  for (const id of allPracticeIds()) {
+    total++;
+    const st = statuses[id] || 'new';
+    if (st === 'done') done++;
+    else if (st === 'doing') doing++;
+    else fresh++;
   }
   const pct = total ? Math.round(done / total * 100) : 0;
   document.getElementById('totalCount').textContent = total;
@@ -1877,12 +1877,10 @@ function clearDrill() {
     c.classList.remove('drill-active', 'drill-flash'));
 }
 document.getElementById('timerDrill').addEventListener('click', () => {
-  const keys = [];
-  for (const bk in BANKS) for (const it of BANKS[bk].items) {
-    const id = qId(bk, it.num);
+  const keys = allPracticeIds().filter(id => {
     const card = document.getElementById('q-' + id);
-    if (card && card.style.display !== 'none') keys.push(id);
-  }
+    return card && card.style.display !== 'none';
+  });
   if (!keys.length) { setTip('当前筛选条件下没有可抽取的题目，请调整关键词或状态。', 'err'); return; }
   const pick = keys[Math.floor(Math.random() * keys.length)];
   const card = document.getElementById('q-' + pick);
@@ -1915,13 +1913,17 @@ document.getElementById('quickBackup').addEventListener('click', () => document.
 /* ============ 导出全部笔记（Markdown 下载） ============ */
 document.getElementById('exportBtn').addEventListener('click', () => {
   let md = '# ELPA 备考笔记导出\n\n> 导出时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
-  for (const bk in BANKS) {
-    md += '\n## ' + BANKS[bk].name + '\n\n';
-    for (const it of BANKS[bk].items) {
-      const id = qId(bk, it.num);
+  const sections = [
+    { name: '往年题库', ids: PAST_QUESTION_IDS },
+    { name: '2026 Fall 新题库', ids: BANKS.D.items.map(it => qId('D', it.num)) }
+  ];
+  for (const section of sections) {
+    md += '\n## ' + section.name + '\n\n';
+    for (const [i, id] of section.ids.entries()) {
+      const it = questionById(id);
       const st = statuses[id] || 'new';
       const stLabel = { new: '未练', doing: '练习中', done: '已掌握' }[st];
-      md += '### ' + it.num + '. ' + it.en + '\n';
+      md += '### ' + (i + 1) + '. ' + it.en + '\n';
       if (it.cn) md += '> ' + it.cn + '\n';
       md += '*状态：' + stLabel + '*\n\n';
       const qn = notes['qn-' + id];
@@ -1965,10 +1967,13 @@ toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoot
 
 /* ============ 渲染（读取数据后统一执行） ============ */
 function renderAll() {
-  renderBank('A');
-  renderBank('B');
-  renderBank('C');
-  renderBank('D');
+  if (migrateLegacyPractice()) markDirty();
+  const aItems = BANKS.A.items.filter(it => typeof it.num === 'number' && it.num <= 7);
+  const cItems = BANKS.C.items.filter(it => it.num <= 17);
+  const bItems = BANKS.B.items.filter(it => it.num === 9);
+  document.getElementById('bankPast').innerHTML =
+    renderBank('A', aItems) + renderBank('C', cItems, 7) + renderBank('B', bItems, 24);
+  document.getElementById('bankD').innerHTML = renderBank('D');
   updateProgress();
   applyFilters();
 }

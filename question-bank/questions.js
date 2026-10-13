@@ -1,11 +1,11 @@
 /* ELPA 结构化题库 · 网站唯一题目数据入口。
  * 题目来自学生分享及回忆，并非 HKUST(GZ) 官方题卡。
  * 如需更新题目，请在此维护条目与稳定 ID；来源与背景详见同目录 Markdown 文档。
- * A/B/C 条目为既有题库，为兼容学习进度请勿随意更改其编号。
+ * A/B/C 条目仅为旧学习记录和来源兼容保留，页面按往年题库去重展示。
  */
 const BANKS = {
   A: {
-    name: "题库一 · 往年主题题库",
+    name: "往年题库",
     items: [
       { num: 1, en: "Describe and reflect upon your experience of undergraduate study.",
         cn: "描述并反思你的本科学习经历",
@@ -97,7 +97,7 @@ const BANKS = {
     ]
   },
   B: {
-    name: "题库二 · ELPA 补充题库",
+    name: "往年题库",
     items: [
       { num: 1, en: "How would you explain a technical term to the first-year UG?",
         cn: "你会如何向大一本科生解释一个专业术语？", subs: []},
@@ -116,7 +116,7 @@ const BANKS = {
       { num: 8, en: "Discuss the role of mentorship in academic success.",
         cn: "讨论导师制在学术成功中的作用", subs: []},
       { num: 9, en: "How can PG students leverage AI to improve their language proficiency?",
-        cn: "研究生如何利用 AI 提升语言能力？（重点新增方向）", subs: []},
+        cn: "研究生如何利用 AI 提升语言能力？", subs: []},
       { num: 10, en: "Why is integrity important for your academic discipline?",
         cn: "为什么诚信对你的学科很重要？", subs: []},
       { num: 11, en: "How do PG students leverage digital tools?",
@@ -128,7 +128,7 @@ const BANKS = {
     ]
   },
   C: {
-    name: "题库三 · 考生回忆与补充主题",
+    name: "往年题库",
     items: [
       { num: 1, en: "How would you explain a technical term to the first-year undergraduate?",
         cn: "如何向大一新生解释一个专业术语",
@@ -162,7 +162,7 @@ const BANKS = {
           { en: "Mainly focus on how to use AI ethically", cn: "主要围绕怎么用才算合乎伦理" }
         ]},
       { num: 5, en: "Explain a core concept or technique in your research field in simple terms, give an example of its application, and explain its limitations.",
-        cn: "用简而易懂的话解释你研究（field）中的核心概念或技术，举例说明应用并说明它的局限性（与题库二第 5 题相同）",
+        cn: "用简单语言解释研究核心概念、实际应用及局限性",
         subs: []},
       { num: 6, en: "Briefly introduce the problems you encountered in academic research, how you solved them, and what the results were.",
         cn: "简要介绍学术研究遇到的问题，你如何解决，结果怎么样",
@@ -193,7 +193,7 @@ const BANKS = {
           { en: "Why is integrity important in research and education?", cn: "为什么诚信在研究和教育中很重要" },
           { en: "How to maintain academic integrity?", cn: "如何维护学术诚信" }
         ]},
-      { num: 10, en: "How do postgraduate students leverage digital tools (e.g. AI)?",
+      { num: 10, en: "How do postgraduate students leverage digital tools (e.g. AI)?", recallTag:"小问未完整记录",
         cn: "研究生如何利用数字工具（如 AI）？", subs: []},
       { num: 11, en: "Importance of feedback, including receiving and giving feedback.",
         cn: "反馈的重要性，包括接受和给予反馈",
@@ -204,7 +204,7 @@ const BANKS = {
           { en: "What is the most effective way to give / receive feedback?", cn: "什么方式的反馈最有效" }
         ]},
       { num: 12, en: "Describe a time when you used creative approaches to solve a problem in academic research.",
-        cn: "描述一个在学术研究中，你应用创造性手段解决什么问题（与题库二第 13 题相同）",
+        cn: "描述在学术研究中创造性解决问题的经历",
         subs: []},
       { num: 13, en: "Is AI dangerous or helpful?",
         cn: "AI 是危险的还是有益的？", subs: []},
@@ -215,7 +215,7 @@ const BANKS = {
       { num: 16, en: "What can you learn from the Internet?",
         cn: "描述一下你在互联网中能学到什么？（与题库一附加题相同）", subs: []},
       { num: 17, en: "How can AI help language learning?",
-        cn: "AI 对语言学习的帮助（新增题）", subs: []},
+        cn: "AI 对语言学习的帮助", subs: []},
       { num: 18, en: "Describe an event or situation where you were required to speak in English as a research postgraduate.",
         cn: "新增题（与往年题库第 3 题相同，重点关注）", subs: []}
     ]
@@ -224,7 +224,7 @@ const BANKS = {
 
 /* 2026 Fall 场次回忆：在原 A/B/C 题目 ID 后增补，保留已有进度映射 */
 BANKS.D = {
-  name: '题库四 · 2026 Fall 场次反馈',
+  name: '2026 Fall 新题库',
   items: [
     { num:1, en:'How would you explain a term such as supply chain or fluid dynamics to undergraduates?', cn:'8.24 09:30｜向本科生解释专业术语；考生英文回忆经轻微规范化，非核实原文', subs:[] },
     { num:2, en:'How would you guide students to use AI?', cn:'8.24 09:30｜指导学生使用 AI；考生英文回忆', subs:[] },
@@ -232,11 +232,30 @@ BANKS.D = {
     { num:4, en:'Explain one of your projects.', cn:'8.24 09:30｜介绍个人项目；考生英文回忆经轻微规范化', subs:[] },
     { num:5, en:'If you were a teaching assistant and discovered that a student had used AI for an assignment where AI was not permitted, how would you respond?', cn:'8.28 16:40｜如何处理学生违规使用 AI 的情况；考生英文回忆经轻微规范化', subs:[] },
     { num:6, en:'Introduce a term from your field of study and explain it using an analogy.', cn:'8.28 16:40｜用类比解释专业术语；考生英文回忆', subs:[] },
-    { num:7, en:'[整理译文] How would you interpret two studies that reach different conclusions on the same issue?', cn:'9 月初反馈｜同一问题的两项研究为何结论不同？仅记录中文题意，小问未记录', subs:[] },
-    { num:8, en:'[整理译文] How would you explain a difficult academic concept to undergraduates from different cultural and academic backgrounds?', cn:'9 月初反馈｜向跨文化、跨专业学生解释复杂学术概念；仅记录中文题意', subs:[] },
+    { num:7, en:'How would you interpret two studies that reach different conclusions on the same issue?', recallTag:'英文为整理译文', cn:'9 月初反馈｜同一问题的两项研究为何结论不同？仅记录中文题意，小问未记录', subs:[] },
+    { num:8, en:'How would you explain a difficult academic concept to undergraduates from different cultural and academic backgrounds?', recallTag:'英文为整理译文', cn:'9 月初反馈｜向跨文化、跨专业学生解释复杂学术概念；仅记录中文题意', subs:[] },
     { num:9, en:'What was your first impression of HKUST(GZ) when you arrived?', cn:'9 月初校园题｜初到学校的印象；分享英文问法经轻微规范化', subs:[] },
     { num:10, en:'How could you use the unique platform of HKUST(GZ) to achieve your personal goals?', cn:'9 月初校园题｜如何利用学校资源实现个人目标；分享英文问法经轻微规范化', subs:[] },
     { num:11, en:'What place at HKUST(GZ) would you most like to visit or experience, and why?', cn:'9 月初校园题｜最想参观或体验的校园地点及原因；分享英文问法', subs:[] },
     { num:12, en:'What kind of skills do you hope to develop at HKUST(GZ)?', cn:'9 月初校园题｜希望在学校提升什么技能；分享英文问法', subs:[] }
   ]
+};
+
+/* 旧题库内部编号和别名兼容，网页只呈现去重后的往年题库与新题库。 */
+const PAST_QUESTION_IDS = ["A-1","A-2","A-3","A-4","A-5","A-6","A-7","C-1","C-2","C-3","C-4","C-5","C-6","C-7","C-8","C-9","C-10","C-11","C-12","C-13","C-14","C-15","C-16","C-17","B-9"];
+const LEGACY_QUESTION_ALIASES = {
+  "A-附": "C-16",
+  "B-1": "C-1",
+  "B-2": "C-3",
+  "B-3": "C-2",
+  "B-4": "C-4",
+  "B-5": "C-5",
+  "B-6": "C-6",
+  "B-7": "C-7",
+  "B-8": "C-8",
+  "B-10": "C-9",
+  "B-11": "C-10",
+  "B-12": "C-11",
+  "B-13": "C-12",
+  "C-18": "A-3"
 };
