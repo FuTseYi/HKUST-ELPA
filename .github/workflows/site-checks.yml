@@ -54,36 +54,24 @@ jobs:
           data = Path('question-bank/questions.js').read_text(encoding='utf-8')
           assert 'BANKS.D = {' in data, '2026 Fall drills not included'
           print(f'HTML smoke checks passed ({len(collector.ids)} IDs).')
-          from base64 import b64encode
-          from struct import unpack
           image = Path('assets/hkustgz-campus.webp').read_bytes()
-          assert image[:4] == b'RIFF' and image[8:12] == b'WEBP', 'Invalid WebP image header'
-          encoded = b64encode(image).decode('ascii')
-          anchors = ["UklGRt4lAABXRUJQVlA4INIl", "/7IQ/Tzpm+oun1NWeNDcU3Dq",
-              "FP9wXxfZ0vG9xKZJBtiKeT2W", "WdZJsUGIcSXBoZLqv9UWsBMA",
-              "58MIrg+8Tu5V2Ot85JKZoFJw", "CoIikV1a84wnYBmZXnGuz3RZ",
-              "niUSlaDGa3+BaEXwnlcR6ZeB", "GgBvpNk8pyWMzm4/Ckf4S8Ud",
-              "BDkMeTWrZPFGdJjza051nfYF", "UVLNxXbyGWO+vNR6DINTidoj",
-              "lEQ2tlK3CGDib2AnJhvgqjkI", "s8elRy9plG4Y6M3OZ5/ZzjmE",
-              "v3cuBCMdJLlYtXIEtRC7I74c", "fKXYzY0WcLXF6tFpqcO5Hg2d",
-              "csj6lb5sk9ox2KzhNV1AoFAR", "CoJd/lhroANuhAn7WJ/6rgkS",
-              "7gxrVgRkZdXGbLQhoBRSpwYb", "tQYGZ6BRsSoP5eBZpMZhwp4w",
-              "F6bslL4P3VcsRUmCcpJeb7wd", "o1010tJhnZmON2lCPklx/zo1",
-              "ZNDdznmUJHA99C+N63gzi4MK", "2xytuZRkcF8XKrjkdwgUAq0d",
-              "QLOT2QotAnrJk5ry6Q6HGEpp", "sitIOgEvzqBS/0JG8LcXjVYo",
-              "a7MbnvFKX/cJ4vZNQ1obmKyH", "KElkUerNYebR4RWWuGsjUyZZ"]
-          print('Asset diagnostics:', len(image), len(encoded), [encoded.find(t) for t in anchors])
-          # Temporary asset-transport diagnostic: reconstruct 2 missing base64 chars and verify Git blob SHA.
-          import hashlib
-          original_chunk = 's8elRy9plG4Y6M3OZ5/ZzjmEDtRGrvrnrvZxPT/CdJkoY0IofmQXDAY/90Zrv6V/18XXbQlOVGwrMfyiWJpttv45z+rPqF/AKtXuSKHGu6vqFcnPNUO0lx44ZEszcWv5xV+hgMN3KzWdrhtAfaV2wfxTPYMb5raIEKZwo3wIfDO0YsczkbCP3nx05jlFMZRE3KvoXg8ec1R53YRbAhOxGF4N8KKLEzJr8XHfbOCgrQ875PKONOXrnF8TB7XmlGnvkXpk1gYC8HCJ1O8RGBWVVQJifvcBpF0KsPsnffjIvVGd82o8jvTqSdntwEg6poPyOBm0FkRX36fr4lX/ACXiP7FSrUZX52BKk+8GHcAcQBxqZ0BLrDVCRZP+ysPHdus4oSMyavSadKHsWhhiLKcemFhiJjkS6u0VYxpCwQkpIyqapyiDuHQlxHzjoh7tl1qI72Qq7Qu6AsnuhTpHZPVh4fuW999Zys1jJFmsj7Ver5lprF+79j+p'
-          assert len(original_chunk) == 500
-          repaired = encoded[:5500] + original_chunk + encoded[5998:-2]
-          repaired_bytes = __import__('base64').b64decode(repaired, validate=True)
-          repaired_sha = hashlib.sha1(('blob ' + str(len(repaired_bytes)) + '\\0').encode().replace(b'\\0', b'\0') + repaired_bytes).hexdigest()
-          print('REPAIR_EXPECTED_SHA', repaired_sha)
-          assert repaired_sha == '11719b4ecaac26f0755eaa12058c7ab9e24819fc', 'Repair payload mismatch'
-          print('REPAIRED_BASE64_BEGIN' + repaired + 'REPAIRED_BASE64_END')
-          assert len(image) == unpack('<I', image[4:8])[0] + 8, 'Truncated image data'
+          assert image[:4] == b'RIFF' and image[8:12] == b'WEBP', 'Invalid WebP signature'
+          assert len(image) == int.from_bytes(image[4:8], 'little') + 8, 'Truncated image data'
+          assert len(image) > 8000, 'Hero image unexpectedly small'
+          assert "assets/hkustgz-campus.webp" in html, 'Missing hero image CSS URL'
+          print(f'Campus image container valid: {len(image)} bytes.')
+          PY
+      - name: Decode hero image
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          p=Path('assets/hkustgz-campus.webp')
+          with Image.open(p) as img:
+              img.load()
+              assert img.width >= 450 and img.height >= 240, f'Unexpected image dimensions: {img.size}'
+              print('Hero image decoded:', img.size)
           PY
       - name: Check JavaScript syntax
         run: |
