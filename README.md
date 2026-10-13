@@ -11,8 +11,11 @@
 ## 快速开始
 
 - **[独立题库 · Question Bank](./question-bank/README.md)**：仅分为**往年题库**与**2026 Fall 新题库**，保留提示小问，必要时简要标注回忆不完整的信息。
-- **[进入 ELPA 练习页面](https://futseyi.github.io/HKUST-GZ-ELPA/)**：浏览题目、搜索关键词、使用计时器与随机抽题。
-- **[查看网页源文件](./index.html)**：本项目采用单页 HTML 页面，可下载仓库后直接在浏览器中打开 `index.html`。
+- **[网站首页](https://futseyi.github.io/HKUST-GZ-ELPA/)**：网站导航与功能概览。
+- **[考试指南](https://futseyi.github.io/HKUST-GZ-ELPA/guide.html)**：常见流程与 FAQ。
+- **[题库练习](https://futseyi.github.io/HKUST-GZ-ELPA/practice.html)**：两组题库、关键词与状态筛选、每页 8 题、计时与个人笔记。
+- **[资料来源](https://futseyi.github.io/HKUST-GZ-ELPA/sources.html)**：资料分享链接与贡献说明。
+- **页面结构**：多页面静态网站（`index.html`、`guide.html`、`practice.html`、`sources.html`），共享蓝黄导航样式见 `site.css`。
 - **备考建议**：先了解当期考试流程，再按话题分类准备；练习时优先用自己的真实经历组织答案，而不是单纯背诵范文。
 
 ### 当前练习页面
@@ -20,7 +23,8 @@
 | 模块 | 内容 |
 | --- | --- |
 | 考试流程与 FAQ | 汇总不同场次的流程和常见问题 |
-| 题库与检索 | 合并去重的往年题库及独立的 2026 Fall 新题库，含中文说明与提示小问 |
+| 题库与检索 | 练习页提供往年题库与 2026 Fall 新题库，保留中文说明与提示小问 |
+| 分页浏览 | 两组题库分别分页，每页最多 8 题；筛选与随机抽题覆盖全部匹配题目 |
 | 模拟训练 | 在当前搜索和状态筛选结果中随机抽题、倒计时与正向计时 |
 | 题目筛选 | 关键词搜索 + 未练／练习中／已掌握状态组合筛选 |
 | 学习记录 | 题目进度、Markdown 笔记、备份恢复与笔记导出 |
@@ -28,7 +32,7 @@
 
 ### 题目维护方式
 
-网页从 [`question-bank/questions.js`](./question-bank/questions.js) 加载结构化题目数据。题目、中文释义与提示小问请优先在该文件更新，并同步检查对应的[来源与场次文档](./question-bank/README.md)；无需改动页面 HTML 的功能代码。页面统一展示往年题库与 2026 Fall 新题库，内部编号用于准确关联题目与个人学习记录。
+`practice.html` 从 [`question-bank/questions.js`](./question-bank/questions.js) 加载结构化题目数据。题目、中文释义与提示小问请优先在该文件更新，并同步检查对应的[来源与场次文档](./question-bank/README.md)；无需改动页面 HTML 的功能代码。页面统一展示往年题库与 2026 Fall 新题库，内部编号用于准确关联题目与个人学习记录。
 
 ### 学习记录、备份与恢复
 

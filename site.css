@@ -1,0 +1,121 @@
+:root { --site-navy:#003e74; --site-blue:#1763a3; --site-gold:#f4c65a; --site-ink:#172940; --site-muted:#64748b; --site-line:#dbe5f0; --site-bg:#f5f8fc; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; scroll-padding-top:90px; }
+body { margin:0; }
+.elpa-nav { position:sticky; top:0; z-index:100; background:rgba(255,255,255,.97); border-bottom:1px solid rgba(17,58,100,.12); box-shadow:0 5px 24px rgba(6,41,77,.06); backdrop-filter:blur(14px); }
+.elpa-nav-inner { max-width:1210px; margin:0 auto; padding:0 25px; min-height:72px; display:flex; align-items:center; gap:32px; }
+.elpa-brand { display:flex; align-items:center; gap:10px; color:var(--site-navy); text-decoration:none; font-size:14px; font-weight:650; white-space:nowrap; line-height:1.1; }
+.elpa-brand strong {font-weight:800;}
+.elpa-brand small {display:block; letter-spacing:.07em; font-size:10px; color:var(--site-muted); margin-top:4px;}
+.elpa-brand-icon {width:38px; height:38px; border-radius:12px; display:grid; place-items:center; background:var(--site-navy); color:white; font-weight:850; font-size:22px;}
+.elpa-brand-icon span {color:var(--site-gold); font-size:23px;}
+.elpa-nav-links { display:flex; align-items:stretch; align-self:stretch; gap:4px; margin-left:auto; }
+.elpa-nav-links a { display:flex; align-items:center; padding:0 17px; border-bottom:3px solid transparent; text-decoration:none; color:#475569; font-size:14px; font-weight:600; transition:.2s ease; }
+.elpa-nav-links a:hover, .elpa-nav-links a.active { color:var(--site-navy); border-bottom-color:var(--site-gold); background:rgba(14,69,123,.035); }
+.elpa-nav-github { padding:9px 13px; border:1px solid #cedde9; border-radius:999px; text-decoration:none; color:var(--site-navy); font-size:12px; font-weight:700; white-space:nowrap; }
+.elpa-nav-github:hover { background:#eaf2fa; }
+.elpa-body { background:var(--site-bg); color:var(--site-ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"PingFang SC","Microsoft YaHei",sans-serif; line-height:1.7; }
+.elpa-body a { color:var(--site-blue); }
+.elpa-hero {position:relative; isolation:isolate; min-height:470px; display:flex; align-items:center; color:#fff; background:linear-gradient(95deg,rgba(0,28,58,.91),rgba(0,49,91,.78) 40%,rgba(0,47,88,.25) 85%),url('./assets/Administration-Building-14-1536x864.jpg') center 58%/cover no-repeat;}
+.elpa-hero::after { content:""; position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(to right,#f4c65a 0%,#f4c65a 23%,transparent 23%); }
+.elpa-hero-inner { width:min(1180px,calc(100% - 48px)); margin:0 auto; padding:68px 0 78px; }
+.elpa-eyebrow {display:inline-flex; align-items:center; gap:9px; font-size:11px; text-transform:uppercase; letter-spacing:.13em; font-weight:750; padding:6px 14px; border:1px solid rgba(255,255,255,.45); border-radius:999px; background:rgba(0,38,78,.2);}
+.elpa-eyebrow::before {content:""; height:7px; width:7px; border-radius:50%; background:var(--site-gold);}
+.elpa-hero h1 {font-size:clamp(38px,5vw,61px); letter-spacing:-.035em; line-height:1.15; margin:18px 0 14px; font-weight:850;}
+.elpa-hero h1 em {font-style:normal; color:#f9d780;}
+.elpa-hero p {max-width:660px; font-size:16px; line-height:1.95; color:rgba(255,255,255,.87); margin:0;}
+.elpa-actions {display:flex; flex-wrap:wrap; gap:12px; margin-top:30px;}
+.elpa-button {display:inline-flex; align-items:center; justify-content:center; gap:11px; min-height:44px; border-radius:999px; padding:10px 21px; text-decoration:none; font-weight:750; font-size:13px; transition:.2s;}
+.elpa-button.primary {background:var(--site-gold); color:#183049;}
+.elpa-button.primary:hover {background:#ffdb84; transform:translateY(-2px);}
+.elpa-button.light {color:#fff; border:1px solid rgba(255,255,255,.6); background:rgba(255,255,255,.1);}
+.elpa-button.light:hover {background:rgba(255,255,255,.2);}
+.elpa-main {max-width:1180px; margin:0 auto; padding:46px 24px 72px;}
+.elpa-kicker {font-size:12px; color:#9b6a09; text-transform:uppercase; letter-spacing:.12em; font-weight:800;}
+.elpa-heading {margin:8px 0 6px; font-size:clamp(26px,3vw,36px); color:var(--site-navy); line-height:1.3;}
+.elpa-desc {color:var(--site-muted); max-width:770px; margin:0 0 27px; font-size:14px;}
+.elpa-feature-grid {display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px;}
+.elpa-feature {display:flex; flex-direction:column; gap:10px; padding:30px 27px; border:1px solid var(--site-line); border-radius:21px; background:#fff; box-shadow:0 12px 35px rgba(17,59,97,.05); text-decoration:none; transition:.2s;}
+.elpa-feature:hover {transform:translateY(-3px); border-color:#accbe5; box-shadow:0 17px 40px rgba(17,59,97,.12);}
+.elpa-feature-icon {display:grid; place-items:center; width:45px; height:45px; border-radius:13px; background:#eaf2fa; font-size:22px;}
+.elpa-feature strong {font-size:18px; color:var(--site-navy);}
+.elpa-feature p {margin:0; color:var(--site-muted); font-size:13px; flex:1;}
+.elpa-feature .arrow {font-size:12px; font-weight:700; color:var(--site-blue);}
+.elpa-nums {display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:31px 0 0;}
+.elpa-num {padding:20px 24px; background:#ecf3fa; border-radius:17px; border:1px solid #dde8f3;}
+.elpa-num strong {display:block; font-size:26px; color:var(--site-navy);}
+.elpa-num small {color:var(--site-muted); font-size:12px;}
+.elpa-panel {margin-top:38px; padding:29px 32px; border:1px solid var(--site-line); border-radius:20px; background:white;}
+.elpa-panel h2 {font-size:19px; margin:0 0 9px; color:var(--site-navy);}
+.elpa-panel p {font-size:13px; color:var(--site-muted); margin:0 0 14px;}
+.elpa-subhero {background:linear-gradient(100deg,#062a50,#07538c); color:#fff; padding:64px 24px 54px; border-bottom:5px solid var(--site-gold);}
+.elpa-subhero-inner {max-width:1180px; margin:0 auto;}
+.elpa-subhero h1 {font-size:clamp(28px,4vw,43px); margin:13px 0 8px;}
+.elpa-subhero p {color:#dce8f4; max-width:790px; margin:0; font-size:14px;}
+.elpa-flow {display:grid; gap:14px; margin-top:20px;}
+.elpa-flow-step {padding:22px 25px; background:#fff; border:1px solid var(--site-line); border-left:4px solid var(--site-blue); border-radius:12px;}
+.elpa-flow-step h3 {margin:0 0 8px; color:var(--site-navy); font-size:16px;}
+.elpa-flow-step p {margin:0; color:#4c5c70; font-size:13.5px;}
+.elpa-guide-faq {margin-top:32px;}
+.elpa-guide-faq details {background:white; border:1px solid var(--site-line); border-radius:12px; margin:9px 0; padding:16px 20px;}
+.elpa-guide-faq summary {cursor:pointer; font-weight:700; color:var(--site-ink); font-size:14px;}
+.elpa-guide-faq details[open] {border-color:#b9d1e8;}
+.elpa-guide-faq p {margin:10px 0 0; color:#556578; font-size:13px;}
+.elpa-resource-grid {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px;}
+.elpa-resource {background:#fff; border-radius:15px; border:1px solid var(--site-line); padding:24px;}
+.elpa-resource h3 {font-size:16px; margin:0 0 7px; color:var(--site-navy);}
+.elpa-resource p {font-size:13px; color:var(--site-muted);}
+.elpa-resource a {font-size:13px; font-weight:700; text-decoration:none;}
+.elpa-callout {border:1px solid #e6d9af; background:#fff9ed; color:#625331; border-radius:13px; padding:17px 21px; font-size:13px; margin:20px 0;}
+.elpa-footer {background:#082b50; padding:29px 24px; text-align:center; font-size:12px; color:#b9cede;}
+.elpa-footer a {color:#f4d17b; text-decoration:none;}
+/* Practice page controls are layered over its existing functional styles. */
+.page-practice .campus-hero {min-height:240px; padding:35px 24px 34px;}
+.page-practice .campus-hero h1 {font-size:clamp(29px,4vw,39px);}
+.page-practice .campus-hero .hero-lead {font-size:14px; margin-top:8px;}
+.page-practice .campus-hero .hero-description {font-size:12px; margin-top:6px;}
+.page-practice .campus-hero .hero-actions {margin-top:18px;}
+.page-practice .hero-caption {bottom:12px;}
+.bank-pagination {display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:7px; margin:21px auto 34px; padding:7px; color:var(--site-muted);}
+.bank-pagination button {min-width:36px; min-height:36px; padding:6px 12px; background:#fff; border:1px solid #d6e2ed; border-radius:10px; color:var(--site-navy); font-size:13px; font-weight:700; cursor:pointer;}
+.bank-pagination button:hover:not(:disabled) {background:#eaf2fa; border-color:#a8cae8;}
+.bank-pagination button[aria-current="page"] {background:var(--site-navy); border-color:var(--site-navy); color:white;}
+.bank-pagination button:disabled {opacity:.35; cursor:default;}
+.bank-pagination .pagination-caption {flex-basis:100%; text-align:center; font-size:12px; margin-top:3px;}
+.elpa-nav a:focus-visible,.bank-pagination button:focus-visible,.elpa-body a:focus-visible,.elpa-guide-faq summary:focus-visible {outline:3px solid #e5a921;outline-offset:3px;}
+@media(max-width:900px){.elpa-feature-grid {grid-template-columns:repeat(2,minmax(0,1fr));} .elpa-nav-inner {gap:15px;padding:0 15px;}}
+@media(max-width:650px){
+ .elpa-nav-inner {min-height:62px; flex-wrap:wrap; align-items:center; justify-content:space-between; padding:10px 13px 0; row-gap:6px;}
+ .elpa-brand {font-size:12px;}
+ .elpa-brand small {font-size:9px;}
+ .elpa-brand-icon {width:33px;height:33px;font-size:18px;}
+ .elpa-nav-github {margin-left:auto;font-size:11px;}
+ .elpa-nav-links {order:3;flex-basis:100%;overflow:auto; margin:0;justify-content:space-between;gap:0;}
+ .elpa-nav-links a {padding:8px 10px 10px;font-size:12px;white-space:nowrap;}
+ .elpa-hero {min-height:450px;}
+ .elpa-hero-inner {padding:58px 0 60px;}
+ .elpa-feature-grid {grid-template-columns:1fr;gap:12px;}
+ .elpa-feature {padding:22px;}
+ .elpa-main {padding:34px 16px 58px;}
+ .elpa-nums {gap:8px;}
+ .elpa-num {padding:14px 12px;}
+ .elpa-num strong {font-size:22px;}
+ .elpa-resource-grid {grid-template-columns:1fr;}
+ .elpa-panel {padding:21px;}
+ .elpa-subhero {padding:43px 17px 37px;}
+ .page-practice .campus-hero {min-height:220px;padding:27px 15px 30px;}
+ .page-practice .campus-hero h1 {font-size:28px;}
+ .page-practice .campus-hero .hero-actions {gap:8px;}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;} .elpa-feature,.elpa-button {transition:none;}}
+
+/* Exam timeline carried over from shared student reports. */
+.guide-legacy-process .sec-head {display:flex;align-items:center;gap:12px;margin:18px 0;}
+.guide-legacy-process .sec-head h2 {font-size:21px;color:#003e74;margin:0;}
+.guide-legacy-process .sec-head .tag {background:#fff6df;border:1px solid #f0d9a0;border-radius:99px;padding:2px 10px;font-size:11px;color:#876015;}
+.guide-legacy-process .timeline {display:grid;gap:14px;margin-top:18px;}
+.guide-legacy-process .step {background:#fff;border:1px solid #dbe5f0;border-left:4px solid #1763a3;border-radius:12px;padding:21px 24px;}
+.guide-legacy-process .step h3 {font-size:15px;color:#003e74;margin:0 0 9px;}
+.guide-legacy-process .step p {font-size:13.5px;color:#4c5c70;line-height:1.85;margin:0;}
+.guide-legacy-process .step-tag {display:inline-block;font-size:11px;font-weight:700;border-radius:99px;background:#f0f6fb;color:#175889;padding:2px 10px;margin-left:6px;}
+.page-practice .bank-pagination[hidden] {display:none;}

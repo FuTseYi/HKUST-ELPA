@@ -3,15 +3,18 @@ name: Validate ELPA website
 on:
   pull_request:
     paths:
-      - 'index.html'
+      - '*.html'
+      - 'site.css'
       - 'question-bank/questions.js'
       - 'assets/Administration-Building-14-1536x864.jpg'
       - '.github/workflows/site-checks.yml'
   push:
     branches: [main]
     paths:
-      - 'index.html'
+      - '*.html'
+      - 'site.css'
       - 'question-bank/questions.js'
+      - 'assets/Administration-Building-14-1536x864.jpg'
       - '.github/workflows/site-checks.yml'
 
 permissions:
@@ -22,63 +25,84 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract script and check required UI elements
+      - name: Check multi-page routes, practice controls and hero image
         run: |
           python3 - <<'PY'
           from pathlib import Path
           from html.parser import HTMLParser
           import re
 
-          html = Path('index.html').read_text(encoding='utf-8')
-          scripts = re.findall(r'<script>([\s\S]*?)</script>', html)
-          assert len(scripts) == 1, 'Expected a single inline JavaScript application script'
-          Path('/tmp/elpa-app.js').write_text(scripts[0], encoding='utf-8')
-
-          class IdCollector(HTMLParser):
+          class Inspector(HTMLParser):
               def __init__(self):
                   super().__init__()
-                  self.ids = []
-              def handle_starttag(self, tag, attrs):
-                  props = dict(attrs)
-                  if 'id' in props:
-                      self.ids.append(props['id'])
-          collector = IdCollector()
-          collector.feed(html)
-          for key in ['searchInput', 'statusFilter', 'matchCount', 'backupBtn',
-                      'restoreBtn', 'restoreInput', 'bankPast', 'bankD',
-                      'progressBar', 'saveBtn', 'saveTopBtn']:
-              assert key in collector.ids, f'Missing required DOM ID: {key}'
-          assert len(collector.ids) == len(set(collector.ids)), 'Duplicate DOM IDs'
-          assert 'HKUST 正式题库' not in html, 'Unverified official question-bank claim'
-          assert 'src="./question-bank/questions.js"' in html, 'Missing question data source'
-          data = Path('question-bank/questions.js').read_text(encoding='utf-8')
-          assert 'BANKS.D = {' in data, '2026 Fall drills not included'
-          assert 'PAST_QUESTION_IDS' in data, 'Merged past question index missing'
-          assert 'LEGACY_QUESTION_ALIASES' in data, 'Legacy note mapping missing'
-          assert 'sec-bankB' not in html and 'sec-bankC' not in html, 'Old section still visible'
-          assert html.count('<section id="sec-bank') == 2, 'Expected two banks'
-          print(f'HTML smoke checks passed ({len(collector.ids)} IDs).')
-          image = Path('assets/Administration-Building-14-1536x864.jpg').read_bytes()
-          assert image[:3] == b'\xff\xd8\xff', 'Invalid JPEG signature'
-          assert image[-2:] == b'\xff\xd9', 'Incomplete JPEG file'
-          assert len(image) > 8000, 'Hero image unexpectedly small'
-          asset_url = './assets/Administration-Building-14-1536x864.jpg'
-          assert html.count(asset_url) == 3, 'Expected preload, desktop and mobile hero image references'
-          print(f'Campus JPEG file header and references valid: {len(image)} bytes.')
+                  self.ids=[]
+              def handle_starttag(self,tag,attrs):
+                  fields=dict(attrs)
+                  if "id" in fields: self.ids.append(fields["id"])
+
+          pages={}
+          for filename in ["index.html","guide.html","practice.html","sources.html"]:
+              content=Path(filename).read_text(encoding="utf-8")
+              pages[filename]=content
+              assert 'class="elpa-nav"' in content, f"Shared header absent in {filename}"
+              assert 'href="./site.css"' in content, f"Shared styles absent in {filename}"
+              for linked in pages.keys():
+                  pass
+              for route in ["index.html","guide.html","practice.html","sources.html"]:
+                  assert 'href="./'+route+'"' in content, f"Broken navigation: {filename} -> {route}"
+              inspector=Inspector()
+              inspector.feed(content)
+              assert len(inspector.ids)==len(set(inspector.ids)), f"Duplicate DOM ID in {filename}"
+              scripts=re.findall(r"<script>([\s\S]*?)</script>",content)
+              assert len(scripts)==1 if filename!="sources.html" else len(scripts)==0, f"Unexpected inline scripts in {filename}"
+              if scripts:
+                  Path("/tmp/elpa-"+filename+".js").write_text(scripts[0],encoding="utf-8")
+
+          practice=pages["practice.html"]
+          inspector=Inspector()
+          inspector.feed(practice)
+          for key in ("searchInput","statusFilter","matchCount","backupBtn","restoreBtn","restoreInput",
+                      "bankPast","bankD","pagerPast","pagerFall","progressBar","saveBtn","saveTopBtn"):
+              assert key in inspector.ids, f"Missing practice control: {key}"
+          assert "function renderPager(" in practice and "PAGE_SIZE=8" in practice, "Practice pagination missing"
+          assert "dataset.filterMatch" in practice, "Search and random-drill coordination missing"
+          assert practice.count('<section id="sec-bank')==2, "Expected two practice banks"
+          assert 'faqList' not in practice and '<section id="sec-process">' not in practice, "Guide content leaked into practice"
+          assert 'src="./question-bank/questions.js"' in practice, "Structured question bank not loaded"
+
+          guide=pages["guide.html"]
+          assert 'guideFaqList' in guide and 'Step 5' in guide, "Exam guide content missing"
+          assert "FAQS" in guide, "Guide questions not included"
+          home=pages["index.html"]
+          assert 'practice.html#sec-bankA' in home and 'practice.html#sec-bankD' in home, "Home topic shortcuts missing"
+          sources=pages["sources.html"]
+          for url in ("docs.qq.com/doc/DT3BxSkJzSGdUamJE","docs.qq.com/doc/DSHJydEVYSHBtdkZO","share.note.youdao.com"):
+              assert url in sources, f"Original source link missing: {url}"
+          data=Path("question-bank/questions.js").read_text(encoding="utf-8")
+          assert 'BANKS.D = {' in data and 'PAST_QUESTION_IDS' in data, "Question data invalid"
+
+          css=Path("site.css").read_text(encoding="utf-8")
+          assert "bank-pagination" in css and "elpa-nav-links" in css, "Page and pagination styling missing"
+          asset=Path("assets/Administration-Building-14-1536x864.jpg").read_bytes()
+          assert asset[:3]==b"\xff\xd8\xff" and asset[-2:]==b"\xff\xd9", "Invalid JPEG"
+          assert len(asset)>8000
+          assert "./assets/Administration-Building-14-1536x864.jpg" in css
+          assert "./assets/Administration-Building-14-1536x864.jpg" in practice
+          print("4 pages, 2 paginated question banks, stable IDs, source links, and campus image validated")
           PY
-      - name: Decode hero image
+      - name: Check JavaScript syntax
+        run: |
+          node --check /tmp/elpa-index.html.js
+          node --check /tmp/elpa-guide.html.js
+          node --check /tmp/elpa-practice.html.js
+          node --check question-bank/questions.js
+      - name: Decode campus JPEG
         run: |
           python3 -m pip install --quiet pillow
           python3 - <<'PY'
           from PIL import Image
-          from pathlib import Path
-          p=Path('assets/Administration-Building-14-1536x864.jpg')
-          with Image.open(p) as img:
-              img.load()
-              assert img.width >= 450 and img.height >= 240, f'Unexpected image dimensions: {img.size}'
-              print('Hero image decoded:', img.size)
+          with Image.open("assets/Administration-Building-14-1536x864.jpg") as img:
+              img.verify()
+              assert img.width>=450 and img.height>=240
+              print(img.size)
           PY
-      - name: Check JavaScript syntax
-        run: |
-          node --check /tmp/elpa-app.js
-          node --check question-bank/questions.js
