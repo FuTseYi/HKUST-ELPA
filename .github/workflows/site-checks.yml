@@ -1,0 +1,54 @@
+name: Validate ELPA website
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - '.github/workflows/site-checks.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - '.github/workflows/site-checks.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract script and check required UI elements
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          import re
+
+          html = Path('index.html').read_text(encoding='utf-8')
+          scripts = re.findall(r'<script(?:\s[^>]*)?>([\s\S]*?)</script>', html)
+          assert len(scripts) == 1, 'Expected a single inline JavaScript application script'
+          Path('/tmp/elpa-app.js').write_text(scripts[0], encoding='utf-8')
+
+          class IdCollector(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = []
+              def handle_starttag(self, tag, attrs):
+                  props = dict(attrs)
+                  if 'id' in props:
+                      self.ids.append(props['id'])
+          collector = IdCollector()
+          collector.feed(html)
+          for key in ['searchInput', 'statusFilter', 'matchCount', 'backupBtn',
+                      'restoreBtn', 'restoreInput', 'bankA', 'bankB', 'bankC',
+                      'bankD', 'progressBar', 'saveBtn', 'saveTopBtn']:
+              assert key in collector.ids, f'Missing required DOM ID: {key}'
+          assert len(collector.ids) == len(set(collector.ids)), 'Duplicate DOM IDs'
+          assert 'HKUST 正式题库' not in html, 'Unverified official question-bank claim'
+          assert 'BANKS.D = {' in html, '2026 Fall drills not included'
+          print(f'HTML smoke checks passed ({len(collector.ids)} IDs).')
+          PY
+      - name: Check JavaScript syntax
+        run: node --check /tmp/elpa-app.js
