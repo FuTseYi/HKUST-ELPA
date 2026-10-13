@@ -73,6 +73,16 @@ jobs:
               "QLOT2QotAnrJk5ry6Q6HGEpp", "sitIOgEvzqBS/0JG8LcXjVYo",
               "a7MbnvFKX/cJ4vZNQ1obmKyH", "KElkUerNYebR4RWWuGsjUyZZ"]
           print('Asset diagnostics:', len(image), len(encoded), [encoded.find(t) for t in anchors])
+          # Temporary asset-transport diagnostic: reconstruct 2 missing base64 chars and verify Git blob SHA.
+          import hashlib
+          original_chunk = 's8elRy9plG4Y6M3OZ5/ZzjmEDtRGrvrnrvZxPT/CdJkoY0IofmQXDAY/90Zrv6V/18XXbQlOVGwrMfyiWJpttv45z+rPqF/AKtXuSKHGu6vqFcnPNUO0lx44ZEszcWv5xV+hgMN3KzWdrhtAfaV2wfxTPYMb5raIEKZwo3wIfDO0YsczkbCP3nx05jlFMZRE3KvoXg8ec1R53YRbAhOxGF4N8KKLEzJr8XHfbOCgrQ875PKONOXrnF8TB7XmlGnvkXpk1gYC8HCJ1O8RGBWVVQJifvcBpF0KsPsnffjIvVGd82o8jvTqSdntwEg6poPyOBm0FkRX36fr4lX/ACXiP7FSrUZX52BKk+8GHcAcQBxqZ0BLrDVCRZP+ysPHdus4oSMyavSadKHsWhhiLKcemFhiJjkS6u0VYxpCwQkpIyqapyiDuHQlxHzjoh7tl1qI72Qq7Qu6AsnuhTpHZPVh4fuW999Zys1jJFmsj7Ver5lprF+79j+p'
+          assert len(original_chunk) == 500
+          repaired = encoded[:5500] + original_chunk + encoded[5998:-2]
+          repaired_bytes = __import__('base64').b64decode(repaired, validate=True)
+          repaired_sha = hashlib.sha1(('blob ' + str(len(repaired_bytes)) + '\\0').encode().replace(b'\\0', b'\0') + repaired_bytes).hexdigest()
+          print('REPAIR_EXPECTED_SHA', repaired_sha)
+          assert repaired_sha == '11719b4ecaac26f0755eaa12058c7ab9e24819fc', 'Repair payload mismatch'
+          print('REPAIRED_BASE64_BEGIN' + repaired + 'REPAIRED_BASE64_END')
           assert len(image) == unpack('<I', image[4:8])[0] + 8, 'Truncated image data'
           PY
       - name: Check JavaScript syntax
