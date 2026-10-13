@@ -570,7 +570,7 @@
     <label class="auto-switch" id="autoSwitch" title="开启时自动同步到已关联的 JSON 文件；浏览器本地学习记录始终自动保存">
       <input type="checkbox" id="autoSaveToggle" checked>
       <span class="auto-track"></span>
-      <span class="auto-label">自动同步文件</span>
+      <span class="auto-label">同步文件</span>
     </label>
     <button class="folder-btn" id="helpBtn" title="快捷键帮助（按 ? 或 Ctrl+/）">⌨️</button>
     <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）">⏱️</button>
@@ -578,7 +578,7 @@
   </div>
 
   <!-- 存储状态提示 -->
-  <div class="storage-banner" id="storageTip"></div>
+  <div class="storage-banner" id="storageTip" role="status" aria-live="polite"></div>
 
   <!-- 快捷键帮助浮层 -->
   <div class="help-mask" id="helpMask" onclick="closeHelp()">
@@ -1002,21 +1002,75 @@ BANKS.D = {
   ]
 };
 
-/* ============ 数据持久化：同目录 JSON 文件 ============ */
+/* ============ 学习记录：浏览器本地优先，JSON 文件可选同步 ============ */
 const DATA_FILE = 'elpa_data.json';
-const LS_KEY = 'elpa-q-status-v1';
-const LS_NOTES = 'elpa-notes-v1';
+const LS_KEY = 'elpa-q-status-v1'; // 兼容旧数据
+const LS_NOTES = 'elpa-notes-v1';  // 兼容旧数据
+const LS_SNAPSHOT = 'elpa-data-snapshot-v2';
 const IDB_NAME = 'elpa-fs-db';
 const IDB_STORE = 'handles';
 const IDB_DIR_KEY = 'data-dir';
 
-let statuses = {};   // { "A-1": "new|doing|done", ... }
-let notes = {};      // { "A-1-0": "用户笔记", ... }
-let dirHandle = null; // FileSystemDirectoryHandle（记住的文件夹）
-let dirty = false;   // 是否有未保存的修改
-const fsSupported = !!(window.showDirectoryPicker && window.showOpenFilePicker);
+let statuses = {};
+let notes = {};
+let dirHandle = null;
+let dirty = false; // 已保存于浏览器，但尚未同步到所选文件夹
+let revision = 0;
+let fileWriteQueue = Promise.resolve();
+const fsSupported = typeof window.showDirectoryPicker === 'function' && !!window.isSecureContext;
 
-/* ---- IndexedDB：记住文件夹句柄（刷新/重开后仍有效） ---- */
+function validRecord(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+function normalizePayload(data) {
+  if (!validRecord(data) || !validRecord(data.statuses) || !validRecord(data.notes)) {
+    throw new Error('数据文件格式不正确（需要 statuses 与 notes 对象）');
+  }
+  const cleanStatuses = {};
+  const cleanNotes = {};
+  for (const [key, value] of Object.entries(data.statuses)) {
+    if (/^[A-D]-\d+$/.test(key) && ['new', 'doing', 'done'].includes(value)) cleanStatuses[key] = value;
+  }
+  for (const [key, value] of Object.entries(data.notes)) {
+    if (/^(?:qn-)?[A-D]-\d+(?:-\d+)?$/.test(key) && typeof value === 'string' && value.length <= 200000) {
+      cleanNotes[key] = value;
+    }
+  }
+  return { version: 1, updatedAt: data.updatedAt || '', statuses: cleanStatuses, notes: cleanNotes };
+}
+function snapshot() {
+  return { version: 1, updatedAt: new Date().toISOString(), statuses: { ...statuses }, notes: { ...notes } };
+}
+function persistBrowser(payload = snapshot()) {
+  try {
+    localStorage.setItem(LS_SNAPSHOT, JSON.stringify(payload));
+    return true;
+  } catch (error) {
+    setTip('❌ 浏览器存储空间不足或存储被禁用。请先点击“备份”保存 JSON 文件。', 'err');
+    return false;
+  }
+}
+function restoreBrowser() {
+  try {
+    const saved = localStorage.getItem(LS_SNAPSHOT);
+    const data = saved ? JSON.parse(saved) : {
+      statuses: JSON.parse(localStorage.getItem(LS_KEY) || '{}'),
+      notes: JSON.parse(localStorage.getItem(LS_NOTES) || '{}'),
+      updatedAt: ''
+    };
+    const valid = normalizePayload(data);
+    statuses = valid.statuses;
+    notes = valid.notes;
+    return valid;
+  } catch (error) {
+    console.warn('旧学习记录读取失败，当前使用空数据：', error);
+    statuses = {};
+    notes = {};
+    return { updatedAt: '', statuses, notes };
+  }
+}
+
+/* ---- 记住文件夹句柄，兼容已有配置 ---- */
 function idbOpen() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(IDB_NAME, 1);
@@ -1030,8 +1084,8 @@ async function idbSet(key, val) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(IDB_STORE, 'readwrite');
     tx.objectStore(IDB_STORE).put(val, key);
-    tx.oncomplete = () => resolve();
-    tx.onerror = e => reject(e);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = e => { db.close(); reject(e); };
   });
 }
 async function idbGet(key) {
@@ -1039,33 +1093,28 @@ async function idbGet(key) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(IDB_STORE, 'readonly');
     const rq = tx.objectStore(IDB_STORE).get(key);
-    rq.onsuccess = () => resolve(rq.result || null);
-    rq.onerror = e => reject(e);
+    rq.onsuccess = () => { db.close(); resolve(rq.result || null); };
+    rq.onerror = e => { db.close(); reject(e); };
   });
 }
 
-/* ---- 存储提示条 ---- */
 function setTip(msg, cls) {
   const el = document.getElementById('storageTip');
   if (!el) return;
   el.textContent = msg;
   el.className = 'storage-banner show' + (cls ? ' ' + cls : '');
 }
-
-/* ---- 保存按钮状态 ---- */
 function updateSaveBtn() {
   const btn = document.getElementById('saveBtn');
   if (!btn) return;
-  btn.classList.remove('saved', 'dirty');
-  if (dirty) btn.classList.add('dirty');
+  btn.classList.toggle('dirty', dirty);
+  if (dirty) btn.classList.remove('saved');
 }
 function flashSaveBtn() {
   const btn = document.getElementById('saveBtn');
   const top = document.getElementById('saveTopBtn');
-  // 右下角悬浮按钮：变绿闪烁
   btn.classList.add('saved');
   setTimeout(() => btn.classList.remove('saved'), 1500);
-  // 顶栏按钮：短暂显示「✅ 已保存」并变绿
   if (top) {
     const old = top.innerHTML;
     top.classList.add('saved');
@@ -1073,7 +1122,6 @@ function flashSaveBtn() {
     setTimeout(() => { top.classList.remove('saved'); top.innerHTML = old; }, 1500);
   }
 }
-/* ---- 保存中状态（按钮禁用 + 变色，不改变文字） ---- */
 function setSaving(flag) {
   const top = document.getElementById('saveTopBtn');
   if (!top) return;
@@ -1081,113 +1129,165 @@ function setSaving(flag) {
   top.classList.toggle('saving', flag);
 }
 
-/* ---- 写入 JSON（或降级 localStorage） ---- */
+/* ---- 文件写入按序执行，避免手动保存与自动同步互相覆盖 ---- */
 async function writeData() {
-  const payload = { version: 1, updatedAt: new Date().toISOString(), statuses, notes };
+  const data = snapshot();
+  if (!persistBrowser(data)) throw new Error('浏览器存储失败');
   if (fsSupported && dirHandle) {
-    const fh = await dirHandle.getFileHandle(DATA_FILE, { create: true });
-    const w = await fh.createWritable();
-    await w.write(JSON.stringify(payload, null, 2));
-    await w.close();
-  } else {
-    try {
-      localStorage.setItem(LS_KEY, JSON.stringify(statuses));
-      localStorage.setItem(LS_NOTES, JSON.stringify(notes));
-    } catch (e) { console.error('保存失败', e); }
+    const content = JSON.stringify(data, null, 2);
+    const task = async () => {
+      const fh = await dirHandle.getFileHandle(DATA_FILE, { create: true });
+      const w = await fh.createWritable();
+      try { await w.write(content); await w.close(); }
+      catch (e) { try { await w.abort(); } catch (_) {} throw e; }
+    };
+    const pending = fileWriteQueue.then(task, task);
+    fileWriteQueue = pending.catch(() => {});
+    await pending;
   }
 }
-
-/* ---- 从已关联文件夹读取（无 JSON 则自动生成） ---- */
-async function loadFromDir() {
-  let fh = null;
-  try { fh = await dirHandle.getFileHandle(DATA_FILE, { create: false }); } catch (e) { fh = null; }
-  if (fh) {
-    const f = await fh.getFile();
-    const data = JSON.parse(await f.text());
-    statuses = (data && data.statuses) || {};
-    notes = (data && data.notes) || {};
-    setTip('💾 已读取 ' + DATA_FILE + '（进度 ' + Object.keys(statuses).length + ' 题 · 笔记 ' + Object.keys(notes).length + ' 条）', 'ok');
-  } else {
-    await writeData();
-    setTip('✅ 未找到 ' + DATA_FILE + '，已自动生成', 'ok');
+async function loadFromDir(localRecord = null, explicit = false) {
+  let fh;
+  try { fh = await dirHandle.getFileHandle(DATA_FILE, { create: false }); }
+  catch (e) { if (e.name === 'NotFoundError') return false; throw e; }
+  const raw = await fh.getFile();
+  const data = normalizePayload(JSON.parse(await raw.text()));
+  const localCount = Object.keys(statuses).length + Object.keys(notes).length;
+  const fileCount = Object.keys(data.statuses).length + Object.keys(data.notes).length;
+  const localDate = Date.parse(localRecord && localRecord.updatedAt || '') || 0;
+  const fileDate = Date.parse(data.updatedAt || '') || 0;
+  if (!explicit && localCount && (localDate > fileDate || (!fileDate && fileCount))) {
+    dirty = true;
+    updateSaveBtn();
+    setTip('ℹ️ 浏览器内有更新的学习记录，已优先保留。点击“保存”可同步到已关联的 JSON 文件。', 'ok');
+    return true;
   }
+  if (!explicit && localCount && !fileCount) {
+    dirty = true;
+    updateSaveBtn();
+    setTip('ℹ️ JSON 文件为空，已保留浏览器内已有学习记录。', 'ok');
+    return true;
+  }
+  statuses = data.statuses;
+  notes = data.notes;
+  persistBrowser({ ...data, updatedAt: data.updatedAt || new Date().toISOString() });
   dirty = false;
   updateSaveBtn();
+  setTip('✅ 已读取 ' + DATA_FILE + '（进度 ' + Object.keys(statuses).length + ' 条 · 笔记 ' + Object.keys(notes).length + ' 条）', 'ok');
+  return true;
 }
 
-/* ---- 标记有未保存修改 ---- */
 let autoSaveOn = true;
 let autoSaveTimer = null;
-function markDirty() {
-  if (!fsSupported || !dirHandle) { writeData(); return; } // 降级模式直接自动保存
-  dirty = true;
-  updateSaveBtn();
-  if (autoSaveOn) {
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(async () => {
-      try {
-        await writeData();
+function scheduleFileSync() {
+  clearTimeout(autoSaveTimer);
+  if (!autoSaveOn || !dirHandle) return;
+  autoSaveTimer = setTimeout(async () => {
+    const currentRevision = revision;
+    try {
+      await writeData();
+      if (currentRevision === revision) {
         dirty = false;
         updateSaveBtn();
-        setTip('✅ 已自动保存到 ' + DATA_FILE + '（' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) + '）', 'ok');
-      } catch (e) {
-        setTip('❌ 自动保存失败：' + e.message + '，请点击 💾 手动保存', 'err');
+        setTip('✅ 已同步 JSON 文件（' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) + '）', 'ok');
+      } else {
+        scheduleFileSync();
       }
-    }, 1500);
-  }
+    } catch (e) {
+      dirty = true;
+      updateSaveBtn();
+      setTip('⚠️ 浏览器记录已保留，JSON 自动同步失败：' + e.message + '。请手动保存重试。', 'err');
+    }
+  }, 1500);
 }
-
-/* ---- 打开页面时自动读取 ---- */
+function markDirty() {
+  revision++;
+  const localOk = persistBrowser();
+  dirty = !!dirHandle || !localOk;
+  updateSaveBtn();
+  scheduleFileSync();
+}
 async function initStorage() {
+  const localRecord = restoreBrowser();
   if (!fsSupported) {
-    try {
-      statuses = JSON.parse(localStorage.getItem(LS_KEY)) || {};
-      notes = JSON.parse(localStorage.getItem(LS_NOTES)) || {};
-    } catch (e) { statuses = {}; notes = {}; }
-    setTip('当前浏览器不支持直接读写文件，进度与笔记已自动保存在浏览器本地（建议使用 Chrome / Edge）', 'ok');
+    setTip('✅ 学习记录自动保存在此浏览器。可使用“备份 / 恢复”跨设备迁移；浏览器清理数据可能删除记录。', 'ok');
     return;
   }
-  try { dirHandle = await idbGet(IDB_DIR_KEY); } catch (e) { dirHandle = null; }
-  if (dirHandle) {
-    try { await loadFromDir(); }
-    catch (e) {
-      dirHandle = null;
-      setTip('❌ 无法访问已记住的笔记数据文件夹（可能被移动、重命名或删除）。请点击 📂 重新选择笔记数据 JSON 所在文件夹，即可继续自动保存。如果是初次使用，点击保存选择位置即可', 'err');
+  try { dirHandle = await idbGet(IDB_DIR_KEY); }
+  catch (e) { dirHandle = null; }
+  if (!dirHandle) {
+    setTip('✅ 学习记录自动保存在此浏览器。需要长期留存时请下载 JSON 备份（可选关联文件夹）。', 'ok');
+    return;
+  }
+  try {
+    const exists = await loadFromDir(localRecord);
+    if (!exists) {
+      dirty = Object.keys(statuses).length + Object.keys(notes).length > 0;
+      updateSaveBtn();
+      setTip('ℹ️ 已关联文件夹暂未找到 JSON 文件，浏览器记录已保留；点击“保存”创建文件。', 'ok');
     }
+  } catch (e) {
+    dirHandle = null;
+    setTip('⚠️ 暂时无法读取关联的 JSON 文件，已恢复浏览器本地记录；可点击 📂 重新选择文件夹。', 'err');
   }
 }
 
-/* ---- 保存（右下角 💾 与顶栏「💾 保存」共用） ---- */
+/* ---- 手动关联文件夹：已有 JSON 时必须先确认是否导入 ---- */
+async function connectDirectory() {
+  if (!fsSupported) {
+    setTip('该浏览器不支持文件夹写入。请使用“备份 / 恢复”管理 JSON 文件。', 'err');
+    return false;
+  }
+  const candidate = await window.showDirectoryPicker({ id: 'elpa-data-dir', mode: 'readwrite' });
+  let existing = false;
+  try { await candidate.getFileHandle(DATA_FILE, { create: false }); existing = true; }
+  catch (e) { if (e.name !== 'NotFoundError') throw e; }
+  if (existing) {
+    const ok = window.confirm('该文件夹已有 elpa_data.json。是否导入该文件并替换当前页面的浏览器记录？\n建议先使用“备份”保存当前记录。取消则不连接该文件夹。');
+    if (!ok) return false;
+    const previous = dirHandle;
+    dirHandle = candidate;
+    try {
+      await loadFromDir(null, true);
+    } catch (e) {
+      dirHandle = previous;
+      throw e;
+    }
+    renderAll();
+  } else {
+    dirHandle = candidate;
+    await writeData();
+    dirty = false;
+    updateSaveBtn();
+    setTip('✅ 已关联文件夹，并创建 ' + DATA_FILE, 'ok');
+  }
+  try { await idbSet(IDB_DIR_KEY, candidate); }
+  catch (e) { setTip('⚠️ 文件已读取／保存，但浏览器未能记住文件夹，下次可能需要重新选择。', 'err'); }
+  return true;
+}
+
+/* ---- 手动保存：始终有本地副本；文件同步为可选操作 ---- */
 async function handleSave() {
   setSaving(true);
   try {
-    if (!fsSupported) {
-      await writeData();
-      setTip('✅ 已保存到浏览器本地', 'ok');
-    } else if (!dirHandle) {
-      try {
-        dirHandle = await window.showDirectoryPicker({ id: 'elpa-data-dir', mode: 'readwrite' });
-        await idbSet(IDB_DIR_KEY, dirHandle);
-      } catch (e) { setTip('已取消选择文件夹，数据未保存', 'err'); return; }
-      let exists = false;
-      try { await dirHandle.getFileHandle(DATA_FILE, { create: false }); exists = true; } catch (e) { exists = false; }
-      if (exists) {
-        await loadFromDir();
-        renderAll();
-        setTip('✅ 已关联文件夹并读取 ' + DATA_FILE, 'ok');
-      } else {
-        await writeData();
-        setTip('✅ 已自动创建并保存 ' + DATA_FILE, 'ok');
-      }
+    if (!dirHandle && fsSupported) {
+      const linked = await connectDirectory();
+      if (!linked) { setTip('浏览器学习记录已保留，未连接新的 JSON 文件夹。', 'ok'); return; }
     } else {
+      const savedRevision = revision;
       await writeData();
-      setTip('✅ 已保存到 ' + DATA_FILE, 'ok');
+      if (savedRevision === revision) {
+        dirty = false;
+        updateSaveBtn();
+      } else {
+        scheduleFileSync();
+      }
+      setTip('✅ 已保存' + (dirHandle ? '至浏览器并同步 ' + DATA_FILE : '到浏览器本地'), 'ok');
     }
-    dirty = false;
-    updateSaveBtn();
     flashSaveBtn();
   } catch (e) {
-    setTip('❌ 保存失败：' + e.message + '，请重试', 'err');
+    if (e.name === 'AbortError') setTip('已取消选择文件夹；浏览器中的学习记录不受影响。', 'ok');
+    else setTip('⚠️ 文件保存失败：' + e.message + '；浏览器本地记录仍然保留。', 'err');
   } finally {
     setSaving(false);
   }
@@ -1195,39 +1295,59 @@ async function handleSave() {
 document.getElementById('saveBtn').addEventListener('click', handleSave);
 document.getElementById('saveTopBtn').addEventListener('click', handleSave);
 
-/* ---- 自动保存开关 ---- */
+/* ---- 自动同步只控制已关联文件夹；浏览器始终自动保存 ---- */
 try { autoSaveOn = localStorage.getItem('elpa-autosave') !== '0'; } catch (e) { autoSaveOn = true; }
 const autoSaveToggle = document.getElementById('autoSaveToggle');
 autoSaveToggle.checked = autoSaveOn;
 autoSaveToggle.addEventListener('change', () => {
   autoSaveOn = autoSaveToggle.checked;
   try { localStorage.setItem('elpa-autosave', autoSaveOn ? '1' : '0'); } catch (e) {}
-  if (autoSaveOn && dirty) {
-    writeData().then(() => { dirty = false; updateSaveBtn(); setTip('✅ 已自动保存到 ' + (dirHandle ? DATA_FILE : '浏览器本地'), 'ok'); });
+  if (autoSaveOn && dirty) scheduleFileSync();
+  if (!autoSaveOn) clearTimeout(autoSaveTimer);
+  setTip(autoSaveOn ? '✅ 已开启文件自动同步；浏览器学习记录始终自动保存。' : 'ℹ️ 已关闭文件自动同步；浏览器学习记录仍会自动保存。', 'ok');
+});
+document.getElementById('folderBtn').addEventListener('click', async () => {
+  try { await connectDirectory(); }
+  catch (e) {
+    if (e.name !== 'AbortError') setTip('❌ 无法关联文件夹：' + e.message, 'err');
   }
-  setTip(autoSaveOn ? '🔁 自动保存已开启，修改后 1.5 秒自动写入 ' + DATA_FILE : '⏸ 自动保存已关闭，请手动点击保存（Ctrl+S）', 'ok');
-  setTimeout(() => { const el = document.getElementById('storageTip'); if (el) el.className = 'storage-banner'; }, 3000);
 });
 
-/* ---- 更换/重新选择数据文件夹 ---- */
-document.getElementById('folderBtn').addEventListener('click', async () => {
-  if (!fsSupported) { setTip('当前浏览器不支持选择文件夹，请使用 Chrome / Edge', 'err'); return; }
+/* ---- JSON 备份与恢复，不依赖 File System Access API ---- */
+document.getElementById('backupBtn').addEventListener('click', () => {
+  const content = JSON.stringify(snapshot(), null, 2);
+  const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'elpa_data_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setTip('✅ 已生成 JSON 备份，请将下载的文件妥善保管。', 'ok');
+});
+const restoreInput = document.getElementById('restoreInput');
+document.getElementById('restoreBtn').addEventListener('click', () => restoreInput.click());
+restoreInput.addEventListener('change', async () => {
+  const file = restoreInput.files && restoreInput.files[0];
+  restoreInput.value = '';
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    setTip('❌ JSON 备份超过 5 MB；为安全起见未导入。', 'err');
+    return;
+  }
   try {
-    dirHandle = await window.showDirectoryPicker({ id: 'elpa-data-dir', mode: 'readwrite' });
-    await idbSet(IDB_DIR_KEY, dirHandle);
-    let exists = false;
-    try { await dirHandle.getFileHandle(DATA_FILE, { create: false }); exists = true; } catch (e) { exists = false; }
-    if (exists) {
-      await loadFromDir();
-      renderAll();
-      setTip('✅ 已读取 ' + DATA_FILE, 'ok');
-    } else {
-      await writeData();
-      setTip('✅ 该文件夹没有数据文件，已自动生成 ' + DATA_FILE, 'ok');
-    }
-    dirty = false;
-    updateSaveBtn();
-  } catch (e) { setTip('已取消选择文件夹', 'err'); }
+    const data = normalizePayload(JSON.parse(await file.text()));
+    if (!window.confirm('确认从此 JSON 恢复学习记录？这将替换当前浏览器内的进度和笔记。\n建议先点击“备份”保存现有记录。')) return;
+    statuses = data.statuses;
+    notes = data.notes;
+    renderAll();
+    markDirty();
+    setTip('✅ 已恢复学习进度与笔记，并保存到本浏览器' + (dirHandle ? '；关联文件将按自动同步设置更新。' : '。'), 'ok');
+  } catch (e) {
+    setTip('❌ 备份文件无法导入：' + e.message, 'err');
+  }
 });
 
 function qId(bank, num) { return bank + '-' + num; }
