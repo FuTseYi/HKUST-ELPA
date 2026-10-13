@@ -5,7 +5,7 @@ on:
     paths:
       - 'index.html'
       - 'question-bank/questions.js'
-      - 'assets/hkustgz-campus.webp'
+      - 'assets/Administration-Building-14-1536x864.jpg'
       - '.github/workflows/site-checks.yml'
   push:
     branches: [main]
@@ -54,12 +54,13 @@ jobs:
           data = Path('question-bank/questions.js').read_text(encoding='utf-8')
           assert 'BANKS.D = {' in data, '2026 Fall drills not included'
           print(f'HTML smoke checks passed ({len(collector.ids)} IDs).')
-          image = Path('assets/hkustgz-campus.webp').read_bytes()
-          assert image[:4] == b'RIFF' and image[8:12] == b'WEBP', 'Invalid WebP signature'
-          assert len(image) == int.from_bytes(image[4:8], 'little') + 8, 'Truncated image data'
+          image = Path('assets/Administration-Building-14-1536x864.jpg').read_bytes()
+          assert image[:3] == b'\xff\xd8\xff', 'Invalid JPEG signature'
+          assert image[-2:] == b'\xff\xd9', 'Incomplete JPEG file'
           assert len(image) > 8000, 'Hero image unexpectedly small'
-          assert "assets/hkustgz-campus.webp" in html, 'Missing hero image CSS URL'
-          print(f'Campus image container valid: {len(image)} bytes.')
+          asset_url = './assets/Administration-Building-14-1536x864.jpg'
+          assert html.count(asset_url) == 3, 'Expected preload, desktop and mobile hero image references'
+          print(f'Campus JPEG file header and references valid: {len(image)} bytes.')
           PY
       - name: Decode hero image
         run: |
@@ -67,7 +68,7 @@ jobs:
           python3 - <<'PY'
           from PIL import Image
           from pathlib import Path
-          p=Path('assets/hkustgz-campus.webp')
+          p=Path('assets/Administration-Building-14-1536x864.jpg')
           with Image.open(p) as img:
               img.load()
               assert img.width >= 450 and img.height >= 240, f'Unexpected image dimensions: {img.size}'
