@@ -8,8 +8,14 @@ on:
       - 'question-bank/questions.js'
       - 'submit.html'
       - 'submission-config.js'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/approved-submission.yml'
       - 'submit.html'
       - 'submission-config.js'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/approved-submission.yml'
       - 'assets/Administration-Building-14-1536x864.jpg'
       - '.github/workflows/site-checks.yml'
   push:
@@ -109,6 +115,10 @@ jobs:
           node --check /tmp/elpa-submit.html.js
           node --check submission-config.js
           node --check question-bank/questions.js
+      - name: Test approved-question import and stable IDs
+        run: |
+          node --check scripts/import-approved-submission.cjs
+          node --test tests/approved-import.test.cjs
       - name: Decode campus JPEG
         run: |
           python3 -m pip install --quiet pillow
