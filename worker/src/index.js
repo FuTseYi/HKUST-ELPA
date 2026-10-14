@@ -74,6 +74,16 @@ export default {
       }});
     if (request.method !== 'POST') return invalid('Method not allowed',405);
     if (env.SUBMISSIONS_DISABLED !== 'false') return invalid('投稿暂时关闭，请稍后再试。',503);
+    // The API only operates in an explicitly selected mode.
+    const testMode = env.SUBMISSION_MODE === 'test';
+    if (!testMode && env.SUBMISSION_MODE !== 'public')
+      return invalid('投稿服务尚未开放。',503);
+    if (testMode) {
+      const deadline = Number(env.SUBMISSION_TEST_DEADLINE_MS);
+      if (!/^\\d{13}$/.test(String(env.SUBMISSION_TEST_DEADLINE_MS || '')) ||
+          !Number.isSafeInteger(deadline) || Date.now() >= deadline)
+        return invalid('本次测试窗口已结束。',503);
+    }
     if (!env.GITHUB_TOKEN || !env.TURNSTILE_SECRET || !env.SUBMISSION_LIMITER)
       return invalid('投稿服务尚未配置完成。',503);
     if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type') || ''))
@@ -97,6 +107,12 @@ export default {
         !['firsthand','secondhand'].includes(source) ||
         !validText(turnstileToken,1,2048))
       return invalid('请检查必填项、内容格式和字符长度。');
+    // A short-lived test window accepts only an exact synthetic question,
+    // and never needs to accept arbitrary public submissions.
+    if (testMode &&
+       (question.trim() !== env.SUBMISSION_TEST_QUESTION ||
+        term !== '2026 Fall' || subquestions.trim() !== '' || source !== 'firsthand'))
+      return invalid('测试窗口只接收指定测试内容。',403);
     // Never send unverified submissions to GitHub.
     let verified;
     try {
