@@ -35,12 +35,12 @@
 <span class="elpa-kicker">Explore</span><h2 class="elpa-heading">找到你需要的备考内容</h2><p class="elpa-desc">借鉴多页面导航设计，考试信息、练习工具与资料出处各自独立，不必在一个超长页面中反复寻找。</p>
 <div class="elpa-feature-grid">
 <a class="elpa-feature" href="./guide.html"><span class="elpa-feature-icon" aria-hidden="true">🗓️</span><strong>考试指南</strong><p>了解考生反馈中的考试流程、口头陈述、提问环节与常见问题。不同场次要求以现场通知为准。</p><span class="arrow">查看指南 →</span></a>
-<a class="elpa-feature" href="./practice.html#sec-bankA"><span class="elpa-feature-icon" aria-hidden="true">📚</span><strong>往年题库</strong><p>25 道整理去重后的练习题，保留已有提示小问，支持搜索、分页、笔记和练习状态。</p><span class="arrow">开始练习 →</span></a>
-<a class="elpa-feature" href="./practice.html#sec-bankD"><span class="elpa-feature-icon" aria-hidden="true">🎓</span><strong>社区反馈题库</strong><p>保留 2026 Fall 及后续考试批次的考生反馈，题目回忆不完整时会明确标注。</p><span class="arrow">查看新题 →</span></a>
+<a class="elpa-feature" href="./practice.html#sec-bankD"><span class="elpa-feature-icon" aria-hidden="true">🎓</span><strong>本学期新题库</strong><p>优先查看当学期考生反馈的题目；题卡提供英文提问与中文释义，支持直接练习。</p><span class="arrow">查看本学期新题 →</span></a>
+<a class="elpa-feature" href="./practice.html#sec-bankA"><span class="elpa-feature-icon" aria-hidden="true">📚</span><strong>往年题库</strong><p>以历届经典题和其他学期的考题组成历史题库，持续归档且保留学习记录。</p><span class="arrow">练习往年题 →</span></a>
 </div>
 <div class="elpa-nums" aria-label="网站内容概览">
-<div class="elpa-num"><strong>25</strong><small>往年题库练习题</small></div>
-<div class="elpa-num"><strong id="homeNewCount">12</strong><small>社区反馈题</small></div>
+<div class="elpa-num"><strong id="homeNewCount">—</strong><small id="homeTermLabel">本学期新题</small></div>
+<div class="elpa-num"><strong id="homePastCount">—</strong><small>往年题库练习题</small></div>
 <div class="elpa-num"><strong id="homeDoneCount">—</strong><small>已掌握题目（当前浏览器）</small></div>
 </div>
 <div class="elpa-panel"><h2>持续学习，记录自己的进度</h2><p>题目练习时可以搜索关键词、按状态筛选、随机抽题、计时模拟，并在浏览器中保存笔记。支持 JSON 备份与恢复，原有学习进度无需重新开始。</p><a class="elpa-button primary" href="./practice.html">进入练习工具 →</a></div>
@@ -48,11 +48,14 @@
 </section></main>
 <footer class="elpa-footer">HKUST-ELPA · 学生维护的非官方备考资源 · <a href="./sources.html">资料来源与声明</a> · <a href="https://github.com/FuTseYi/HKUST-ELPA" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer>
 <script src="./question-bank/questions.js"></script>
+<script src="./question-bank/appearances.js"></script>
 <script>
 try {
   const snapshot = JSON.parse(localStorage.getItem('elpa-data-snapshot-v2') || '{}');
-  const ids = PAST_QUESTION_IDS.concat(BANKS.D.items.map(it => "D-" + it.num));
-  document.getElementById("homeNewCount").textContent = String(BANKS.D.items.length);
+  const ids = elpaAllPracticeIds();
+  document.getElementById('homeTermLabel').textContent = elpaActiveTerm() + ' 新题';
+  document.getElementById('homeNewCount').textContent = String(elpaCurrentQuestionIds().length);
+  document.getElementById('homePastCount').textContent = String(elpaArchivedQuestionIds().length);
   const statuses = snapshot.statuses || {};
   document.getElementById('homeDoneCount').textContent = String(ids.filter(id=>statuses[id]==='done').length);
 } catch (e) { document.getElementById('homeDoneCount').textContent='—'; }

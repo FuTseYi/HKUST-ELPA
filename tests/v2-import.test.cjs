@@ -37,6 +37,7 @@ test('v2 new question keeps bilingual main, dynamic subs, and stable ID',()=>{
  const f=fixture();try{
   const r=f.run(question(),101);assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/status: added/);
   assert.match(f.read('questions.js'),/"num":1000101/);
+  assert.match(f.read('questions.js'),/"term":"2026 Fall"/);
   assert.match(f.read('questions.js'),/"cn":"你如何为跨学科研究做准备？"/);
   assert.match(f.read('questions.js'),/"en":"What was your main challenge\?","cn":"你遇到的主要挑战是什么？"/);
   assert.match(f.read('appearances.js'),/"D-1000101"/);
@@ -109,5 +110,33 @@ test('same Issue imported twice is idempotent',()=>{
   const p=f.read('appearances.js');
   const r=f.run(a,107);assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/status: duplicate/);
   assert.equal(f.read('appearances.js'),p);
+ }finally{f.close();}
+});
+
+test('current-term grouping archives other sessions without renumbering saved IDs',()=>{
+ const f=fixture();try{
+  assert.equal(f.run(question(),301).status,0);
+  const spring={...question('Can you describe your current academic interests in simple terms?'),
+    term:'2027 Spring'};
+  assert.equal(f.run(spring,302).status,0);
+  const classify=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+`
+    return {
+      fall:elpaCurrentQuestionIds('2026 Fall'),
+      spring:elpaCurrentQuestionIds('2027 Spring'),
+      past:elpaArchivedQuestionIds('2027 Spring'),
+      january:elpaActiveTerm(new Date(2027,0,10)),
+      february:elpaActiveTerm(new Date(2027,1,10))
+    };`);
+  const groups=classify();
+  assert.equal(groups.fall.length,13); // The 12 original 2026 Fall reports + Issue #301.
+  assert.deepEqual([...groups.spring],['D-1000302']);
+  assert.ok(groups.past.includes('D-1'));
+  assert.ok(groups.past.includes('D-1000301'));
+  assert.ok(!groups.past.includes('D-1000302'));
+  assert.equal(groups.january,'2026 Fall');
+  assert.equal(groups.february,'2027 Spring');
+  const every=new Set([...groups.spring,...groups.past]);
+  assert.equal(every.size,elpaTotal());
+  function elpaTotal(){return 25+12+2;}
  }finally{f.close();}
 });
