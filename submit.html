@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="向 HKUST(GZ) ELPA 非官方备考题库贡献考生回忆题，无需账号，提交后由维护者审核。">
+<meta name="theme-color" content="#003e74">
+<title>贡献新题｜HKUST(GZ) ELPA</title>
+<link rel="stylesheet" href="./site.css">
+<style>
+.submission-main{max-width:760px;margin:42px auto 70px;padding:0 20px}
+.submission-intro h1{font-size:clamp(1.75rem,5vw,2.5rem);line-height:1.2;margin:0 0 12px}
+.submission-intro p{line-height:1.8;color:#44556a}
+.submission-panel{background:#fff;border:1px solid #dce4ed;border-radius:16px;padding:clamp(20px,4vw,34px);box-shadow:0 10px 32px rgba(16,49,89,.06)}
+.submission-form{display:grid;gap:20px}
+.submission-field{display:grid;gap:7px}
+.submission-field label{font-weight:700;color:#16365e}
+.submission-field input,.submission-field textarea,.submission-field select{box-sizing:border-box;width:100%;padding:12px 13px;border:1px solid #b9c7d6;border-radius:9px;background:#fff;color:#172b45;font:inherit;font-size:1rem}
+.submission-field textarea{resize:vertical;min-height:100px}
+.submission-field :is(input,textarea,select):focus{outline:3px solid #cce1fa;outline-offset:1px}
+.submission-help,.submission-note{font-size:.9rem;color:#56667b;line-height:1.65}
+.submission-note{background:#f1f6fb;border-radius:9px;padding:12px 14px;margin:0}
+.submission-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.submission-button{border:0;border-radius:9px;background:#003e74;color:white;padding:13px 25px;font:inherit;font-weight:700;cursor:pointer}
+.submission-button:disabled{opacity:.6;cursor:not-allowed}
+.submission-message{line-height:1.6;min-height:1.5em;margin:0}
+.submission-message[data-state="error"]{color:#a32626}
+.submission-message[data-state="success"]{color:#17613a}
+.submission-message[data-state="info"]{color:#39566e}
+.submission-turnstile{min-height:65px}
+@media(max-width:540px){.submission-main{margin-top:25px}.submission-button{width:100%}}
+</style>
+</head>
+<body class="elpa-body">
+<nav class="elpa-nav" aria-label="主导航">
+  <div class="elpa-nav-inner">
+    <a class="elpa-brand" href="./index.html" aria-label="ELPA 首页"><span class="elpa-brand-icon">E<span>·</span></span><span>HKUST(GZ) <strong>ELPA</strong><small>Speaking Preparation</small></span></a>
+    <div class="elpa-nav-links">
+      <a href="./index.html">首页</a>
+      <a href="./guide.html">考试指南</a>
+      <a href="./practice.html">题库练习</a>
+      <a href="./sources.html">资料来源</a>
+    </div>
+    <a class="elpa-nav-github" href="https://github.com/FuTseYi/HKUST-GZ-ELPA" target="_blank" rel="noopener noreferrer" aria-label="GitHub 项目">GitHub ↗</a>
+  </div>
+</nav>
+<main class="submission-main">
+  <header class="submission-intro">
+    <h1>贡献新题 <span lang="en">Submit a Question</span></h1>
+    <p>感谢分享 ELPA 口语题目回忆。无需 GitHub 账号，投稿会进入<strong>公开的 GitHub Issues 待审核区</strong>，只有通过维护者审核的题目才可能进入正式练习题库。</p>
+  </header>
+  <section class="submission-panel" aria-label="提交题目">
+    <form id="submissionForm" class="submission-form">
+      <p class="submission-note">仅填写考试题目相关信息。请勿提交姓名、学号、联系方式、个人经历或其他可识别个人身份的信息。题目可能来自考生回忆，并非官方原题。</p>
+      <div class="submission-field">
+        <label for="submissionTerm">考试批次 *</label>
+        <select id="submissionTerm" name="term" required></select>
+      </div>
+      <div class="submission-field">
+        <label for="submissionQuestion">题目内容 *</label>
+        <textarea id="submissionQuestion" name="question" maxlength="1000" minlength="8" rows="4" placeholder="尽量填写现场英文题干；如果只记得中文题意，也可以填写中文回忆并注明不确定的部分。" required></textarea>
+        <div class="submission-help">最多 1000 字符。仅记录确实记得的内容，不必自行补全。</div>
+      </div>
+      <div class="submission-field">
+        <label for="submissionSubs">提示小问（选填）</label>
+        <textarea id="submissionSubs" name="subquestions" maxlength="2000" rows="4" placeholder="例如：a. Why is it important?&#10;b. Can you give an example?"></textarea>
+        <div class="submission-help">最多 2000 字符；没有记住就留空。</div>
+      </div>
+      <div class="submission-field">
+        <label for="submissionSource">来源类型 *</label>
+        <select id="submissionSource" name="source" required>
+          <option value="firsthand">本人亲历（考生回忆）</option>
+          <option value="secondhand">同学转述（非一手）</option>
+        </select>
+      </div>
+      <div id="submissionTurnstile" class="submission-turnstile" aria-label="人机验证"></div>
+      <div class="submission-actions">
+        <button id="submissionButton" class="submission-button" type="submit" disabled>提交待审核</button>
+        <a href="./practice.html">返回题库练习 →</a>
+      </div>
+      <p id="submissionMessage" class="submission-message" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+</main>
+<footer class="elpa-footer">学生维护的非官方备考资源 · 不代表 HKUST(GZ) 官方立场 · <a href="./sources.html">资料来源与声明</a></footer>
+<script src="./submission-config.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+<script>
+(function(){
+  'use strict';
+  const config = window.ELPA_SUBMISSION_CONFIG || {};
+  const form = document.getElementById('submissionForm');
+  const button = document.getElementById('submissionButton');
+  const message = document.getElementById('submissionMessage');
+  const term = document.getElementById('submissionTerm');
+  const year = new Date().getFullYear();
+  [year-1, year, year+1].forEach(y=>['Spring','Fall'].forEach(t=>{
+    const opt=document.createElement('option');
+    opt.value=y+' '+t; opt.textContent=opt.value; term.append(opt);
+  }));
+  term.value=year+' Fall';
+  const other=document.createElement('option'); other.value='Other / Unknown';other.textContent='其他 / 不确定';term.append(other);
+  let widgetId=null;
+  const ready=Boolean(config.apiEndpoint && config.turnstileSiteKey &&
+     /^https:\/\//.test(config.apiEndpoint));
+  function show(text,state){message.textContent=text;message.dataset.state=state;}
+  if(!ready){
+    show('投稿功能尚未开放：管理员正在配置安全接收服务。请稍后再来。','info');
+  }else{
+    show('请完成人机验证后提交。','info');
+    const start=Date.now();
+    const tryRender=()=>{
+      if(window.turnstile && typeof window.turnstile.render==='function'){
+        widgetId=window.turnstile.render('#submissionTurnstile',{sitekey:config.turnstileSiteKey});
+        button.disabled=false; return;
+      }
+      if(Date.now()-start<12000) setTimeout(tryRender,200);
+      else show('人机验证加载失败，请刷新重试。','error');
+    };
+    tryRender();
+  }
+  form.addEventListener('submit',async(event)=>{
+    event.preventDefault();
+    if(!ready||widgetId===null||button.disabled)return;
+    const question=document.getElementById('submissionQuestion').value.trim();
+    const subquestions=document.getElementById('submissionSubs').value.trim();
+    const source=document.getElementById('submissionSource').value;
+    const token=window.turnstile.getResponse(widgetId);
+    if(question.length<8||question.length>1000||subquestions.length>2000||!token){
+      show('请检查题目长度并完成人机验证。','error'); return;
+    }
+    button.disabled=true;
+    show('正在安全提交，请稍候……','info');
+    try {
+      const response=await fetch(config.apiEndpoint,{
+        method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({term:term.value,question,subquestions,source,turnstileToken:token})
+      });
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok||!data.ok)throw new Error(data.message||'提交失败，请稍后再试。');
+      form.reset();term.value=year+' Fall';
+      show('提交成功！题目已进入公开待审核队列，尚未收录到正式题库。感谢分享！','success');
+    }catch(error){
+      show(error.message||'网络异常，请稍后重试。','error');
+    }finally{
+      if(widgetId!==null && window.turnstile)window.turnstile.reset(widgetId);
+      button.disabled=false;
+    }
+  });
+})();
+</script>
+</body>
+</html>
