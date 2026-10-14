@@ -161,9 +161,9 @@ test('Fast Track and campus categories keep distinct canonical IDs and review re
   assert.doesNotMatch(f.read('questions.js'),/1000501/);
   const clear={...fast,campus:'clear-water-bay'};
   assert.equal(f.run(clear,502).status,0);
-  assert.match(f.read('fast-track.js'),/"T-DOES-NOT-EXIST"|"num":1000502/);
+  assert.match(f.read('fast-track.js'),/"num":1000502/);
   assert.match(f.read('appearances.js'),/"T-1000502"/);
-  const regular={...fast,track:'regular'};
+  const regular={...clear,track:'regular'};
   assert.equal(f.run(regular,503).status,0);
   assert.match(f.read('fast-track.js'),/"num":1000503/);
   assert.match(f.read('appearances.js'),/"H-1000503"/);
