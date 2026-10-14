@@ -12,7 +12,8 @@ permissions:
   issues: write
 
 concurrency:
-  group: elpa-approved-submissions
+  # Each issue is independent. A global concurrency key can discard queued approvals.
+  group: elpa-approved-${{ github.event.issue.number }}
   cancel-in-progress: false
 
 jobs:
