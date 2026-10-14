@@ -121,6 +121,7 @@ jobs:
         run: |
           node --check scripts/import-approved-submission.cjs
           node --test tests/approved-import.test.cjs
+          node --test tests/worker.test.cjs
       - name: Decode campus JPEG
         run: |
           python3 -m pip install --quiet pillow
