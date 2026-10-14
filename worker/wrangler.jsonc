@@ -7,7 +7,7 @@
   "ratelimits": [
     {
       "name": "SUBMISSION_LIMITER",
-      "namespace_id": "1001",
+      "namespace_id": "11247601",
       "simple": { "limit": 3, "period": 60 }
     }
   ]
