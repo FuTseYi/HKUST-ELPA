@@ -624,13 +624,16 @@
   }
   @media (max-width: 360px) { .quick-grid { grid-template-columns: 1fr; } }
 
-  /* Clear search action and feedback are separate from live filtering. */
-  .search-box {display:flex;align-items:center;min-width:0;position:relative;}
-  .search-box input {width:100%;min-width:0;height:48px;min-height:48px;padding:11px 122px 11px 40px;border-radius:12px;font-size:15px;}
+  /* Keep accessibility labels available to screen readers, not in the visual flex layout. */
+  .sr-only {position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+  /* The search action is a separate flex item, not overlaid on placeholder text. */
+  .search-box {display:flex;align-items:center;gap:8px;min-width:0;position:relative;}
+  .search-box .search-field {position:relative;min-width:0;flex:1 1 auto;}
+  .search-box input {display:block;width:100%;min-width:0;height:48px;min-height:48px;padding:11px 42px 11px 40px;border-radius:12px;font-size:15px;}
   .search-box .icon {font-size:22px;line-height:1;left:15px;pointer-events:none;}
-  .search-box .search-clear {right:91px;top:50%;transform:translateY(-50%);width:26px;height:26px;z-index:2;display:none;align-items:center;justify-content:center;position:absolute;border:0;background:#e8edf4;color:#52677d;border-radius:7px;cursor:pointer;font-size:18px;}
+  .search-box .search-clear {right:10px;top:50%;transform:translateY(-50%);width:26px;height:26px;z-index:2;display:none;align-items:center;justify-content:center;position:absolute;border:0;background:#e8edf4;color:#52677d;border-radius:7px;cursor:pointer;font-size:18px;}
   .search-box .search-clear.show {display:flex;}
-  .search-box .search-submit {position:absolute;top:5px;right:5px;bottom:5px;border:0;border-radius:9px;background:#003e74;color:#fff;min-width:77px;padding:0 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;}
+  .search-box .search-submit {position:static;flex:0 0 auto;min-height:44px;border:0;border-radius:10px;background:#003e74;color:#fff;min-width:77px;padding:0 15px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;}
   .search-box .search-submit:hover {background:#135e9b;}
   .search-box .search-submit:focus-visible {outline:3px solid #e3b34b;outline-offset:2px;}
   .search-feedback {flex:1 0 100%;font-size:13px;color:#245579;background:#ecf5fe;padding:9px 12px;border-radius:9px;line-height:1.6;border:1px solid #cbdfee;margin:0;}
@@ -639,10 +642,14 @@
   .qcard[tabindex="-1"]:focus {outline:2px solid #21659b;outline-offset:2px;}
   .qcard {scroll-margin-top:155px;}
   @media(max-width:640px){
-    .search-box input {font-size:16px;height:48px;padding-right:119px;}
+    .search-box input {font-size:16px;height:48px;padding-right:42px;}
     .search-box .search-submit {min-width:74px;}
-    .search-box .search-clear {right:86px;}
     .qcard{scroll-margin-top:128px;}
+  }
+  @media(max-width:480px){
+    .search-box {flex-direction:column;align-items:stretch;}
+    .search-box .search-field {flex:none;width:100%;}
+    .search-box .search-submit {width:100%;min-height:42px;}
   }
 
 </style>
@@ -672,9 +679,11 @@
   <div class="toolbar">
     <form class="search-box" id="searchForm" role="search" aria-label="题目搜索">
       <label class="sr-only" for="searchInput">搜索题目或关键词</label>
-      <span class="icon" aria-hidden="true">⌕</span>
-      <input type="search" id="searchInput" name="query" aria-label="搜索题目或关键词" placeholder="搜索题目或关键词" enterkeyhint="search" autocomplete="off">
-      <button type="button" class="search-clear" id="searchClear" title="清空搜索" aria-label="清空搜索">×</button>
+      <div class="search-field">
+        <span class="icon" aria-hidden="true">⌕</span>
+        <input type="search" id="searchInput" name="query" aria-label="搜索题目或关键词" placeholder="搜索题目或关键词" enterkeyhint="search" autocomplete="off">
+        <button type="button" class="search-clear" id="searchClear" title="清空搜索" aria-label="清空搜索">×</button>
+      </div>
       <button type="submit" class="search-submit" id="searchSubmit">搜索 <span aria-hidden="true">↗</span></button>
     </form>
     <p id="searchFeedback" class="search-feedback" role="status" aria-live="polite" hidden></p>
