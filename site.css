@@ -122,13 +122,13 @@ body { margin:0; }
 .page-practice .bank-pagination[hidden] {display:none;}
 
 /* HKUST-ELPA original identity, accessible navigation and clear contribution action. */
-.elpa-brand-icon { flex:none;width:40px;height:40px;border-radius:12px;background:transparent;display:block;overflow:hidden;box-shadow:0 3px 10px rgba(0,49,91,.10); }
+.elpa-brand-icon {flex:none;width:29px;height:29px;border:0;border-radius:0;background:none;box-shadow:none;display:block;overflow:visible;}
 .elpa-brand-icon img {width:100%;height:100%;display:block;}
 .elpa-brand-name {letter-spacing:.01em;white-space:nowrap;}
 .elpa-nav-actions {margin-left:4px;display:flex;align-items:center;gap:10px;flex:none;}
- .elpa-nav-actions .elpa-nav-github {margin-left:0;width:42px;height:42px;border-radius:12px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;}
+ .elpa-nav-actions .elpa-nav-github {margin-left:0;width:35px;height:35px;border:0;border-radius:0;box-shadow:none;background:none;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;}
 .elpa-nav-github img {width:20px;height:20px;display:block;}
-.elpa-nav-github:hover {border-color:#8da7bf;background:#edf4fb;}
+.elpa-nav-github:hover {border-color:transparent;background:none;opacity:.76;}
 .elpa-nav-submit {display:inline-flex;align-items:center;justify-content:center;min-height:43px;white-space:nowrap;gap:5px;padding:9px 17px;border-radius:12px;background:var(--site-gold);color:#18344e!important;border:1px solid #ecc151;text-decoration:none;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(190,136,24,.16);transition:transform .16s ease,box-shadow .16s ease,background .16s ease;}
 .elpa-nav-submit:hover,.elpa-nav-submit[aria-current="page"] {background:#ffd779;box-shadow:0 6px 18px rgba(190,136,24,.22);transform:translateY(-1px);}
 .elpa-nav-submit:focus-visible {outline:3px solid #003e74;outline-offset:3px;}
@@ -145,7 +145,7 @@ body { margin:0; }
 }
 @media (max-width:650px) {
  .elpa-nav-inner {padding:8px 13px 0;gap:7px;min-height:62px;}
- .elpa-brand-icon {width:35px;height:35px;}
+ .elpa-brand-icon {width:27px;height:27px;}
  .elpa-brand-name {font-size:12px;}
  .elpa-brand small {font-size:8px;}
  .elpa-nav-actions {margin-left:auto;gap:7px;}
