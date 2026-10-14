@@ -63,7 +63,7 @@ test('Chinese recollection is explicitly identified as non-verbatim',()=>{
   assert.match(contents,/中文题意回忆，未核实英文原题/);
 });
 test('more than 30 subquestions fails rather than silently dropping content',()=>{
-  const many=Array.from({length:31},(_,i)=>'Subquestion '+i).join('\\n');
+  const many=Array.from({length:31},(_,i)=>'Subquestion '+i).join('\n');
   const {result}=attempt({subquestions:many},'Please describe a unique research topic in simple English.',47);
   assert.notEqual(result.status,0);
   assert.match(result.stderr,/Too many subquestions/);
