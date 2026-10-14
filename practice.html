@@ -2155,15 +2155,24 @@ function setExamChoice(axis,value){
   termFilter.value='';examStageFilter.value='';statusFilter.value='all';searchInput.value='';
   bankPages.past=1;bankPages.fall=1;searchFeedback.hidden=true;
   renderAll();populateExamFilters();
-  if(location.hash==='#sec-bankA'&&!isNanshaRegular())history.replaceState(null,'',location.pathname+'#sec-bankD');
+  const params=new URLSearchParams(location.search);
+  params.set('campus',activeCampus);params.set('track',activeTrack);
+  const hash=location.hash==='#sec-bankA'&&!isNanshaRegular()?'#sec-bankD':location.hash;
+  history.replaceState(null,'',location.pathname+'?'+params.toString()+hash);
 }
 document.querySelectorAll('[data-campus]').forEach(b=>b.addEventListener('click',()=>setExamChoice('campus',b.dataset.campus)));
 document.querySelectorAll('[data-track]').forEach(b=>b.addEventListener('click',()=>setExamChoice('track',b.dataset.track)));
 
 /* ============ 初始化：先读取同目录 JSON，再渲染 ============ */
 (async function init() {
+  const route=new URLSearchParams(location.search);
+  if(['nansha','clear-water-bay'].includes(route.get('campus')))activeCampus=route.get('campus');
+  if(['regular','fast-track'].includes(route.get('track')))activeTrack=route.get('track');
+  document.querySelectorAll('[data-campus]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.campus===activeCampus)));
+  document.querySelectorAll('[data-track]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.track===activeTrack)));
   renderTOC();
   await initStorage();
+  populateExamFilters();
   renderAll();
   if (location.hash) {
     const target = document.getElementById(location.hash.slice(1));
