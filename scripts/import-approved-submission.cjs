@@ -10,6 +10,11 @@ const eventFile=process.env.GITHUB_EVENT_PATH || process.argv[2];
 if(!eventFile)throw Error('GitHub event payload required');
 const event=JSON.parse(fs.readFileSync(eventFile,'utf8'));
 const issue=event.issue||{};
+/* v2 is additive: original v1 approval semantics and IDs are preserved. */
+if(/^<!-- elpa-submission-v2:[A-Za-z0-9_-]+ -->\s*$/m.test(issue.body||'')){
+  require('./import-v2-submission.cjs')(event);
+  process.exit(0);
+}
 const number=issue.number;
 const marker=(issue.body||'').match(/^<!-- elpa-submission-v1:([A-Za-z0-9_-]+) -->\s*$/m);
 if(!Number.isSafeInteger(number)||number<1||!marker||!String(issue.title||'').startsWith('[ELPA 投稿]')){

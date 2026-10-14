@@ -5,7 +5,7 @@ on:
     paths:
       - '*.html'
       - 'site.css'
-      - 'question-bank/questions.js'
+      - 'question-bank/**'
       - 'question-bank/taxonomy.js'
       - 'docs/submission-v2-spec.md'
       - 'submission-config.js'
@@ -20,7 +20,7 @@ on:
     paths:
       - '*.html'
       - 'site.css'
-      - 'question-bank/questions.js'
+      - 'question-bank/**'
       - 'question-bank/taxonomy.js'
       - 'docs/submission-v2-spec.md'
       - 'submission-config.js'
@@ -122,10 +122,14 @@ jobs:
           node --check /tmp/elpa-worker.mjs
           node --check question-bank/questions.js
           node --check question-bank/taxonomy.js
+          node --check question-bank/appearances.js
+          node --check question-bank/advice.js
       - name: Test approved-question import and stable IDs
         run: |
           node --check scripts/import-approved-submission.cjs
+          node --check scripts/import-v2-submission.cjs
           node --test tests/approved-import.test.cjs
+          node --test tests/v2-import.test.cjs
           node --test tests/worker.test.cjs
       - name: Decode campus JPEG
         run: |

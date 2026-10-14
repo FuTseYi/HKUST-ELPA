@@ -29,13 +29,17 @@ jobs:
         id: import
         run: node scripts/import-approved-submission.cjs
       - name: Validate generated question-bank JavaScript
-        if: steps.import.outputs.result == 'added'
+        if: steps.import.outputs.result == 'added' || steps.import.outputs.result == 'linked'
         run: |
           node --check question-bank/questions.js
+          node --check question-bank/appearances.js
+          node --check question-bank/advice.js
+          node --check scripts/import-v2-submission.cjs
           node --test tests/approved-import.test.cjs
+          node --test tests/v2-import.test.cjs
           node --test tests/worker.test.cjs
       - name: Open data-only PR
-        if: steps.import.outputs.result == 'added'
+        if: steps.import.outputs.result == 'added' || steps.import.outputs.result == 'linked'
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
@@ -49,8 +53,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "${BRANCH}"
-          git add -- question-bank/questions.js question-bank/community-submissions.md
-          git diff --cached --name-only | grep -Eq '^question-bank/(questions\.js|community-submissions\.md)$'
+          git add -A -- question-bank/
+          changed="$(git diff --cached --name-only)"
+          test -n "$changed"
+          if echo "$changed" | grep -Ev '^question-bank/(questions\.js|community-submissions\.md|appearances\.js|advice\.js|community-advice\.md)$'; then
+            echo 'Unexpected changed file outside reviewed data allowlist'
+            exit 1
+          fi
           git commit -m "docs: propose approved ELPA question from issue #${ISSUE_NUMBER}"
           git push --set-upstream origin "${BRANCH}"
           gh pr create --base main --head "${BRANCH}" \
