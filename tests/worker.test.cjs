@@ -29,6 +29,7 @@ function makeWorker({siteverify={success:true,hostname:'futseyi.github.io',actio
   vm.runInNewContext(source.replace('export default {','module.exports = {'),sandbox,{filename:'worker.js'});
   const env={
     SUBMISSIONS_DISABLED:'false',
+    SUBMISSION_MODE:'public',
     GITHUB_TOKEN:'FAKE-NOT-A-CREDENTIAL',
     TURNSTILE_SECRET:'FAKE-NOT-A-SECRET',
     SUBMISSION_LIMITER:{limit:async()=>rateLimit}
@@ -97,4 +98,42 @@ test('missing or malformed enable flag fails closed (opt-in only)',async()=>{
   assert.equal(r.status,503);
   assert.equal(x.calls.length,0);
  }
+});
+
+test('mode missing fails closed even when disabled flag is false',async()=>{
+  const x=makeWorker();
+  delete x.env.SUBMISSION_MODE;
+  const r=await x.handler.fetch(x.request(baseBody),x.env);
+  assert.equal(r.status,503);
+  assert.equal(x.calls.length,0);
+});
+test('test window automatically expires and never reaches verification or GitHub',async()=>{
+  const x=makeWorker();
+  x.env.SUBMISSION_MODE='test';
+  x.env.SUBMISSION_TEST_DEADLINE_MS=String(Date.now()-1000);
+  x.env.SUBMISSION_TEST_QUESTION=baseBody.question;
+  const r=await x.handler.fetch(x.request(baseBody),x.env);
+  assert.equal(r.status,503);
+  assert.equal(x.calls.length,0);
+});
+test('test window rejects non-allowlisted questions before Turnstile or GitHub',async()=>{
+  const x=makeWorker();
+  x.env.SUBMISSION_MODE='test';
+  x.env.SUBMISSION_TEST_DEADLINE_MS=String(Date.now()+120000);
+  x.env.SUBMISSION_TEST_QUESTION='TEST ONLY - HKUST-ELPA integration verification';
+  const r=await x.handler.fetch(x.request(baseBody),x.env);
+  assert.equal(r.status,403);
+  assert.equal(x.calls.length,0);
+});
+test('test window accepts only exact allowlisted synthetic payload',async()=>{
+  const x=makeWorker();
+  const question='TEST ONLY - HKUST-ELPA integration verification';
+  x.env.SUBMISSION_MODE='test';
+  x.env.SUBMISSION_TEST_DEADLINE_MS=String(Date.now()+120000);
+  x.env.SUBMISSION_TEST_QUESTION=question;
+  const r=await x.handler.fetch(x.request({...baseBody,
+    term:'2026 Fall',question,subquestions:'',source:'firsthand'}),x.env);
+  assert.equal(r.status,201,await r.text());
+  assert.equal(x.calls.length,2);
+  assert.match(JSON.parse(x.calls[1].init.body).title,/TEST ONLY/);
 });
