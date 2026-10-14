@@ -110,7 +110,7 @@
     const start=Date.now();
     const tryRender=()=>{
       if(window.turnstile && typeof window.turnstile.render==='function'){
-        widgetId=window.turnstile.render('#submissionTurnstile',{sitekey:config.turnstileSiteKey});
+        widgetId=window.turnstile.render('#submissionTurnstile',{sitekey:config.turnstileSiteKey,action:'elpa_submit'});
         button.disabled=false; return;
       }
       if(Date.now()-start<12000) setTimeout(tryRender,200);

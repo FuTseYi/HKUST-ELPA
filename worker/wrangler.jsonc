@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hkust-gz-elpa-submissions",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-14",
+  "workers_dev": true,
+  "ratelimits": [
+    {
+      "name": "SUBMISSION_LIMITER",
+      "namespace_id": "11247601",
+      "simple": { "limit": 3, "period": 60 }
+    }
+  ]
+}

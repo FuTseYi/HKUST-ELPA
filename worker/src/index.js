@@ -1,0 +1,157 @@
+/* Anonymous ELPA submissions: minimal, fail-closed Cloudflare Worker.
+ * Deploy separately from GitHub Pages. Secrets must never enter this repository.
+ */
+const ORIGIN = 'https://futseyi.github.io';
+const HOSTNAME = 'futseyi.github.io';
+const OWNER = 'FuTseYi';
+const REPO = 'HKUST-GZ-ELPA';
+const MAX_BODY_BYTES = 6500;
+
+function json(payload, status = 200, origin = false) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+      ...(origin ? {
+        'Access-Control-Allow-Origin': ORIGIN,
+        'Vary': 'Origin',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      } : {})
+    }
+  });
+}
+function invalid(message, status = 400) {
+  return json({ok:false,message}, status, true);
+}
+async function readLimitedJSON(request) {
+  if (!request.body) throw new Error('missing body');
+  const reader = request.body.getReader();
+  const chunks = [];
+  let size = 0;
+  try {
+    while (true) {
+      const {done,value}=await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_BODY_BYTES) throw new Error('payload too large');
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(size);
+  let i = 0;
+  for (const chunk of chunks) {bytes.set(chunk,i);i+=chunk.length;}
+  return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));
+}
+function validText(value, min, max) {
+  return typeof value === 'string' &&
+    value.trim().length >= min && value.trim().length <= max &&
+    !/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value);
+}
+function encodeBase64Url(text) {
+  const bytes = new TextEncoder().encode(text);
+  let ascii = '';
+  for (const byte of bytes) ascii += String.fromCharCode(byte);
+  return btoa(ascii).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const originOK = request.headers.get('Origin') === ORIGIN;
+    if (request.method === 'GET' && url.pathname === '/health')
+      return json({ok:true,service:'elpa-submission'});
+    if (url.pathname !== '/submit') return json({ok:false,message:'Not found'},404);
+    if (!originOK) return json({ok:false,message:'Forbidden'},403);
+    if (request.method === 'OPTIONS')
+      return new Response(null,{status:204,headers:{
+        'Access-Control-Allow-Origin':ORIGIN,'Vary':'Origin',
+        'Access-Control-Allow-Methods':'POST, OPTIONS',
+        'Access-Control-Allow-Headers':'Content-Type','Access-Control-Max-Age':'600'
+      }});
+    if (request.method !== 'POST') return invalid('Method not allowed',405);
+    if (env.SUBMISSIONS_DISABLED === 'true') return invalid('投稿暂时关闭，请稍后再试。',503);
+    if (!env.GITHUB_TOKEN || !env.TURNSTILE_SECRET || !env.SUBMISSION_LIMITER)
+      return invalid('投稿服务尚未配置完成。',503);
+    if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type') || ''))
+      return invalid('仅支持 JSON 格式。',415);
+    const length = Number(request.headers.get('Content-Length')||0);
+    if (length > MAX_BODY_BYTES) return invalid('内容过长。',413);
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    try {
+      const limited = await env.SUBMISSION_LIMITER.limit({key:ip});
+      if (!limited.success) return invalid('提交过于频繁，请稍后再试。',429);
+    } catch {
+      return invalid('投稿服务暂时繁忙。',503); // fail closed
+    }
+    let body;
+    try {body = await readLimitedJSON(request);}
+    catch {return invalid('投稿数据无效或内容过长。',400);}
+    const {term,question,subquestions,source,turnstileToken} = body || {};
+    const termOK = typeof term==='string' && (/^20\d{2} (Spring|Fall)$/.test(term) || term==='Other / Unknown');
+    if (!termOK || !validText(question,8,1000) ||
+        !validText(subquestions,0,2000) ||
+        !['firsthand','secondhand'].includes(source) ||
+        !validText(turnstileToken,1,2048))
+      return invalid('请检查必填项、内容格式和字符长度。');
+    // Never send unverified submissions to GitHub.
+    let verified;
+    try {
+      const response=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:new URLSearchParams({secret:env.TURNSTILE_SECRET,response:turnstileToken,remoteip:ip}),
+        signal:AbortSignal.timeout(10000)
+      });
+      if (!response.ok) throw new Error('Turnstile unavailable');
+      verified=await response.json();
+    }catch{
+      return invalid('人机验证暂不可用，请稍后重试。',503);
+    }
+    if (!verified.success || verified.hostname!==HOSTNAME || verified.action!=='elpa_submit')
+      return invalid('人机验证失败或已过期，请重试。',403);
+    const record={version:1,term,question:question.trim(),subquestions:subquestions.trim(),source};
+    const encoded=encodeBase64Url(JSON.stringify(record));
+    const quoted=(t)=>t.split('\n').map(s=>'> '+s).join('\n');
+    const issueBody=[
+      '## ELPA 新题投稿（待审核）',
+      '',
+      '> 本 Issue 为公开匿名投稿。**未审核，不代表正式题库或官方原题。**',
+      '',
+      '**场次：** '+term,
+      '**来源：** '+(source==='firsthand'?'本人亲历':'同学转述'),
+      '',
+      '### 主问题',
+      quoted(record.question),
+      '',
+      '### 提示小问',
+      record.subquestions?quoted(record.subquestions):'> 未记录',
+      '',
+      '<!-- elpa-submission-v1:'+encoded+' -->'
+    ].join('\n');
+    const title='[ELPA 投稿] ['+term+'] '+record.question.replace(/\s+/g,' ').slice(0,70);
+    let github;
+    try {
+      const response=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/issues',{
+        method:'POST',
+        headers:{
+          'Authorization':'Bearer '+env.GITHUB_TOKEN,
+          'Accept':'application/vnd.github+json',
+          'X-GitHub-Api-Version':'2022-11-28',
+          'User-Agent':'HKUST-GZ-ELPA-Submission'
+        },
+        body:JSON.stringify({title,body:issueBody}),
+        signal:AbortSignal.timeout(10000)
+      });
+      if (!response.ok) throw new Error('GitHub issue create failed: '+response.status);
+      github=await response.json();
+    }catch(e){
+      console.error('Submission delivery failed',String(e));
+      return invalid('投稿暂时未能保存，请稍后重试。',503);
+    }
+    return json({ok:true,issueUrl:github.html_url},201,true);
+  }
+};
