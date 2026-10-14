@@ -6,6 +6,10 @@ on:
       - '*.html'
       - 'site.css'
       - 'question-bank/questions.js'
+      - 'submit.html'
+      - 'submission-config.js'
+      - 'submit.html'
+      - 'submission-config.js'
       - 'assets/Administration-Building-14-1536x864.jpg'
       - '.github/workflows/site-checks.yml'
   push:
@@ -41,7 +45,7 @@ jobs:
                   if "id" in fields: self.ids.append(fields["id"])
 
           pages={}
-          for filename in ["index.html","guide.html","practice.html","sources.html"]:
+          for filename in ["index.html","guide.html","practice.html","sources.html","submit.html"]:
               content=Path(filename).read_text(encoding="utf-8")
               pages[filename]=content
               assert 'class="elpa-nav"' in content, f"Shared header absent in {filename}"
@@ -73,6 +77,13 @@ jobs:
           guide=pages["guide.html"]
           assert 'guideFaqList' in guide and 'Step 5' in guide, "Exam guide content missing"
           assert "FAQS" in guide, "Guide questions not included"
+          submit=pages["submit.html"]
+          assert 'id="submissionForm"' in submit and 'id="submissionButton"' in submit, "Native submission form missing"
+          assert 'turnstile.getResponse' in submit and 'type="submit" disabled' in submit, "Submit must require Turnstile and fail closed"
+          assert 'href="./submit.html"' in pages["practice.html"], "Practice submit entry missing"
+          assert 'href="./submit.html"' in pages["index.html"], "Home submit entry missing"
+          assert Path("submission-config.js").is_file(), "Public config file missing"
+
           home=pages["index.html"]
           assert 'practice.html#sec-bankA' in home and 'practice.html#sec-bankD' in home, "Home topic shortcuts missing"
           sources=pages["sources.html"]
@@ -95,6 +106,8 @@ jobs:
           node --check /tmp/elpa-index.html.js
           node --check /tmp/elpa-guide.html.js
           node --check /tmp/elpa-practice.html.js
+          node --check /tmp/elpa-submit.html.js
+          node --check submission-config.js
           node --check question-bank/questions.js
       - name: Decode campus JPEG
         run: |
