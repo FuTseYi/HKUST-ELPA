@@ -110,8 +110,18 @@
     const start=Date.now();
     const tryRender=()=>{
       if(window.turnstile && typeof window.turnstile.render==='function'){
-        widgetId=window.turnstile.render('#submissionTurnstile',{sitekey:config.turnstileSiteKey,action:'elpa_submit'});
-        button.disabled=false; return;
+        try {
+          widgetId=window.turnstile.render('#submissionTurnstile',{
+            sitekey:config.turnstileSiteKey,
+            action:'elpa_submit',
+            callback:()=>{button.disabled=false;show('验证完成，可以提交题目。','info');},
+            'expired-callback':()=>{button.disabled=true;show('人机验证已过期，请重新验证。','error');},
+            'error-callback':()=>{button.disabled=true;show('验证组件出错，请稍后重试。','error');}
+          });
+        } catch {
+          show('人机验证初始化失败，请刷新重试。','error');
+        }
+        return;
       }
       if(Date.now()-start<12000) setTimeout(tryRender,200);
       else show('人机验证加载失败，请刷新重试。','error');
@@ -143,7 +153,7 @@
       show(error.message||'网络异常，请稍后重试。','error');
     }finally{
       if(widgetId!==null && window.turnstile)window.turnstile.reset(widgetId);
-      button.disabled=false;
+      button.disabled=true;
     }
   });
 })();
