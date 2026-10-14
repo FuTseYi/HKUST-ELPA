@@ -32,6 +32,7 @@ jobs:
         run: |
           node --check question-bank/questions.js
           node --test tests/approved-import.test.cjs
+          node --test tests/worker.test.cjs
       - name: Open data-only PR
         if: steps.import.outputs.result == 'added'
         env:
@@ -40,6 +41,10 @@ jobs:
         run: |
           set -euo pipefail
           BRANCH="elpa/approved-issue-${ISSUE_NUMBER}"
+          if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null 2>&1; then
+            echo "Proposal branch already exists; refusing to recreate it."
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "${BRANCH}"
