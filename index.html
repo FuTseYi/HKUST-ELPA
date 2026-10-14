@@ -35,12 +35,12 @@
 <span class="elpa-kicker">Explore</span><h2 class="elpa-heading">找到你需要的备考内容</h2><p class="elpa-desc">借鉴多页面导航设计，考试信息、练习工具与资料出处各自独立，不必在一个超长页面中反复寻找。</p>
 <div class="elpa-feature-grid">
 <a class="elpa-feature" href="./guide.html"><span class="elpa-feature-icon" aria-hidden="true">🗓️</span><strong>考试指南</strong><p>了解考生反馈中的考试流程、口头陈述、提问环节与常见问题。不同场次要求以现场通知为准。</p><span class="arrow">查看指南 →</span></a>
-<a class="elpa-feature" href="./practice.html#sec-bankD"><span class="elpa-feature-icon" aria-hidden="true">🎓</span><strong>本学期新题库</strong><p>优先查看当学期考生反馈的题目；题卡提供英文提问与中文释义，支持直接练习。</p><span class="arrow">查看本学期新题 →</span></a>
-<a class="elpa-feature" href="./practice.html#sec-bankA"><span class="elpa-feature-icon" aria-hidden="true">📚</span><strong>往年题库</strong><p>以历届经典题和其他学期的考题组成历史题库，持续归档且保留学习记录。</p><span class="arrow">练习往年题 →</span></a>
+<a class="elpa-feature" href="./practice.html#sec-bankD"><span class="elpa-feature-icon" aria-hidden="true">🎓</span><strong>最新学期题库</strong><p>优先查看最新已收录学期的考生反馈；新的学期题目审核入库后自动切换，提供英文提问与中文释义。</p><span class="arrow">查看最新学期新题 →</span></a>
+<a class="elpa-feature" href="./practice.html#sec-bankA"><span class="elpa-feature-icon" aria-hidden="true">📚</span><strong>过往题库</strong><p>以历届经典题和其他学期的考题组成历史题库，持续归档且保留学习记录。</p><span class="arrow">练习过往题 →</span></a>
 </div>
 <div class="elpa-nums" aria-label="网站内容概览">
-<div class="elpa-num"><strong id="homeNewCount">—</strong><small id="homeTermLabel">本学期新题</small></div>
-<div class="elpa-num"><strong id="homePastCount">—</strong><small>往年题库练习题</small></div>
+<div class="elpa-num"><strong id="homeNewCount">—</strong><small id="homeTermLabel">最新学期新题</small></div>
+<div class="elpa-num"><strong id="homePastCount">—</strong><small>过往题库练习题</small></div>
 <div class="elpa-num"><strong id="homeDoneCount">—</strong><small>已掌握题目（当前浏览器）</small></div>
 </div>
 <div class="elpa-panel"><h2>持续学习，记录自己的进度</h2><p>题目练习时可以搜索关键词、按状态筛选、随机抽题、计时模拟，并在浏览器中保存笔记。支持 JSON 备份与恢复，原有学习进度无需重新开始。</p><a class="elpa-button primary" href="./practice.html">进入练习工具 →</a></div>
@@ -53,7 +53,7 @@
 try {
   const snapshot = JSON.parse(localStorage.getItem('elpa-data-snapshot-v2') || '{}');
   const ids = elpaAllPracticeIds();
-  document.getElementById('homeTermLabel').textContent = elpaActiveTerm() + ' 新题';
+  document.getElementById('homeTermLabel').textContent = elpaLatestTerm() + ' 新题';
   document.getElementById('homeNewCount').textContent = String(elpaCurrentQuestionIds().length);
   document.getElementById('homePastCount').textContent = String(elpaArchivedQuestionIds().length);
   const statuses = snapshot.statuses || {};
