@@ -1,11 +1,11 @@
 /* ELPA 结构化题库 · 网站唯一题目数据入口。
  * 题目来自学生分享及回忆，并非 HKUST(GZ) 官方题卡。
  * 如需更新题目，请在此维护条目与稳定 ID；来源与背景详见同目录 Markdown 文档。
- * A/B/C 条目仅为旧学习记录和来源兼容保留，页面按往年题库去重展示。
+ * A/B/C 条目仅为旧学习记录和来源兼容保留，页面按过往题库去重展示。
  */
 const BANKS = {
   A: {
-    name: "往年题库",
+    name: "过往题库",
     items: [
       { num: 1, en: "Describe and reflect upon your experience of undergraduate study.",
         cn: "描述并反思你的本科学习经历",
@@ -97,7 +97,7 @@ const BANKS = {
     ]
   },
   B: {
-    name: "往年题库",
+    name: "过往题库",
     items: [
       { num: 1, en: "How would you explain a technical term to the first-year UG?",
         cn: "你会如何向大一本科生解释一个专业术语？", subs: []},
@@ -128,7 +128,7 @@ const BANKS = {
     ]
   },
   C: {
-    name: "往年题库",
+    name: "过往题库",
     items: [
       { num: 1, en: "How would you explain a technical term to the first-year undergraduate?",
         cn: "如何向大一新生解释一个专业术语",
@@ -241,7 +241,7 @@ BANKS.D = {
   ]
 };
 
-/* 旧题库内部编号和别名兼容，网页只呈现去重后的往年题库与新题库。 */
+/* 旧题库内部编号和别名兼容，网页只呈现去重后的过往题库与新题库。 */
 const PAST_QUESTION_IDS = ["A-1","A-2","A-3","A-4","A-5","A-6","A-7","C-1","C-2","C-3","C-4","C-5","C-6","C-7","C-8","C-9","C-10","C-11","C-12","C-13","C-14","C-15","C-16","C-17","B-9"];
 const LEGACY_QUESTION_ALIASES = {
   "A-附": "C-16",
@@ -260,15 +260,23 @@ const LEGACY_QUESTION_ALIASES = {
   "C-18": "A-3"
 };
 
-/* Display grouping is derived from reported academic terms; question IDs stay unchanged.
- * HKUST Fall: August–January, Spring: February–July (local browser calendar).
- * Other-term submissions move into the archive, including any earlier D-series reports.
+/* Display grouping is derived only from merged, reviewed question data.
+ * The latest represented term is displayed first regardless of today's calendar.
+ * Student progress stays keyed to the canonical question ID across terms.
  */
-function elpaActiveTerm(at = new Date()) {
-  const year = at.getFullYear();
-  const month = at.getMonth();
-  return month === 0 ? (year - 1) + ' Fall' :
-    year + (month < 7 ? ' Spring' : ' Fall');
+function elpaLatestTerm() {
+  const terms = new Set();
+  for (const id of elpaAllPracticeIds()) {
+    for (const term of elpaReportedTerms(id)) {
+      if (/^20\\d{2} (Spring|Fall)$/.test(term)) terms.add(term);
+    }
+  }
+  return [...terms].sort((a,b) => {
+    const [yearA,seasonA] = a.split(' ');
+    const [yearB,seasonB] = b.split(' ');
+    return Number(yearB)-Number(yearA) ||
+      (seasonB === 'Fall' ? 1 : 0) - (seasonA === 'Fall' ? 1 : 0);
+  })[0] || '';
 }
 function elpaAllPracticeIds() {
   return PAST_QUESTION_IDS.concat(BANKS.D.items.map(item => 'D-' + item.num));
@@ -288,10 +296,10 @@ function elpaReportedTerms(id) {
   }
   return [...terms];
 }
-function elpaCurrentQuestionIds(term = elpaActiveTerm()) {
+function elpaCurrentQuestionIds(term = elpaLatestTerm()) {
   return elpaAllPracticeIds().filter(id => elpaReportedTerms(id).includes(term));
 }
-function elpaArchivedQuestionIds(term = elpaActiveTerm()) {
+function elpaArchivedQuestionIds(term = elpaLatestTerm()) {
   const current = new Set(elpaCurrentQuestionIds(term));
   return elpaAllPracticeIds().filter(id => !current.has(id));
 }
