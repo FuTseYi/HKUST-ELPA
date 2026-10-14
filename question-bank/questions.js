@@ -237,7 +237,8 @@ BANKS.D = {
     { num:9, en:'What was your first impression of HKUST(GZ) when you arrived?', cn:'9 月初校园题｜初到学校的印象；分享英文问法经轻微规范化', subs:[] },
     { num:10, en:'How could you use the unique platform of HKUST(GZ) to achieve your personal goals?', cn:'9 月初校园题｜如何利用学校资源实现个人目标；分享英文问法经轻微规范化', subs:[] },
     { num:11, en:'What place at HKUST(GZ) would you most like to visit or experience, and why?', cn:'9 月初校园题｜最想参观或体验的校园地点及原因；分享英文问法', subs:[] },
-    { num:12, en:'What kind of skills do you hope to develop at HKUST(GZ)?', cn:'9 月初校园题｜希望在学校提升什么技能；分享英文问法', subs:[] }
+    { num:12, en:'What kind of skills do you hope to develop at HKUST(GZ)?', cn:'9 月初校园题｜希望在学校提升什么技能；分享英文问法', subs:[] },
+    {"num":1000009,"en":"TEST ONLY - Synthetic ELPA question for workflow verification. DO NOT PUBLISH.","cn":"2027 Fall｜社区投稿（考生亲历；非官方核实原题）","recallTag":"考生英文回忆，非官方原题","subs":[{"en":"a. Placeholder follow-up only. (TEST)","cn":""}]}
   ]
 };
 
