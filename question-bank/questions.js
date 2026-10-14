@@ -61,7 +61,7 @@ const BANKS = {
           { en: "Other details? / Any difficulties?", cn: "其他细节？困难？" }
         ]},
       { num: 5, en: "Describe why you chose to study at HKUST.",
-        cn: "描述你为什么选择来香港科技大学读书（有考生考场抽到）",
+        cn: "描述你为什么选择在香港科技大学学习。",
         subs: [
           { en: "What did you hear about HKUST before you came here?", cn: "来之前听说过科大什么" },
           { en: "What attracted you to study at HKUST?", cn: "什么吸引你来科大" },
@@ -72,7 +72,7 @@ const BANKS = {
           { en: "Aside from studies, what else do you hope to achieve at HKUST?", cn: "除了学业还想收获什么" }
         ]},
       { num: 6, en: "Describe a challenge you faced in your studies or at work. How did you overcome it?",
-        cn: "描述一个学习或工作中遇到的挑战，以及你是如何克服的（有考生考场抽到）",
+        cn: "描述你在学习或工作中遇到的一次挑战，以及你是如何克服它的。",
         subs: [
           { en: "What was the challenge?", cn: "什么挑战" },
           { en: "Why was it a challenge?", cn: "为什么是挑战" },
@@ -82,7 +82,7 @@ const BANKS = {
           { en: "Would you deal with it differently now?", cn: "现在会换一种方式处理吗" }
         ]},
       { num: 7, en: "Describe a time when you attended an interview (e.g. job, university etc.)",
-        cn: "描述一次你参加面试的经历（工作、升学等）—— 2025.9.10 场次原题出现，重点准备！",
+        cn: "描述一次你参加工作、升学或其他面试的经历。",
         subs: [
           { en: "What type of interview did you attend?", cn: "什么类型的面试" },
           { en: "Did you do well? Why?", cn: "表现好吗？为什么" },
@@ -193,7 +193,7 @@ const BANKS = {
           { en: "Why is integrity important in research and education?", cn: "为什么诚信在研究和教育中很重要" },
           { en: "How to maintain academic integrity?", cn: "如何维护学术诚信" }
         ]},
-      { num: 10, en: "How do postgraduate students leverage digital tools (e.g. AI)?", recallTag:"小问未完整记录",
+      { num: 10, en: "How do postgraduate students leverage digital tools (e.g. AI)?",
         cn: "研究生如何利用数字工具（如 AI）？", subs: []},
       { num: 11, en: "Importance of feedback, including receiving and giving feedback.",
         cn: "反馈的重要性，包括接受和给予反馈",
@@ -211,13 +211,13 @@ const BANKS = {
       { num: 14, en: "What are the benefits and challenges of collaborating with people from different fields?",
         cn: "与不同领域的人合作的好处与挑战？", subs: []},
       { num: 15, en: "Talk about your experience of taking online courses.",
-        cn: "网课经验", subs: []},
+        cn: "谈谈你参加网络课程的经历。", subs: []},
       { num: 16, en: "What can you learn from the Internet?",
-        cn: "描述一下你在互联网中能学到什么？（与题库一附加题相同）", subs: []},
+        cn: "你能从互联网中学到什么？", subs: []},
       { num: 17, en: "How can AI help language learning?",
         cn: "AI 对语言学习的帮助", subs: []},
       { num: 18, en: "Describe an event or situation where you were required to speak in English as a research postgraduate.",
-        cn: "新增题（与往年题库第 3 题相同，重点关注）", subs: []}
+        cn: "描述一次你作为研究型研究生需要使用英语发言的活动或情境。", subs: []}
     ]
   }
 };
@@ -226,18 +226,18 @@ const BANKS = {
 BANKS.D = {
   name: '社区反馈题库',
   items: [
-    { num:1, en:'How would you explain a term such as supply chain or fluid dynamics to undergraduates?', cn:'8.24 09:30｜向本科生解释专业术语；考生英文回忆经轻微规范化，非核实原文', subs:[] },
-    { num:2, en:'How would you guide students to use AI?', cn:'8.24 09:30｜指导学生使用 AI；考生英文回忆', subs:[] },
-    { num:3, en:'What do you think AI can do for your studies?', cn:'8.24 09:30｜AI 如何帮助学习；考生英文回忆经轻微规范化', subs:[] },
-    { num:4, en:'Explain one of your projects.', cn:'8.24 09:30｜介绍个人项目；考生英文回忆经轻微规范化', subs:[] },
-    { num:5, en:'If you were a teaching assistant and discovered that a student had used AI for an assignment where AI was not permitted, how would you respond?', cn:'8.28 16:40｜如何处理学生违规使用 AI 的情况；考生英文回忆经轻微规范化', subs:[] },
-    { num:6, en:'Introduce a term from your field of study and explain it using an analogy.', cn:'8.28 16:40｜用类比解释专业术语；考生英文回忆', subs:[] },
-    { num:7, en:'How would you interpret two studies that reach different conclusions on the same issue?', recallTag:'英文为整理译文', cn:'9 月初反馈｜同一问题的两项研究为何结论不同？仅记录中文题意，小问未记录', subs:[] },
-    { num:8, en:'How would you explain a difficult academic concept to undergraduates from different cultural and academic backgrounds?', recallTag:'英文为整理译文', cn:'9 月初反馈｜向跨文化、跨专业学生解释复杂学术概念；仅记录中文题意', subs:[] },
-    { num:9, en:'What was your first impression of HKUST(GZ) when you arrived?', cn:'9 月初校园题｜初到学校的印象；分享英文问法经轻微规范化', subs:[] },
-    { num:10, en:'How could you use the unique platform of HKUST(GZ) to achieve your personal goals?', cn:'9 月初校园题｜如何利用学校资源实现个人目标；分享英文问法经轻微规范化', subs:[] },
-    { num:11, en:'What place at HKUST(GZ) would you most like to visit or experience, and why?', cn:'9 月初校园题｜最想参观或体验的校园地点及原因；分享英文问法', subs:[] },
-    { num:12, en:'What kind of skills do you hope to develop at HKUST(GZ)?', cn:'9 月初校园题｜希望在学校提升什么技能；分享英文问法', subs:[] }
+    { num:1, term:'2026 Fall', en:'How would you explain a term such as supply chain or fluid dynamics to undergraduates?', cn:'你会如何向本科生解释“供应链”或“流体力学”等专业术语？', subs:[] },
+    { num:2, term:'2026 Fall', en:'How would you guide students to use AI?', cn:'你会如何指导学生使用人工智能？', subs:[] },
+    { num:3, term:'2026 Fall', en:'What do you think AI can do for your studies?', cn:'你认为人工智能能够如何帮助你的学习？', subs:[] },
+    { num:4, term:'2026 Fall', en:'Explain one of your projects.', cn:'请介绍一个你参与过的项目。', subs:[] },
+    { num:5, term:'2026 Fall', en:'If you were a teaching assistant and discovered that a student had used AI for an assignment where AI was not permitted, how would you respond?', cn:'如果你是一名助教，发现学生在明确禁止使用人工智能的作业中使用了 AI，你会如何处理？', subs:[] },
+    { num:6, term:'2026 Fall', en:'Introduce a term from your field of study and explain it using an analogy.', cn:'请介绍一个你专业领域的术语，并用类比的方法解释它。', subs:[] },
+    { num:7, term:'2026 Fall', en:'How would you interpret two studies that reach different conclusions on the same issue?', cn:'你会如何理解针对同一个问题的两项研究得出了不同结论？', subs:[] },
+    { num:8, term:'2026 Fall', en:'How would you explain a difficult academic concept to undergraduates from different cultural and academic backgrounds?', cn:'你会如何向文化背景和专业背景不同的本科生解释一个复杂的学术概念？', subs:[] },
+    { num:9, term:'2026 Fall', en:'What was your first impression of HKUST(GZ) when you arrived?', cn:'你刚来到香港科技大学（广州）时，对学校的第一印象是什么？', subs:[] },
+    { num:10, term:'2026 Fall', en:'How could you use the unique platform of HKUST(GZ) to achieve your personal goals?', cn:'你会如何利用香港科技大学（广州）的独特平台实现个人目标？', subs:[] },
+    { num:11, term:'2026 Fall', en:'What place at HKUST(GZ) would you most like to visit or experience, and why?', cn:'在香港科技大学（广州），你最想参观或体验哪个地方？为什么？', subs:[] },
+    { num:12, term:'2026 Fall', en:'What kind of skills do you hope to develop at HKUST(GZ)?', cn:'你希望在香港科技大学（广州）培养哪些技能？', subs:[] }
   ]
 };
 
@@ -259,3 +259,39 @@ const LEGACY_QUESTION_ALIASES = {
   "B-13": "C-12",
   "C-18": "A-3"
 };
+
+/* Display grouping is derived from reported academic terms; question IDs stay unchanged.
+ * HKUST Fall: August–January, Spring: February–July (local browser calendar).
+ * Other-term submissions move into the archive, including any earlier D-series reports.
+ */
+function elpaActiveTerm(at = new Date()) {
+  const year = at.getFullYear();
+  const month = at.getMonth();
+  return month === 0 ? (year - 1) + ' Fall' :
+    year + (month < 7 ? ' Spring' : ' Fall');
+}
+function elpaAllPracticeIds() {
+  return PAST_QUESTION_IDS.concat(BANKS.D.items.map(item => 'D-' + item.num));
+}
+function elpaReportedTerms(id) {
+  const terms = new Set();
+  if (id.startsWith('D-')) {
+    const item = BANKS.D.items.find(entry => 'D-' + entry.num === id);
+    if (item && item.term) terms.add(item.term);
+    // Old reports D-1..D-12 predate explicit term metadata.
+    else if (item && Number.isInteger(item.num) && item.num >= 1 && item.num <= 12)
+      terms.add('2026 Fall');
+  }
+  const records = typeof ELPA_APPEARANCES === 'undefined' ? [] : ELPA_APPEARANCES[id];
+  if (Array.isArray(records)) {
+    for (const entry of records) if (entry && entry.term) terms.add(entry.term);
+  }
+  return [...terms];
+}
+function elpaCurrentQuestionIds(term = elpaActiveTerm()) {
+  return elpaAllPracticeIds().filter(id => elpaReportedTerms(id).includes(term));
+}
+function elpaArchivedQuestionIds(term = elpaActiveTerm()) {
+  const current = new Set(elpaCurrentQuestionIds(term));
+  return elpaAllPracticeIds().filter(id => !current.has(id));
+}
