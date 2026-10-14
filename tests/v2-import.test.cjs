@@ -124,8 +124,8 @@ test('current-term grouping archives other sessions without renumbering saved ID
       fall:elpaCurrentQuestionIds('2026 Fall'),
       spring:elpaCurrentQuestionIds('2027 Spring'),
       past:elpaArchivedQuestionIds('2027 Spring'),
-      january:elpaActiveTerm(new Date(2027,0,10)),
-      february:elpaActiveTerm(new Date(2027,1,10))
+      latest:elpaLatestTerm(),
+      sorted:elpaArchivedQuestionIds(elpaLatestTerm())
     };`);
   const groups=classify();
   assert.equal(groups.fall.length,13); // The 12 original 2026 Fall reports + Issue #301.
@@ -133,8 +133,14 @@ test('current-term grouping archives other sessions without renumbering saved ID
   assert.ok(groups.past.includes('D-1'));
   assert.ok(groups.past.includes('D-1000301'));
   assert.ok(!groups.past.includes('D-1000302'));
-  assert.equal(groups.january,'2026 Fall');
-  assert.equal(groups.february,'2027 Spring');
+  assert.equal(groups.latest,'2027 Spring');
+  const older=question('How should a student plan a research project with limited time?');
+  assert.equal(f.run(older,303).status,0);
+  const latestAfterOlder=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+
+    '\nreturn elpaLatestTerm();')();
+  assert.equal(latestAfterOlder,'2027 Spring');
+  assert.ok(groups.sorted.includes('D-1'));
+  assert.ok(!groups.sorted.includes('D-1000302'));
   const every=new Set([...groups.spring,...groups.past]);
   assert.equal(every.size,elpaTotal());
   function elpaTotal(){return 25+12+2;}

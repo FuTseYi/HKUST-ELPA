@@ -668,7 +668,7 @@
   </div>
 </nav>
 
-<header class="campus-hero"><div class="hero-inner"><span class="hero-eyebrow">ELPA · Speaking Practice</span><h1>题库练习 <span class="hero-highlight">Practice</span></h1><p class="hero-lead">本学期新题 · 往年题库 · 搜索 · 分页 · 模拟计时</p><p class="hero-description">笔记与练习状态自动保存在当前浏览器，支持导出与恢复。</p><nav class="elpa-actions" aria-label="题库快速跳转"><a class="elpa-cta elpa-cta-primary" href="#sec-bankD">本学期新题 <span aria-hidden="true">↓</span></a><a class="elpa-cta elpa-cta-secondary" href="#sec-bankA">往年题库 <span aria-hidden="true">↓</span></a></nav></div></header>
+<header class="campus-hero"><div class="hero-inner"><span class="hero-eyebrow">ELPA · Speaking Practice</span><h1>题库练习 <span class="hero-highlight">Practice</span></h1><p class="hero-lead">最新学期新题 · 过往题库 · 搜索 · 分页 · 模拟计时</p><p class="hero-description">笔记与练习状态自动保存在当前浏览器，支持导出与恢复。</p><nav class="elpa-actions" aria-label="题库快速跳转"><a class="elpa-cta elpa-cta-primary" href="#sec-bankD">最新学期新题 <span aria-hidden="true">↓</span></a><a class="elpa-cta elpa-cta-secondary" href="#sec-bankA">过往题库 <span aria-hidden="true">↓</span></a></nav></div></header>
 
 <div class="wrap">
   <aside class="source-notice" role="note">
@@ -793,17 +793,17 @@
   <nav class="toc" id="toc"></nav>
 
   <section id="sec-bankD">
-    <div class="sec-head"><span class="emoji">🎓</span><h2 id="currentBankTitle">本学期新题库</h2><span class="tag" id="feedbackBankCount">当前学期 · 持续更新</span></div>
-    <p class="sec-desc">优先呈现当前学期已经反馈的考题；题目按考生分享整理成中英双语，供直接练习。学期变化后，旧场次自动转入下方往年题库。<a href="./sources.html">查看题目来源 ↗</a></p>
+    <div class="sec-head"><span class="emoji">🎓</span><h2 id="currentBankTitle">最新学期题库</h2><span class="tag" id="feedbackBankCount">最新已收录学期 · 持续更新</span></div>
+    <p class="sec-desc">优先展示已收录的最新考试学期题目；新学期考题审核入库后自动切换，原有场次归入下方过往题库。题目采用中英双语整理，供直接练习。<a href="./sources.html">查看题目来源 ↗</a></p>
     <div id="bankD"></div>
-    <nav class="bank-pagination" id="pagerFall" aria-label="本学期新题库分页"></nav>
+    <nav class="bank-pagination" id="pagerFall" aria-label="最新学期题库分页"></nav>
   </section>
 
   <section id="sec-bankA">
-    <div class="sec-head"><span class="emoji">📚</span><h2>往年题库</h2><span class="tag" id="pastBankCount">历年题目 · 持续归档</span></div>
+    <div class="sec-head"><span class="emoji">📚</span><h2>过往题库</h2><span class="tag" id="pastBankCount">历年题目 · 持续归档</span></div>
     <p class="sec-desc">往届经典题与其他学期的考生反馈统一归档，题目保留原有编号与学习进度，随时可以继续练习。</p>
     <div id="bankPast"></div>
-    <nav class="bank-pagination" id="pagerPast" aria-label="往年题库分页"></nav>
+    <nav class="bank-pagination" id="pagerPast" aria-label="过往题库分页"></nav>
   </section>
 
   <footer>学生维护的非官方备考资源 · 原题出处和补充资料见 <a href="https://github.com/FuTseYi/HKUST-ELPA/tree/main/question-bank">独立题库</a><br>感谢历届同学分享题目与备考经验<br>具体考试要求以对应校区的官方通知为准<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
@@ -1218,12 +1218,12 @@ function escAttr(s) {
 }
 
 function renderTOC() {
-  document.getElementById('currentBankTitle').textContent = elpaActiveTerm() + ' · 本学期新题库';
+  document.getElementById('currentBankTitle').textContent = elpaLatestTerm() + ' · 最新学期题库';
   document.getElementById('feedbackBankCount').textContent = elpaCurrentQuestionIds().length + ' 题 · 持续更新';
   document.getElementById('pastBankCount').textContent = elpaArchivedQuestionIds().length + ' 题 · 历年归档';
   const items = [
-    ['sec-bankD', '🎓', elpaActiveTerm() + ' 本学期新题'],
-    ['sec-bankA', '📚', '往年题库']
+    ['sec-bankD', '🎓', elpaLatestTerm() + ' 最新学期新题'],
+    ['sec-bankA', '📚', '过往题库']
   ];
   document.getElementById('toc').innerHTML =
     '<h2>📑 题库导航</h2><div class="toc-grid">' +
@@ -1502,7 +1502,7 @@ function copyQuestion(id) {
   if (!item) return;
   const currentIds=elpaCurrentQuestionIds();
   const inCurrent=currentIds.includes(id);
-  const section=inCurrent ? elpaActiveTerm() + ' 本学期新题库' : '往年题库';
+  const section=inCurrent ? elpaLatestTerm() + ' 最新学期题库' : '过往题库';
   const number=(inCurrent ? currentIds : elpaArchivedQuestionIds()).indexOf(id) + 1;
   let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
   const copyCn=questionTranslation(id.split('-')[0],item);
@@ -2009,8 +2009,8 @@ document.getElementById('timerDrill').addEventListener('click', () => {
 document.getElementById('exportBtn').addEventListener('click', () => {
   let md = '# ELPA 备考笔记导出\n\n> 导出时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
   const sections = [
-    { name: elpaActiveTerm() + ' · 本学期新题库', ids: elpaCurrentQuestionIds() },
-    { name: '往年题库', ids: elpaArchivedQuestionIds() }
+    { name: elpaLatestTerm() + ' · 最新学期题库', ids: elpaCurrentQuestionIds() },
+    { name: '过往题库', ids: elpaArchivedQuestionIds() }
   ];
   for (const section of sections) {
     md += '\n## ' + section.name + '\n\n';
@@ -2069,7 +2069,7 @@ function renderAll() {
   const currentIds=elpaCurrentQuestionIds(),archivedIds=elpaArchivedQuestionIds();
   document.getElementById('bankD').innerHTML = currentIds.length
     ? renderQuestionIds(currentIds)
-    : '<p class="sec-desc">本学期暂未收录考生反馈题目。欢迎通过「贡献内容」补充新题。</p>';
+    : '<p class="sec-desc">暂无已收录学期的考生反馈题目。欢迎通过「贡献内容」补充新题。</p>';
   document.getElementById('bankPast').innerHTML = renderQuestionIds(archivedIds);
   renderTOC();
   updateProgress();
