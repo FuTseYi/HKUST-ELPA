@@ -16,7 +16,7 @@ It does **not** edit website files or publish a question. Maintainer review rema
    - `npx wrangler secret put TURNSTILE_SECRET`
    - `npx wrangler secret put GITHUB_TOKEN`
    Optional kill switch (plaintext Worker environment variable):
-   `SUBMISSIONS_DISABLED=true` disables POST submissions.
+   `SUBMISSIONS_DISABLED=true` disables POST submissions; requests are accepted **only** when set explicitly to `false` and all other validations succeed. If the binding is missing, submissions remain disabled.
 5. Deploy with `npx wrangler deploy`. In the public `submission-config.js`,
    fill in the deployed **https** Worker URL ending in `/submit` and public Turnstile Site Key.
 6. Verify CORS and protection with invalid requests **before** activating the frontend.
@@ -26,7 +26,7 @@ It does **not** edit website files or publish a question. Maintainer review rema
 ## Security posture
 
 - Exact-origin CORS, exact Turnstile hostname and action validation;
-  the Worker also checks token server-side with Siteverify.
+  the Worker also checks token server-side with Siteverify. The endpoint is opt-in: `SUBMISSIONS_DISABLED` must be explicitly `false`.
 - Cloudflare native binding limits attempted POSTs to **3 per 60 seconds per IP
   at each edge location**. This is approximate/edge-local, not a globally strict quota.
 - Request body is streamed with a 16 KiB cap; text lengths, types and
