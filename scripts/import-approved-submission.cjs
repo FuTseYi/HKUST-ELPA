@@ -16,7 +16,7 @@ if(!Number.isSafeInteger(number)||number<1||!marker||!String(issue.title||'').st
   throw Error('Issue is not a structured ELPA submission');
 }
 const data=JSON.parse(Buffer.from(marker[1],'base64url').toString('utf8'));
-const valid=(v,min,max)=>typeof v==='string'&&v.trim().length>=min&&v.trim().length<=max&&!/[\u0000-\u001f]/.test(v.replace(/\n/g,''));
+const valid=(v,min,max)=>typeof v==='string'&&v.trim().length>=min&&v.trim().length<=max&&!/[\u0000-\u001f]/.test(v.replace(/[\r\n]/g,''));
 if(data.version!==1||!valid(data.question,8,1000)||
    !valid(data.subquestions,0,2000)||
    !( /^20\d{2} (Spring|Fall)$/.test(data.term||'')||data.term==='Other / Unknown')||
