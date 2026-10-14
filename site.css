@@ -12,10 +12,12 @@ body { margin:0; }
 .elpa-nav-links { display:flex; align-items:stretch; align-self:stretch; gap:4px; margin-left:auto; }
 .elpa-nav-links a { display:flex; align-items:center; padding:0 17px; border-bottom:3px solid transparent; text-decoration:none; color:#475569; font-size:14px; font-weight:600; transition:.2s ease; }
 .elpa-nav-links a:hover, .elpa-nav-links a.active { color:var(--site-navy); border-bottom-color:var(--site-gold); background:rgba(14,69,123,.035); }
-.elpa-nav-github { display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; flex:0 0 44px; padding:0; border:1px solid #cedde9; border-radius:999px; text-decoration:none; color:var(--site-navy); }
-.elpa-nav-github svg { display:block; width:23px; height:23px; }
-.elpa-nav-github:focus-visible { outline:3px solid var(--site-blue); outline-offset:3px; }
-.elpa-nav-github:hover { background:#eaf2fa; }
+/* Minimal unframed GitHub mark; compact visual, reliable touch target. */
+.elpa-nav .elpa-nav-github { display:inline-flex; align-items:center; justify-content:center; width:40px; height:44px; flex:0 0 40px; padding:0; border:0; border-radius:0; background:transparent; text-decoration:none; color:var(--site-navy); }
+.elpa-nav-github svg { display:block; width:20px; height:20px; transition:opacity .15s ease; }
+.elpa-nav .elpa-nav-github:hover { background:transparent; color:var(--site-navy); }
+.elpa-nav-github:hover svg { opacity:.65; }
+.elpa-nav-github:focus-visible { outline:2px solid var(--site-blue); outline-offset:2px; border-radius:4px; }
 .elpa-body { background:var(--site-bg); color:var(--site-ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"PingFang SC","Microsoft YaHei",sans-serif; line-height:1.7; }
 .elpa-body a { color:var(--site-blue); }
 .elpa-hero {position:relative; isolation:isolate; min-height:470px; display:flex; align-items:center; color:#fff; background:linear-gradient(95deg,rgba(0,28,58,.91),rgba(0,49,91,.78) 40%,rgba(0,47,88,.25) 85%),url('./assets/Administration-Building-14-1536x864.jpg') center 58%/cover no-repeat;}
