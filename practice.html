@@ -828,16 +828,17 @@
     <nav class="bank-pagination" id="pagerFall" aria-label="最新学期题库分页"></nav>
   </section>
 
-  <section class="elpa-fast-intro" id="fastIntroSection" hidden aria-labelledby="fastIntroTitle">
-    <h2 id="fastIntroTitle">补充准备 · 完整自我介绍任务</h2>
-    <p>另行收集的独立任务，包含 8 个准备要点，不计入 12 道题目。</p>
-    <div id="fastIntroDetails"></div>
-  </section>
   <section id="sec-bankA">
     <div class="sec-head"><span class="emoji">📚</span><h2>过往题库</h2><span class="tag" id="pastBankCount">历年题目 · 持续归档</span></div>
     <p class="sec-desc">往届经典题与其他学期的考生反馈统一归档，题目保留原有编号与学习进度，随时可以继续练习。</p>
     <div id="bankPast"></div>
     <nav class="bank-pagination" id="pagerPast" aria-label="过往题库分页"></nav>
+  </section>
+
+  <section class="elpa-fast-intro" id="fastIntroSection" hidden aria-labelledby="fastIntroTitle">
+    <h2 id="fastIntroTitle">补充准备 · 完整自我介绍任务</h2>
+    <p>另行收集的独立任务，包含 8 个准备要点，不计入 12 道题目。</p>
+    <div id="fastIntroDetails"></div>
   </section>
 
   <footer>学生维护的非官方备考资源 · 原题出处和补充资料见 <a href="https://github.com/FuTseYi/HKUST-ELPA/tree/main/question-bank">独立题库</a><br>感谢历届同学分享题目与备考经验<br>具体考试要求以对应校区的官方通知为准<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
@@ -1261,29 +1262,35 @@ function escAttr(s) {
   return esc(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+function activeLatestTerm(){
+  return elpaLatestTermForIds(activePracticeIds());
+}
+function activeCurrentIds(){
+  const term=activeLatestTerm();
+  return term?activePracticeIds().filter(id=>elpaReportedTerms(id).includes(term)):[];
+}
+function activeArchivedIds(){
+  const current=new Set(activeCurrentIds());
+  return activePracticeIds().filter(id=>!current.has(id));
+}
 function renderTOC() {
-  const regular=isNanshaRegular();
   const campus=activeCampus==='nansha'?'南沙校区':'清水湾校区';
   const type=activeTrack==='regular'?'常规 ELPA':'ELPA Fast Track';
   const count=activePracticeIds().length;
-  document.getElementById('sec-bankA').hidden=!regular;
+  const term=activeLatestTerm(),current=activeCurrentIds(),past=activeArchivedIds();
+  document.getElementById('sec-bankA').hidden=false;
   document.getElementById('fastIntroSection').hidden=!(activeCampus==='nansha'&&activeTrack==='fast-track');
-  document.getElementById('currentBankTitle').textContent=regular
-    ?elpaLatestTerm()+' · 最新学期题库':type+' · '+campus;
-  document.getElementById('feedbackBankCount').textContent=regular
-    ?elpaCurrentQuestionIds().length+' 题 · 持续更新':count+' 题';
-  document.getElementById('pastBankCount').textContent=elpaArchivedQuestionIds().length+' 题 · 历年归档';
-  document.getElementById('currentBankDescription').textContent=regular
-    ?'优先展示最新已收录学期的考题，新学期审核入库后自动切换，其他题目进入过往题库。'
-    : activeCampus==='nansha'
-      ?'南沙校区考生回忆汇编：14 条记录整理为 12 道练习题；另有一项独立自我介绍准备任务。'
-      :'该校区暂无已收录的'+type+'题目，欢迎通过贡献内容分享新的考生回忆。';
-  examChoiceNote.textContent=campus+' · '+type+'；考核类型通用，题目按校区来源展示。'+
-    (count?'当前可练习 '+count+' 道题。':'当前暂无已收录题目。');
-  const items = regular ? [
-    ['sec-bankD', '🎓', elpaLatestTerm() + ' 最新学期新题'],
-    ['sec-bankA', '📚', '过往题库']
-  ] : [['sec-bankD','🎓',type]];
+  document.getElementById('currentBankTitle').textContent=(term?term+' · ':'')+'最新学期题库';
+  document.getElementById('feedbackBankCount').textContent=current.length+' 题 · '+(term||'暂无学期记录');
+  document.getElementById('pastBankCount').textContent=past.length+' 题 · 历年归档';
+  document.getElementById('currentBankDescription').textContent=term
+    ?'优先展示该分类已收录的最新考试学期 '+term+'；新学期题目审核入库后自动切换，旧场次归入过往题库。'
+    :'该分类暂未收录明确标注考试学期的新题；未注明学期的考生回忆保留在下方过往题库。';
+  examChoiceNote.textContent=campus+' · '+type+' · '+count+' 道题；按考试学期自动归类。';
+  const items = [
+    ['sec-bankD','🎓',(term?term+' · ':'')+'最新学期题库'],
+    ['sec-bankA','📚','过往题库']
+  ];
   document.getElementById('toc').innerHTML =
     '<h2>📑 题库导航</h2><div class="toc-grid">' +
     items.map(i => `<a href="#${i[0]}"><span class="num">${i[1]}</span>${esc(i[2])}</a>`).join('') +
@@ -1559,12 +1566,11 @@ function copyQuestion(id) {
   const bankKey = id.split('-')[0];
   const item = questionById(id);
   if (!item) return;
-  const currentIds=elpaCurrentQuestionIds();
+  const currentIds=activeCurrentIds();
   const inCurrent=currentIds.includes(id);
-  const regular=isNanshaRegular();
-  const section=regular ? (inCurrent ? elpaLatestTerm()+' 最新学期题库':'过往题库') :
-    activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA';
-  const number=(regular ? (inCurrent ? currentIds:elpaArchivedQuestionIds()):activePracticeIds()).indexOf(id)+1;
+  const category=activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA';
+  const section=category+' · '+(inCurrent?(activeLatestTerm()+' 最新学期题库'):'过往题库');
+  const number=(inCurrent?currentIds:activeArchivedIds()).indexOf(id)+1;
   let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
   const copyCn=questionTranslation(id.split('-')[0],item);
   if (copyCn) text += `（${copyCn}）\n`;
@@ -1624,16 +1630,18 @@ const statusFilter = document.getElementById('statusFilter');
 const termFilter=document.getElementById('termFilter');
 const examStageFilter=document.getElementById('examStageFilter');
 function populateExamFilters(){
-  const terms=isNanshaRegular()?[...new Set(allPracticeIds().flatMap(id=>elpaReportedTerms(id)))].sort().reverse():[];
+  const terms=[...new Set(allPracticeIds().flatMap(id=>elpaReportedTerms(id)))].sort().reverse();
   termFilter.replaceChildren(new Option('全部考试学期',''));
   for(const term of terms){
     const opt=document.createElement('option');
     opt.value=term;opt.textContent=term;termFilter.append(opt);
   }
-  const hasStages=Object.values(ELPA_APPEARANCES).some(records=>
-    Array.isArray(records)&&records.some(entry=>entry&&entry.examStage));
+  const hasStages=allPracticeIds().some(id=>{
+    const records=ELPA_APPEARANCES[id];
+    return Array.isArray(records)&&records.some(entry=>entry&&entry.examStage);
+  });
   termFilter.disabled=terms.length===0;
-  examStageFilter.disabled=!hasStages||!isNanshaRegular();
+  examStageFilter.disabled=!hasStages;
   termFilter.title=terms.length?'按已知反馈学期筛选':'尚无标注学期的反馈';
   examStageFilter.title=hasStages?'按已确认考试阶段筛选':'暂无已确认考试阶段的投稿';
 }
@@ -2070,11 +2078,12 @@ document.getElementById('timerDrill').addEventListener('click', () => {
 /* ============ 导出全部笔记（Markdown 下载） ============ */
 document.getElementById('exportBtn').addEventListener('click', () => {
   let md = '# ELPA 备考笔记导出\n\n> 导出时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
-  const sections = isNanshaRegular()?[
-    { name: elpaLatestTerm() + ' · 最新学期题库', ids: elpaCurrentQuestionIds() },
-    { name: '过往题库', ids: elpaArchivedQuestionIds() }
-  ]:[{name:(activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA')+' · '+
-    (activeCampus==='nansha'?'南沙校区':'清水湾校区'),ids:activePracticeIds()}];
+  const category=(activeCampus==='nansha'?'南沙校区':'清水湾校区')+' · '+
+    (activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA');
+  const sections=[
+    {name:category+' · '+(activeLatestTerm()||'暂无学期记录')+' · 最新学期题库',ids:activeCurrentIds()},
+    {name:category+' · 过往题库',ids:activeArchivedIds()}
+  ];
   for (const section of sections) {
     md += '\n## ' + section.name + '\n\n';
     for (const [i, id] of section.ids.entries()) {
@@ -2129,9 +2138,7 @@ toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoot
 /* ============ 渲染（读取数据后统一执行） ============ */
 function renderAll() {
   if (migrateLegacyPractice()) markDirty();
-  const regular=isNanshaRegular();
-  const currentIds=regular?elpaCurrentQuestionIds():activePracticeIds();
-  const archivedIds=regular?elpaArchivedQuestionIds():[];
+  const currentIds=activeCurrentIds(),archivedIds=activeArchivedIds();
   document.getElementById('bankD').innerHTML=currentIds.length?renderQuestionIds(currentIds):
     '<p class="sec-desc">该分类暂无已收录题目。可通过「贡献内容」分享考试回忆。</p>';
   document.getElementById('bankPast').innerHTML=renderQuestionIds(archivedIds);
@@ -2157,7 +2164,7 @@ function setExamChoice(axis,value){
   renderAll();populateExamFilters();
   const params=new URLSearchParams(location.search);
   params.set('campus',activeCampus);params.set('track',activeTrack);
-  const hash=location.hash==='#sec-bankA'&&!isNanshaRegular()?'#sec-bankD':location.hash;
+  const hash=location.hash;
   history.replaceState(null,'',location.pathname+'?'+params.toString()+hash);
 }
 document.querySelectorAll('[data-campus]').forEach(b=>b.addEventListener('click',()=>setExamChoice('campus',b.dataset.campus)));

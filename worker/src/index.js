@@ -63,12 +63,16 @@ const ADVICE_TAGS = new Set([
   'exam-process','speaking-strategy','time-management','stress-management',
   'english-expression','ai-learning','exam-experience'
 ]);
+const ELPA_CAMPUSES = new Set(['nansha','clear-water-bay']);
+const ELPA_TRACKS = new Set(['regular','fast-track']);
 const EXAM_STAGES = new Set(['start','mid','end']);
 const ADVICE_PHASES = new Set(['before','during','after']);
 function validV2(body) {
   if(!body||body.version!==2||!validText(body.turnstileToken,1,2048)) return false;
   if(body.kind==='question')
     return /^20\d{2} (Spring|Fall)$/.test(body.term||'') &&
+      (body.campus===undefined||ELPA_CAMPUSES.has(body.campus)) &&
+      (body.track===undefined||ELPA_TRACKS.has(body.track)) &&
       EXAM_STAGES.has(body.examStage) && body.main &&
       validText(body.main.en,8,1000) && validText(body.main.cn,4,1000) &&
       Array.isArray(body.subs) && body.subs.length<=20 &&
@@ -84,6 +88,7 @@ function validV2(body) {
 function cleanV2(body){
   if(body.kind==='question')return {
     version:2,kind:'question',term:body.term,examStage:body.examStage,
+    campus:body.campus||'nansha',track:body.track||'regular',
     main:{en:body.main.en.trim(),cn:body.main.cn.trim()},
     subs:body.subs.map(s=>({en:s.en.trim(),cn:s.cn.trim()})),source:body.source
   };
@@ -107,7 +112,9 @@ function formatV2(record){
   const lines=[
     '## ELPA 考题投稿（待审核）','',
     '> 公开匿名投稿；考生回忆非学校官方原题。',
-    '', '**考试学期：** '+record.term,
+    '', '**考试校区：** '+(record.campus==='nansha'?'南沙校区':'清水湾校区'),
+    '**考试类型：** '+(record.track==='regular'?'常规 ELPA':'ELPA Fast Track'),
+    '**考试学期：** '+record.term,
     '**考试阶段：** '+record.examStage,
     '**来源：** '+(record.source==='firsthand'?'本人亲历':'同学转述'),
     '', '### 主问题 / English',mdQuote(record.main.en),
@@ -118,7 +125,7 @@ function formatV2(record){
     '**小问 '+(i+1)+' / 中文**',mdQuote(sub.cn));
   if(!record.subs.length)lines.push('> 未记录');
   lines.push('','<!-- elpa-submission-v2:'+encodeBase64Url(JSON.stringify(record))+' -->');
-  return {title:'[ELPA 投稿] ['+record.term+'/'+record.examStage+'] '+
+  return {title:'[ELPA 投稿] ['+record.term+'/'+record.examStage+'/'+record.campus+'/'+record.track+'] '+
     record.main.en.replace(/\s+/g,' ').slice(0,65),body:lines.join('\n')};
 }
 

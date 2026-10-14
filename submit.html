@@ -88,7 +88,22 @@
 <button id="tabAdvice" class="contrib-tab" type="button" aria-pressed="false">分享经验 · Advice</button>
 </div>
 <div id="questionFields" class="contrib-section">
-  <h2>01 · 考试场次 <span lang="en">Exam Session</span></h2>
+  <h2>01 · 考试校区与类型 <span lang="en">Campus &amp; Assessment</span></h2>
+  <div class="contrib-row">
+    <div class="contrib-field"><label for="submissionCampus">考试校区 *</label>
+      <select id="submissionCampus" required>
+        <option value="nansha">南沙校区</option>
+        <option value="clear-water-bay">清水湾校区</option>
+      </select>
+    </div>
+    <div class="contrib-field"><label for="submissionTrack">考试类型 *</label>
+      <select id="submissionTrack" required>
+        <option value="regular">常规 ELPA</option>
+        <option value="fast-track">ELPA Fast Track</option>
+      </select>
+    </div>
+  </div>
+  <h2>02 · 考试场次 <span lang="en">Exam Session</span></h2>
   <div class="contrib-row">
     <div class="contrib-field"><label for="submissionYear">考试年份 *</label>
       <select id="submissionYear" required></select>
@@ -104,7 +119,7 @@
     </div>
   </div>
   <hr class="contrib-line">
-  <h2>02 · 主问题 <span lang="en">Main Question</span></h2>
+  <h2>03 · 主问题 <span lang="en">Main Question</span></h2>
   <div class="contrib-field"><label for="mainEn">English *</label>
     <textarea id="mainEn" rows="3" maxlength="1000" minlength="8" required></textarea>
   </div>
@@ -112,13 +127,13 @@
     <textarea id="mainCn" rows="3" maxlength="1000" minlength="4" required></textarea>
   </div>
   <hr class="contrib-line">
-  <h2>03 · 提示小问 <span lang="en">Follow-ups</span></h2>
+  <h2>04 · 提示小问 <span lang="en">Follow-ups</span></h2>
   <p>没有提示小问可留空；添加后需同时填写中英文。</p>
   <div id="followupList" class="contrib-section" aria-live="polite"></div>
   <div class="contrib-actions"><button id="addFollowup" class="contrib-button" type="button">＋ 添加提示小问</button>
     <span id="followupCount" class="contrib-caption">0 / 20</span></div>
   <hr class="contrib-line">
-  <h2>04 · 投稿来源 <span lang="en">Source</span></h2>
+  <h2>05 · 投稿来源 <span lang="en">Source</span></h2>
   <div class="contrib-field"><label for="submissionSource">来源类型 *</label>
     <select id="submissionSource" required><option value="firsthand">本人亲历 · Firsthand</option>
     <option value="secondhand">同学转述 · Secondhand</option></select>
@@ -268,7 +283,8 @@ function buildData(){
   }));
   if(!trimmed('mainEn')||!trimmed('mainCn')||subs.some(x=>!x.en||!x.cn))
     throw new Error('主问题和每个小问均须填写中英文。');
-  return {version:2,kind:'question',term:trimmed('submissionYear')+' '+semester,
+  return {version:2,kind:'question',campus:trimmed('submissionCampus'),track:trimmed('submissionTrack'),
+    term:trimmed('submissionYear')+' '+semester,
     examStage,main:{en:trimmed('mainEn'),cn:trimmed('mainCn')},
     subs,source:trimmed('submissionSource')};
 }
@@ -286,7 +302,8 @@ function showPreview(){
   const preview=get('previewPanel');preview.replaceChildren();
   addText(preview,'h2','投稿预览 · Review');
   if(data.kind==='question'){
-    addText(preview,'small',data.term+' · '+taxonomy.examStages[data.examStage].zh+
+    addText(preview,'small',(data.campus==='nansha'?'南沙校区':'清水湾校区')+' · '+
+      (data.track==='regular'?'常规 ELPA':'ELPA Fast Track')+' · '+data.term+' · '+taxonomy.examStages[data.examStage].zh+
       ' · '+taxonomy.sourceTypes[data.source].zh);
     addText(preview,'strong',data.main.en);
     addText(preview,'p',data.main.cn);

@@ -7,7 +7,7 @@ const bank=path.resolve(__dirname,'../question-bank/questions.js');
 function fixture(){
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-v2-'));
  fs.mkdirSync(path.join(root,'question-bank'));
- for(const name of ['questions.js','appearances.js','advice.js'])
+ for(const name of ['questions.js','fast-track.js','appearances.js','advice.js'])
    fs.copyFileSync(path.resolve(__dirname,'../question-bank/'+name),path.join(root,'question-bank',name));
  return {root,close:()=>fs.rmSync(root,{recursive:true,force:true}),
    read:name=>fs.readFileSync(path.join(root,'question-bank',name),'utf8'),
@@ -85,6 +85,8 @@ test('incomplete Chinese and unknown taxonomy codes are rejected',()=>{
   {...question(),main:{en:question().main.en,cn:''}},
   {...question(),subs:[{en:'English only',cn:''}]},
   {...question(),examStage:'unknown'},
+  {...question(),campus:'unknown-campus'},
+  {...question(),track:'unknown-assessment'},
   {...advice(),tags:['free-form-label']},
   {...advice(),body:'太短'}
  ];
@@ -144,5 +146,70 @@ test('current-term grouping archives other sessions without renumbering saved ID
   const every=new Set([...groups.spring,...groups.past]);
   assert.equal(every.size,elpaTotal());
   function elpaTotal(){return 25+12+2;}
+ }finally{f.close();}
+});
+
+test('Fast Track and campus categories keep distinct canonical IDs and review records',()=>{
+ const f=fixture();try{
+  const fast={...question('What research technique improved your work recently?'),
+    campus:'nansha',track:'fast-track'};
+  const x=f.run(fast,501);
+  assert.equal(x.status,0,x.stderr);
+  assert.match(x.stdout,/status: added/);
+  assert.match(f.read('fast-track.js'),/"num":1000501/);
+  assert.match(f.read('appearances.js'),/"F-1000501"/);
+  assert.doesNotMatch(f.read('questions.js'),/1000501/);
+  const clear={...fast,campus:'clear-water-bay'};
+  assert.equal(f.run(clear,502).status,0);
+  assert.match(f.read('fast-track.js'),/"num":1000502/);
+  assert.match(f.read('appearances.js'),/"T-1000502"/);
+  const regular={...clear,track:'regular'};
+  assert.equal(f.run(regular,503).status,0);
+  assert.match(f.read('fast-track.js'),/"num":1000503/);
+  assert.match(f.read('appearances.js'),/"H-1000503"/);
+  // A second submission into a formerly empty bank must remain valid JS.
+  assert.equal(f.run({...regular,main:{
+    en:'What academic skills are most valuable to a new graduate student?',
+    cn:'研究生最重要的学术技能是什么？'}},504).status,0);
+  assert.doesNotThrow(()=>new Function(f.read('questions.js')+'\n'+f.read('fast-track.js')+'\nreturn BANKS.H.items.length'));
+ }finally{f.close();}
+});
+test('existing Fast Track English wording is reused, not duplicated',()=>{
+ const f=fixture();try{
+  const record={...question('Please introduce yourself and explain why you decided to pursue this degree.'),
+    campus:'nansha',track:'fast-track'};
+  const r=f.run(record,505);
+  assert.equal(r.status,0,r.stderr);
+  assert.match(r.stdout,/status: linked/);
+  assert.match(f.read('appearances.js'),/"F-1"/);
+  assert.doesNotMatch(f.read('fast-track.js'),/1000505/);
+ }finally{f.close();}
+});
+
+test('regular and Fast Track each show their own latest reviewed term and historic reports',()=>{
+ const f=fixture();try{
+  const fast={...question('How did you prepare to communicate effectively with your research supervisor?'),
+    campus:'nansha',track:'fast-track',term:'2027 Spring'};
+  const older={...question('How did you prepare to explain your research to new students?'),
+    campus:'nansha',track:'fast-track',term:'2026 Fall'};
+  assert.equal(f.run(fast,601).status,0);
+  assert.equal(f.run(older,602).status,0);
+  const source=f.read('questions.js')+'\n'+f.read('fast-track.js')+'\n'+
+    f.read('appearances.js')+'\n';
+  const grouping=new Function(source+`
+    const fastIds=BANKS.F.items.map(x=>'F-'+x.num);
+    const nanshaRegular=elpaLatestTerm();
+    const fastLatest=elpaLatestTermForIds(fastIds);
+    const current=fastIds.filter(id=>elpaReportedTerms(id).includes(fastLatest));
+    return {nanshaRegular,fastLatest,current,past:fastIds.filter(id=>!current.includes(id)),
+      originalSource:elpaReportedTerms('F-1')};
+  `)();
+  assert.equal(grouping.nanshaRegular,'2026 Fall');
+  assert.equal(grouping.fastLatest,'2027 Spring');
+  assert.deepEqual([...grouping.current],['F-1000601']);
+  assert.ok(grouping.past.includes('F-1'));
+  assert.ok(grouping.past.includes('F-1000602'));
+  assert.deepEqual([...grouping.originalSource],[]);
+  assert.equal(grouping.current.length+grouping.past.length,14);
  }finally{f.close();}
 });
