@@ -80,7 +80,7 @@ export default {
       return invalid('投稿服务尚未开放。',503);
     if (testMode) {
       const deadline = Number(env.SUBMISSION_TEST_DEADLINE_MS);
-      if (!/^\\d{13}$/.test(String(env.SUBMISSION_TEST_DEADLINE_MS || '')) ||
+      if (!/^\d{13}$/.test(String(env.SUBMISSION_TEST_DEADLINE_MS || '')) ||
           !Number.isSafeInteger(deadline) || Date.now() >= deadline)
         return invalid('本次测试窗口已结束。',503);
     }
