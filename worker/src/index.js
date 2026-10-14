@@ -4,7 +4,7 @@
 const ORIGIN = 'https://futseyi.github.io';
 const HOSTNAME = 'futseyi.github.io';
 const OWNER = 'FuTseYi';
-const REPO = 'HKUST-GZ-ELPA';
+const REPO = 'HKUST-ELPA';
 const MAX_BODY_BYTES = 6500;
 
 function json(payload, status = 200, origin = false) {
@@ -141,7 +141,7 @@ export default {
           'Authorization':'Bearer '+env.GITHUB_TOKEN,
           'Accept':'application/vnd.github+json',
           'X-GitHub-Api-Version':'2022-11-28',
-          'User-Agent':'HKUST-GZ-ELPA-Submission'
+          'User-Agent':'HKUST-ELPA-Submission'
         },
         body:JSON.stringify({title,body:issueBody}),
         signal:AbortSignal.timeout(10000)

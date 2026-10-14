@@ -1,7 +1,7 @@
 # ELPA submission Worker (stage 2)
 
 This **separate Cloudflare Worker** accepts anonymous submissions from
-`https://futseyi.github.io/HKUST-GZ-ELPA/submit.html` and creates a **public GitHub Issue**.
+`https://futseyi.github.io/HKUST-ELPA/submit.html` and creates a **public GitHub Issue**.
 It does **not** edit website files or publish a question. Maintainer review remains mandatory.
 
 ## Deploy prerequisites
@@ -11,7 +11,7 @@ It does **not** edit website files or publish a question. Maintainer review rema
 2. Use Wrangler 4.36+ in `worker/`. Edit `wrangler.jsonc`'s `namespace_id`
    to an account-unique positive integer string (example value `1001` is provisional).
 3. Create a **fine-grained GitHub PAT** restricted to only
-   `FuTseYi/HKUST-GZ-ELPA`, permission **Issues: Read and write**;
+   `FuTseYi/HKUST-ELPA`, permission **Issues: Read and write**;
    no Contents/Actions/Admin permissions. Store it only as a Worker secret.
 4. Configure Worker secrets via:
    - `npx wrangler secret put TURNSTILE_SECRET`

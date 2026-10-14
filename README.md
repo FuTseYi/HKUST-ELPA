@@ -11,10 +11,10 @@
 ## 快速开始
 
 - **[独立题库 · Question Bank](./question-bank/README.md)**：保留**往年题库**与**社区反馈题库（始于 2026 Fall）**，保留提示小问，必要时简要标注回忆不完整的信息。
-- **[网站首页](https://futseyi.github.io/HKUST-GZ-ELPA/)**：网站导航与功能概览。
-- **[考试指南](https://futseyi.github.io/HKUST-GZ-ELPA/guide.html)**：常见流程与 FAQ。
-- **[题库练习](https://futseyi.github.io/HKUST-GZ-ELPA/practice.html)**：两组题库、关键词与状态筛选、每页 8 题、计时与个人笔记。
-- **[资料来源](https://futseyi.github.io/HKUST-GZ-ELPA/sources.html)**：资料分享链接与贡献说明。
+- **[网站首页](https://futseyi.github.io/HKUST-ELPA/)**：网站导航与功能概览。
+- **[考试指南](https://futseyi.github.io/HKUST-ELPA/guide.html)**：常见流程与 FAQ。
+- **[题库练习](https://futseyi.github.io/HKUST-ELPA/practice.html)**：两组题库、关键词与状态筛选、每页 8 题、计时与个人笔记。
+- **[资料来源](https://futseyi.github.io/HKUST-ELPA/sources.html)**：资料分享链接与贡献说明。
 - **页面结构**：多页面静态网站（`index.html`、`guide.html`、`practice.html`、`sources.html`），共享蓝黄导航样式见 `site.css`。
 - **备考建议**：先了解当期考试流程，再按话题分类准备；练习时优先用自己的真实经历组织答案，而不是单纯背诵范文。
 
@@ -66,7 +66,7 @@
 
 ## 参与贡献
 
-欢迎通过 [Issues](https://github.com/FuTseYi/HKUST-GZ-ELPA/issues) 反馈错误、提交新题、报告失效链接或提出改进建议，也欢迎提交 Pull Request。
+欢迎通过 [Issues](https://github.com/FuTseYi/HKUST-ELPA/issues) 反馈错误、提交新题、报告失效链接或提出改进建议，也欢迎提交 Pull Request。
 
 反馈新题时建议写明：**年份与日期（如已知）→ 题目英文原文 → 提示小问 → 来源类型 → 备注**。请勿公开考生姓名、学号或其他个人信息。
 
