@@ -29,7 +29,9 @@ jobs:
         run: node scripts/import-approved-submission.cjs
       - name: Validate generated question-bank JavaScript
         if: steps.import.outputs.result == 'added'
-        run: node --check question-bank/questions.js
+        run: |
+          node --check question-bank/questions.js
+          node --test tests/approved-import.test.cjs
       - name: Open data-only PR
         if: steps.import.outputs.result == 'added'
         env:
