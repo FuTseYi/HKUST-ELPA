@@ -43,7 +43,17 @@
 <section class="elpa-advice-section" id="sec-advice" aria-labelledby="adviceTitle">
   <span class="elpa-kicker">Preparation Insights</span>
   <h2 class="elpa-heading" id="adviceTitle">备考经验 · Preparation Advice</h2>
-  <p class="elpa-desc">来自考生的独立经验分享，经维护者审核收录；不代表学校官方考试要求。</p>
+  <p class="elpa-desc">结合往届考情整理备考提醒；下方社区经验由维护者审核收录。所有内容均非官方考试要求。</p>
+<article class="elpa-advice-card" aria-labelledby="pastExamNotesTitle">
+  <div class="elpa-advice-chips"><span class="elpa-advice-chip">历史考情 · 2025–2026</span><span class="elpa-advice-chip">备考提醒</span></div>
+  <h3 id="pastExamNotesTitle">旧题复现、不同轮次与新增题反馈</h3>
+  <p class="elpa-advice-content">旧题是否仍会出现？2025 年 9 月 10 日有考生反馈抽到关于面试经历的往年题。因此，旧题仍值得练习，不宜只准备新题。
+
+不同轮次会完全相同吗？关于 2026 年 9 月 1 日第二轮，早期有分享认为部分题目与第一轮相近，但不能据此确认完整题卡一致，也不能推断后续场次不会出现新增题。
+
+有哪些新增题？旧资料还曾提及 AI 辅助语言学习、研究生在英语场合发言等话题，但这些题目可能与往年内容重叠。请以当前学期新题库和已注明日期的考生反馈为准，不把整理后的练习表达当作现场逐字原题。</p>
+  <p class="elpa-advice-source"><a href="./practice.html#sec-bankD">查看本学期新题库 ↗</a> · <a href="./sources.html">核对题目来源 ↗</a></p>
+</article>
   <div class="elpa-advice-filters">
     <label for="advicePhaseFilter">备考阶段
       <select id="advicePhaseFilter">
@@ -60,22 +70,13 @@
   <div id="guideAdviceList" class="elpa-advice-grid" aria-live="polite"></div>
   <p id="guideAdviceEmpty" class="elpa-advice-empty">暂无已收录的社区经验。<a href="./submit.html">欢迎分享你的备考建议 →</a></p>
 </section>
-<section class="elpa-guide-faq" id="sec-faq"><span class="elpa-kicker">Questions & Answers</span><h2 class="elpa-heading">常见问题 FAQ</h2><p class="elpa-desc">来自考生经验汇总，其中的“最新”“今年”等描述仅反映原分享时间，不应视为当前实时信息。</p><div id="guideFaqList"></div></section>
+<section class="elpa-guide-faq" id="sec-faq"><span class="elpa-kicker">Questions & Answers</span><h2 class="elpa-heading">常见问题 FAQ</h2><p class="elpa-desc">围绕口语考试的流程、准备与互动环节整理；不同场次可能有差异，以当期通知和现场要求为准。</p><div id="guideFaqList"></div></section>
 <div class="elpa-panel"><h2>准备好练习了吗？</h2><p>建议先按主题选择题目，再模拟 1 分钟准备与 2 分钟陈述，并练习向其他考生提一个相关问题。</p><a class="elpa-button primary" href="./practice.html">前往题库练习 →</a></div>
 </div></main><footer class="elpa-footer">HKUST-ELPA · 学生维护的非官方备考资源 · <a href="./sources.html">资料来源与声明</a> · <a href="https://github.com/FuTseYi/HKUST-ELPA" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer>
 <script src="./question-bank/taxonomy.js"></script>
 <script src="./question-bank/advice.js"></script>
 <script>
 const FAQS = [
-  { q: "往年旧题今年还会考吗？", a: [
-      "最新场次反馈：暂未出现旧题。",
-      "但 2025.9.10 场次有考生明确抽到旧题库第 7 题原题（Describe a time when you attended an interview），几乎一模一样。",
-      "结论：旧题库仍是高价值备考素材，务必准备；同时留意新增题。"
-    ]},
-  { q: "有哪些新增题？", a: [
-      "新增：AI 对语言学习的帮助（How can AI help language learning?）。",
-      "另一题：Describe an event or situation where you were required to speak in English as a research postgraduate（与往年题库第 3 题相同，再次出现）。"
-    ]},
   { q: "Part 3 提问环节需要给对方提几个问题？", a: [
       "一般 1 个即可；如果大家陈述时间偏短，可能问 2–3 个。",
       "可以提前和组员商量一个问题，但别太生硬——先对对方讲过的内容做一两句总结，再自然转到问题。"
@@ -101,15 +102,13 @@ const FAQS = [
       "一个时间段有多个组，每个组 4 人（也有一组 4–5 人的说法）。",
       "同组每个人话题都不同。"
     ]},
-  { q: "考完多久出结果？没过怎么申诉？", a: [
-      "例：25 号上午考，28 号一早出结果。",
-      "申诉可以等其他同学出结果后一起进行。"
+  { q: "成绩一般何时公布？对结果有疑问怎么办？", a: [
+      "不同学期和考试批次的出分时间可能不同，请以学校发布的通知或成绩查询渠道为准。",
+      "如需复核或咨询，及时联系当期通知列明的负责部门，确认是否有相应程序和截止日期。"
     ]},
-  { q: "第二轮（9.1）和第一轮的题一样吗？", a: [
-      "目前所知都是一样的，没有新题。"
-    ]},
-  { q: "自我介绍需要说很多吗？", a: [
-      "不需要，有考生只念了姓名和学号即可。一般说姓名、来自哪里、本科毕业院校就够。"
+  { q: "每场考试都需要自我介绍吗？", a: [
+      "不一定。不同批次的现场反馈存在差异：有的场次安排简短自我介绍，也有场次直接抽题。",
+      "如需自我介绍，一般简要说明自己的学习背景即可，具体按考官现场安排。"
     ]}
 ];
 const faqList=document.getElementById('guideFaqList');
