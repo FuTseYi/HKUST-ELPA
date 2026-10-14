@@ -1,0 +1,56 @@
+name: Prepare approved ELPA question PR
+
+on:
+  issues:
+    types: [labeled]
+
+# Do not run arbitrary source/commands from issues. The issue payload is
+# decoded by a trusted local script and written as escaped data.
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: elpa-approved-submissions
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    if: ${{ github.event.label.name == 'submission:approved' && github.event.sender.login == 'FuTseYi' && github.event.issue.state == 'open' && !github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - name: Import approved submission as data only
+        id: import
+        run: node scripts/import-approved-submission.cjs
+      - name: Validate generated question-bank JavaScript
+        if: steps.import.outputs.result == 'added'
+        run: node --check question-bank/questions.js
+      - name: Open data-only PR
+        if: steps.import.outputs.result == 'added'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          BRANCH="elpa/approved-issue-${ISSUE_NUMBER}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "${BRANCH}"
+          git add -- question-bank/questions.js question-bank/community-submissions.md
+          git diff --cached --name-only | grep -Eq '^question-bank/(questions\.js|community-submissions\.md)$'
+          git commit -m "docs: propose approved ELPA question from issue #${ISSUE_NUMBER}"
+          git push --set-upstream origin "${BRANCH}"
+          gh pr create --base main --head "${BRANCH}" \
+            --title "question-bank: review approved submission #${ISSUE_NUMBER}" \
+            --body "Proposed import from approved Issue #${ISSUE_NUMBER}. Review English recollection, duplicate similarity, source labels, and generated question ID. **Do not auto-merge.**"
+      - name: Mark duplicate as needing review
+        if: steps.import.outputs.result == 'duplicate'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue comment "${ISSUE_NUMBER}" --body "A matching existing question was detected. No change PR was created; please check whether this report adds new context."
