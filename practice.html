@@ -858,6 +858,15 @@
 
 /* ============ 学习记录：浏览器本地优先，JSON 文件可选同步 ============ */
 const DATA_FILE = 'elpa_data.json';
+/* Campus distinguishes the source of a question, not the university-wide assessment category. */
+let activeCampus='nansha',activeTrack='regular';
+const examChoiceNote=document.getElementById('elpaChoiceNote');
+function isNanshaRegular(){return activeCampus==='nansha'&&activeTrack==='regular';}
+function activePracticeIds(){
+  if(activeCampus==='nansha'&&activeTrack==='fast-track')return BANKS.F.items.map(it=>'F-'+it.num);
+  if(activeCampus==='clear-water-bay')return (activeTrack==='regular'?BANKS.H:BANKS.T).items.map(it=>(activeTrack==='regular'?'H-':'T-')+it.num);
+  return elpaAllPracticeIds();
+}
 const LS_KEY = 'elpa-q-status-v1'; // 兼容旧数据
 const LS_NOTES = 'elpa-notes-v1';  // 兼容旧数据
 const LS_SNAPSHOT = 'elpa-data-snapshot-v2';
@@ -1253,13 +1262,28 @@ function escAttr(s) {
 }
 
 function renderTOC() {
-  document.getElementById('currentBankTitle').textContent = elpaLatestTerm() + ' · 最新学期题库';
-  document.getElementById('feedbackBankCount').textContent = elpaCurrentQuestionIds().length + ' 题 · 持续更新';
-  document.getElementById('pastBankCount').textContent = elpaArchivedQuestionIds().length + ' 题 · 历年归档';
-  const items = [
+  const regular=isNanshaRegular();
+  const campus=activeCampus==='nansha'?'南沙校区':'清水湾校区';
+  const type=activeTrack==='regular'?'常规 ELPA':'ELPA Fast Track';
+  const count=activePracticeIds().length;
+  document.getElementById('sec-bankA').hidden=!regular;
+  document.getElementById('fastIntroSection').hidden=!(activeCampus==='nansha'&&activeTrack==='fast-track');
+  document.getElementById('currentBankTitle').textContent=regular
+    ?elpaLatestTerm()+' · 最新学期题库':type+' · '+campus;
+  document.getElementById('feedbackBankCount').textContent=regular
+    ?elpaCurrentQuestionIds().length+' 题 · 持续更新':count+' 题';
+  document.getElementById('pastBankCount').textContent=elpaArchivedQuestionIds().length+' 题 · 历年归档';
+  document.getElementById('currentBankDescription').textContent=regular
+    ?'优先展示最新已收录学期的考题，新学期审核入库后自动切换，其他题目进入过往题库。'
+    : activeCampus==='nansha'
+      ?'南沙校区考生回忆汇编：14 条记录整理为 12 道练习题；另有一项独立自我介绍准备任务。'
+      :'该校区暂无已收录的'+type+'题目，欢迎通过贡献内容分享新的考生回忆。';
+  examChoiceNote.textContent=campus+' · '+type+'；考核类型通用，题目按校区来源展示。'+
+    (count?'当前可练习 '+count+' 道题。':'当前暂无已收录题目。');
+  const items = regular ? [
     ['sec-bankD', '🎓', elpaLatestTerm() + ' 最新学期新题'],
     ['sec-bankA', '📚', '过往题库']
-  ];
+  ] : [['sec-bankD','🎓',type]];
   document.getElementById('toc').innerHTML =
     '<h2>📑 题库导航</h2><div class="toc-grid">' +
     items.map(i => `<a href="#${i[0]}"><span class="num">${i[1]}</span>${esc(i[2])}</a>`).join('') +
@@ -1271,7 +1295,7 @@ function questionById(id) {
   return BANKS[key].items.find(it => qId(key, it.num) === id);
 }
 function allPracticeIds() {
-  return elpaAllPracticeIds();
+  return activePracticeIds();
 }
 function renderQuestionIds(ids) {
   return ids.map((id,index) => {
@@ -1537,8 +1561,10 @@ function copyQuestion(id) {
   if (!item) return;
   const currentIds=elpaCurrentQuestionIds();
   const inCurrent=currentIds.includes(id);
-  const section=inCurrent ? elpaLatestTerm() + ' 最新学期题库' : '过往题库';
-  const number=(inCurrent ? currentIds : elpaArchivedQuestionIds()).indexOf(id) + 1;
+  const regular=isNanshaRegular();
+  const section=regular ? (inCurrent ? elpaLatestTerm()+' 最新学期题库':'过往题库') :
+    activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA';
+  const number=(regular ? (inCurrent ? currentIds:elpaArchivedQuestionIds()):activePracticeIds()).indexOf(id)+1;
   let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
   const copyCn=questionTranslation(id.split('-')[0],item);
   if (copyCn) text += `（${copyCn}）\n`;
@@ -1598,7 +1624,8 @@ const statusFilter = document.getElementById('statusFilter');
 const termFilter=document.getElementById('termFilter');
 const examStageFilter=document.getElementById('examStageFilter');
 function populateExamFilters(){
-  const terms=[...new Set(allPracticeIds().flatMap(id=>elpaReportedTerms(id)))].sort().reverse();
+  const terms=isNanshaRegular()?[...new Set(allPracticeIds().flatMap(id=>elpaReportedTerms(id)))].sort().reverse():[];
+  termFilter.replaceChildren(new Option('全部考试学期',''));
   for(const term of terms){
     const opt=document.createElement('option');
     opt.value=term;opt.textContent=term;termFilter.append(opt);
@@ -1606,7 +1633,7 @@ function populateExamFilters(){
   const hasStages=Object.values(ELPA_APPEARANCES).some(records=>
     Array.isArray(records)&&records.some(entry=>entry&&entry.examStage));
   termFilter.disabled=terms.length===0;
-  examStageFilter.disabled=!hasStages;
+  examStageFilter.disabled=!hasStages||!isNanshaRegular();
   termFilter.title=terms.length?'按已知反馈学期筛选':'尚无标注学期的反馈';
   examStageFilter.title=hasStages?'按已确认考试阶段筛选':'暂无已确认考试阶段的投稿';
 }
@@ -1658,7 +1685,7 @@ function applyFilters(reset=false){
     total+=matches.length;renderPager(kind,matches.length,pages);
   }
   document.getElementById('matchCount').textContent=String(total);
-  document.getElementById('emptyState').style.display=total?'none':'block';
+  document.getElementById('emptyState').style.display=total||!allPracticeIds().length?'none':'block';
   document.getElementById('emptyKeyword').textContent=kw||statusFilter.options[statusFilter.selectedIndex].text;
 }
 searchInput.addEventListener('input',()=>applyFilters(true));
@@ -2012,7 +2039,7 @@ document.getElementById('timerDrill').addEventListener('click', () => {
   const pick = keys[Math.floor(Math.random() * keys.length)];
   const card = document.getElementById('q-' + pick);
   if (!card) return;
-  const kind=pick.startsWith('D-')?'fall':'past';
+  const kind=document.getElementById('bankD').contains(card)?'fall':'past';
   const index=matchingCards(kind).indexOf(card);
   bankPages[kind]=Math.max(1,Math.floor(index/PAGE_SIZE)+1);
   applyFilters();
@@ -2043,10 +2070,11 @@ document.getElementById('timerDrill').addEventListener('click', () => {
 /* ============ 导出全部笔记（Markdown 下载） ============ */
 document.getElementById('exportBtn').addEventListener('click', () => {
   let md = '# ELPA 备考笔记导出\n\n> 导出时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
-  const sections = [
+  const sections = isNanshaRegular()?[
     { name: elpaLatestTerm() + ' · 最新学期题库', ids: elpaCurrentQuestionIds() },
     { name: '过往题库', ids: elpaArchivedQuestionIds() }
-  ];
+  ]:[{name:(activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA')+' · '+
+    (activeCampus==='nansha'?'南沙校区':'清水湾校区'),ids:activePracticeIds()}];
   for (const section of sections) {
     md += '\n## ' + section.name + '\n\n';
     for (const [i, id] of section.ids.entries()) {
