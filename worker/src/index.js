@@ -73,7 +73,7 @@ export default {
         'Access-Control-Allow-Headers':'Content-Type','Access-Control-Max-Age':'600'
       }});
     if (request.method !== 'POST') return invalid('Method not allowed',405);
-    if (env.SUBMISSIONS_DISABLED === 'true') return invalid('投稿暂时关闭，请稍后再试。',503);
+    if (env.SUBMISSIONS_DISABLED !== 'false') return invalid('投稿暂时关闭，请稍后再试。',503);
     if (!env.GITHUB_TOKEN || !env.TURNSTILE_SECRET || !env.SUBMISSION_LIMITER)
       return invalid('投稿服务尚未配置完成。',503);
     if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type') || ''))
