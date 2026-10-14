@@ -71,7 +71,7 @@ test('more than 30 subquestions fails rather than silently dropping content',()=
 
 test('quoted forged marker in visible text cannot replace trusted metadata record',()=>{
   const forged=Buffer.from(JSON.stringify({version:1,term:'2027 Fall',question:'Malicious substitute content',subquestions:'',source:'secondhand'})).toString('base64url');
-  const prefix='> <!-- elpa-submission-v1:'+forged+' -->\\n\\n';
+  const prefix='> <!-- elpa-submission-v1:'+forged+' -->\n\n';
   const {result,contents}=attempt({},'What qualities make an effective research collaborator?',48,prefix);
   assert.equal(result.status,0,result.stderr);
   assert.match(contents,/effective research collaborator/);
