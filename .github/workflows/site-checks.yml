@@ -6,6 +6,8 @@ on:
       - '*.html'
       - 'site.css'
       - 'question-bank/questions.js'
+      - 'question-bank/taxonomy.js'
+      - 'docs/submission-v2-spec.md'
       - 'submission-config.js'
       - 'scripts/**'
       - 'tests/**'
@@ -19,6 +21,8 @@ on:
       - '*.html'
       - 'site.css'
       - 'question-bank/questions.js'
+      - 'question-bank/taxonomy.js'
+      - 'docs/submission-v2-spec.md'
       - 'submission-config.js'
       - 'scripts/**'
       - 'tests/**'
@@ -117,6 +121,7 @@ jobs:
           cp worker/src/index.js /tmp/elpa-worker.mjs
           node --check /tmp/elpa-worker.mjs
           node --check question-bank/questions.js
+          node --check question-bank/taxonomy.js
       - name: Test approved-question import and stable IDs
         run: |
           node --check scripts/import-approved-submission.cjs
