@@ -1,4 +1,4 @@
-# 往年题库｜ELPA Speaking Practice
+# 过往题库｜ELPA Speaking Practice
 
 [返回题库目录](./README.md) · [查看 2026 Fall 反馈](./2026-fall.md)
 
