@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72" role="img" aria-labelledby="title desc">
+<title id="title">HKUST-ELPA</title><desc id="desc">An open study book and a speaking bubble</desc>
+<rect width="72" height="72" rx="19" fill="#063963"/>
+<path d="M13 18c8-3 15-2 23 2 7-4 16-5 23-2v31c-9-2-16-2-23 2-8-4-15-4-23-2V18Z" fill="none" stroke="#FFF" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M36 20v31" stroke="#FFF" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M19 27c5-1 8 0 11 2m-11 7c5-1 8 0 11 2" stroke="#A5C7E1" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M40 27h15a6 6 0 0 1 6 6v3a6 6 0 0 1-6 6h-5l-5 4v-4h-5a6 6 0 0 1-6-6v-3a6 6 0 0 1 6-6Z" fill="#F4C65A" stroke="#063963" stroke-width="2"/>
+<circle cx="42" cy="34.5" r="1.4" fill="#063963"/><circle cx="48" cy="34.5" r="1.4" fill="#063963"/><circle cx="54" cy="34.5" r="1.4" fill="#063963"/>
+</svg>
