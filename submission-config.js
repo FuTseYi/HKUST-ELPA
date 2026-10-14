@@ -4,6 +4,6 @@
  * Keeping either blank disables submissions safely.
  */
 window.ELPA_SUBMISSION_CONFIG = {
-  apiEndpoint: '',
-  turnstileSiteKey: ''
+  apiEndpoint: 'https://hkust-elpa-submissions.futseyi.workers.dev/submit',
+  turnstileSiteKey: '0x4AAAAAAFWWsgbB9w0JPOm3'
 };
