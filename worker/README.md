@@ -55,9 +55,10 @@ never added to the question bank.
 - Turnstile secret: bound to Worker (never commit or paste it)
 - Rate limiter: `SUBMISSION_LIMITER`, namespace `11247601`, 3 requests / 60 seconds per IP per Cloudflare location
 - Worker plaintext switch: `SUBMISSIONS_DISABLED=true` (submission remains closed)
-- GitHub token: **not configured**; private owner setup is required
+- GitHub token: configured as encrypted Worker Secret `GITHUB_TOKEN`; its value is never committed
 - Old Worker public endpoint disabled; historical script retained
-- GitHub repository is `FuTseYi/HKUST-ELPA`; keep all existing development branches after merges
+- GitHub repository is `FuTseYi/HKUST-ELPA`; moderation labels and Actions PR-creation permission have been configured by the owner
+- Existing `visit-counter` Worker is unaffected; keep all development branches after merges
 
 **Pending**: verify external health endpoint, browser Turnstile flow, rejected/valid submissions,
 GitHub Issues, label-triggered PR, and the final GitHub Pages path after deploying the merged code.
