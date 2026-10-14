@@ -268,7 +268,7 @@ function elpaLatestTerm() {
   const terms = new Set();
   for (const id of elpaAllPracticeIds()) {
     for (const term of elpaReportedTerms(id)) {
-      if (/^20\\d{2} (Spring|Fall)$/.test(term)) terms.add(term);
+      if (/^20\d{2} (Spring|Fall)$/.test(term)) terms.add(term);
     }
   }
   return [...terms].sort((a,b) => {
