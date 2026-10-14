@@ -1470,6 +1470,8 @@ function copyQuestion(id) {
   let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
   const copyCn=questionTranslation(id.split('-')[0],item);
   if (copyCn) text += `（${copyCn}）\n`;
+  const copyNote=questionSourceNote(bankKey,item);
+  if (copyNote) text += `来源说明：${copyNote}\n`;
   if (item.subs && item.subs.length) {
     text += '\n提示小问：\n' + item.subs.map(s => '• ' + s.en + (s.cn ? '  (' + s.cn + ')' : '')).join('\n');
   }
@@ -1933,7 +1935,10 @@ document.getElementById('exportBtn').addEventListener('click', () => {
       const st = statuses[id] || 'new';
       const stLabel = { new: '未练', doing: '练习中', done: '已掌握' }[st];
       md += '### ' + (i + 1) + '. ' + it.en + '\n';
-      if (it.cn) md += '> ' + it.cn + '\n';
+      const cn=questionTranslation(id.split('-')[0],it);
+      const historicalNote=questionSourceNote(id.split('-')[0],it);
+      if (cn) md += '> ' + cn + '\n';
+      if (historicalNote) md += '> 来源说明：' + historicalNote + '\n';
       md += '*状态：' + stLabel + '*\n\n';
       const qn = notes['qn-' + id];
       if (qn && qn.trim()) md += '**大问题笔记：**\n\n' + qn.trim() + '\n\n';
