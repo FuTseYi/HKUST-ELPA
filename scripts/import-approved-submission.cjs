@@ -11,7 +11,7 @@ if(!eventFile)throw Error('GitHub event payload required');
 const event=JSON.parse(fs.readFileSync(eventFile,'utf8'));
 const issue=event.issue||{};
 const number=issue.number;
-const marker=(issue.body||'').match(/<!-- elpa-submission-v1:([A-Za-z0-9_-]+) -->/);
+const marker=(issue.body||'').match(/^<!-- elpa-submission-v1:([A-Za-z0-9_-]+) -->\s*$/m);
 if(!Number.isSafeInteger(number)||number<1||!marker||!String(issue.title||'').startsWith('[ELPA 投稿]')){
   throw Error('Issue is not a structured ELPA submission');
 }
