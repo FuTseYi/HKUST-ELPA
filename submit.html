@@ -163,80 +163,179 @@
   </section>
 </main>
 <footer class="elpa-footer">学生维护的非官方备考资源 · 不代表 HKUST(GZ) 官方立场 · <a href="./sources.html">资料来源与声明</a></footer>
+<script src="./question-bank/taxonomy.js"></script>
 <script src="./submission-config.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 <script>
 (function(){
-  'use strict';
-  const config = window.ELPA_SUBMISSION_CONFIG || {};
-  const form = document.getElementById('submissionForm');
-  const button = document.getElementById('submissionButton');
-  const message = document.getElementById('submissionMessage');
-  const term = document.getElementById('submissionTerm');
-  const year = new Date().getFullYear();
-  [year-1, year, year+1].forEach(y=>['Spring','Fall'].forEach(t=>{
-    const opt=document.createElement('option');
-    opt.value=y+' '+t; opt.textContent=opt.value; term.append(opt);
-  }));
-  term.value=year+' Fall';
-  const other=document.createElement('option'); other.value='Other / Unknown';other.textContent='其他 / 不确定';term.append(other);
-  let widgetId=null;
-  const ready=Boolean(config.apiEndpoint && config.turnstileSiteKey &&
-     /^https:\/\//.test(config.apiEndpoint));
-  function show(text,state){message.textContent=text;message.dataset.state=state;}
-  if(!ready){
-    show('投稿功能尚未开放：管理员正在配置安全接收服务。请稍后再来。','info');
-  }else{
-    show('请完成人机验证后提交。','info');
-    const start=Date.now();
-    const tryRender=()=>{
-      if(window.turnstile && typeof window.turnstile.render==='function'){
-        try {
-          widgetId=window.turnstile.render('#submissionTurnstile',{
-            sitekey:config.turnstileSiteKey,
-            action:'elpa_submit',
-            callback:()=>{button.disabled=false;show('验证完成，可以提交题目。','info');},
-            'expired-callback':()=>{button.disabled=true;show('人机验证已过期，请重新验证。','error');},
-            'error-callback':()=>{button.disabled=true;show('验证组件出错，请稍后重试。','error');}
-          });
-        } catch {
-          show('人机验证初始化失败，请刷新重试。','error');
-        }
-        return;
-      }
-      if(Date.now()-start<12000) setTimeout(tryRender,200);
-      else show('人机验证加载失败，请刷新重试。','error');
-    };
-    tryRender();
+'use strict';
+const config=window.ELPA_SUBMISSION_CONFIG||{};
+const tax=typeof ELPA_TAXONOMY==='undefined'?null:ELPA_TAXONOMY;
+const el=id=>document.getElementById(id);
+const form=el('submissionForm'),button=el('submissionButton'),message=el('submissionMessage');
+const kind=el('submissionKind'),year=el('submissionYear'),slot=el('submissionSession');
+const rows=el('followupRows'),add=el('addFollowup'),preview=el('submissionPreview');
+let widgetId=null,serial=0,verified=false;
+const ready=!!(tax&&/^https:\/\//.test(config.apiEndpoint||'')&&config.turnstileSiteKey);
+function show(text,state){message.textContent=text;message.dataset.state=state||'info';}
+for(let y=2022;y<=Math.min(2099,Math.max(2029,new Date().getFullYear()+3));y++){
+ const opt=document.createElement('option');opt.value=String(y);opt.textContent=String(y);year.append(opt);
+}
+year.value=String(Math.min(2099,Math.max(2022,new Date().getFullYear())));
+if(tax)for(const [code,name] of Object.entries(tax.adviceTags)){
+ const label=document.createElement('label'),input=document.createElement('input');
+ input.type='checkbox';input.name='adviceTag';input.value=code;
+ label.append(input,document.createTextNode(name.zh+' · '+name.en));
+ el('adviceTags').append(label);
+}
+el('adviceTags').addEventListener('change',e=>{
+ if(e.target.name==='adviceTag'&&el('adviceTags').querySelectorAll('input:checked').length>4){
+   e.target.checked=false;show('最多选择 4 个标签。','error');
+ }
+ preview.hidden=true;
+});
+function updateKind(){
+ const isQuestion=kind.value==='question';
+ el('questionFields').hidden=!isQuestion;
+ el('adviceFields').hidden=isQuestion;
+ preview.hidden=true;
+ show('填写完成后，可预览并提交待审核。','info');
+}
+kind.addEventListener('change',updateKind);
+function renumber(){
+ [...rows.children].forEach((row,i)=>{
+  row.querySelector('.followup-number').textContent='小问 '+(i+1);
+  row.querySelector('[data-action=up]').disabled=i===0;
+  row.querySelector('[data-action=down]').disabled=i===rows.children.length-1;
+ });
+ add.disabled=rows.children.length>=20;
+}
+function followupInput(parent,labelText,cls,placeholder){
+ const wrapper=document.createElement('div');wrapper.className='submission-field';
+ const label=document.createElement('label'),area=document.createElement('textarea');
+ label.textContent=labelText;area.className=cls;area.maxLength=400;area.rows=2;
+ area.placeholder=placeholder;area.setAttribute('aria-label',labelText+'提示小问');
+ wrapper.append(label,area);parent.append(wrapper);return area;
+}
+add.addEventListener('click',()=>{
+ if(rows.children.length>=20)return;
+ const row=document.createElement('div');row.className='followup-item';row.dataset.id=String(++serial);
+ const head=document.createElement('div');head.className='followup-head';
+ const strong=document.createElement('strong');strong.className='followup-number';
+ const actions=document.createElement('div');actions.className='followup-actions';
+ for(const [action,label,title] of [['up','↑','上移小问'],['down','↓','下移小问'],['remove','删除','删除小问']]){
+  const btn=document.createElement('button');btn.type='button';btn.dataset.action=action;
+  btn.textContent=label;btn.setAttribute('aria-label',title);actions.append(btn);
+ }
+ head.append(strong,actions);row.append(head);
+ const first=followupInput(row,'English *','sub-en','Enter the follow-up in English');
+ followupInput(row,'中文 *','sub-cn','填写对应的中文小问');
+ rows.append(row);renumber();preview.hidden=true;first.focus();
+});
+rows.addEventListener('click',e=>{
+ const btn=e.target.closest('button[data-action]');if(!btn)return;
+ const row=btn.closest('.followup-item');if(!row)return;
+ if(btn.dataset.action==='remove')row.remove();
+ else if(btn.dataset.action==='up'&&row.previousElementSibling)rows.insertBefore(row,row.previousElementSibling);
+ else if(btn.dataset.action==='down'&&row.nextElementSibling)rows.insertBefore(row.nextElementSibling,row);
+ renumber();preview.hidden=true;
+});
+const txt=id=>el(id).value.trim();
+function validString(value,min,max,label){
+ if(value.length<min||value.length>max)throw Error(label+'长度应为 '+min+'–'+max+' 个字符。');
+}
+function payload(){
+ if(kind.value==='advice'){
+  const tags=[...el('adviceTags').querySelectorAll('input:checked')].map(x=>x.value);
+  if(tags.length<1||tags.length>4)throw Error('请选择 1–4 个经验标签。');
+  const title=txt('adviceTitle'),body=txt('adviceBody');
+  validString(title,4,120,'经验标题');validString(body,20,6000,'经验内容');
+  return {version:2,kind:'advice',phase:txt('advicePhase'),tags,title,body};
+ }
+ if(!slot.value)throw Error('请选择所属学期及场次。');
+ const [semester,examStage]=slot.value.split('/');
+ const main={en:txt('questionEn'),cn:txt('questionCn')};
+ validString(main.en,8,1000,'主问题英文');
+ validString(main.cn,4,1000,'主问题中文');
+ const subs=[...rows.children].map((row,i)=>{
+  const en=row.querySelector('.sub-en').value.trim(),cn=row.querySelector('.sub-cn').value.trim();
+  validString(en,1,400,'小问 '+(i+1)+' 英文');
+  validString(cn,1,400,'小问 '+(i+1)+' 中文');
+  return {en,cn};
+ });
+ return {version:2,kind:'question',term:year.value+' '+semester,examStage,main,subs,
+   source:txt('submissionSource')};
+}
+function readable(d){
+ if(d.kind==='advice')return [
+  '备考经验 · '+tax.advicePhases[d.phase].zh,
+  '标签：'+d.tags.map(t=>tax.adviceTags[t].zh).join('、'),
+  '标题：'+d.title,'','正文：',d.body
+ ].join('\n');
+ const lines=['考题 · '+d.term+' · '+tax.examStages[d.examStage].zh,
+  '来源：'+tax.sourceTypes[d.source].zh,'','English:',d.main.en,'','中文：',d.main.cn];
+ for(const [i,sub] of d.subs.entries())lines.push('','小问 '+(i+1),'English: '+sub.en,'中文：'+sub.cn);
+ return lines.join('\n');
+}
+function draft(){
+ try{
+  const d=payload();preview.textContent=readable(d);preview.hidden=false;
+  preview.scrollIntoView({behavior:'smooth',block:'nearest'});
+  return d;
+ }catch(e){show(e.message,'error');return null;}
+}
+el('previewSubmission').addEventListener('click',draft);
+form.addEventListener('input',()=>{preview.hidden=true;});
+if(!ready)show('投稿服务尚未配置完成。','error');
+else{
+ show('请填写内容并完成人机验证。','info');
+ const start=Date.now();
+ function render(){
+  if(window.turnstile&&typeof window.turnstile.render==='function'){
+   try{
+    widgetId=window.turnstile.render('#submissionTurnstile',{
+     sitekey:config.turnstileSiteKey,action:'elpa_submit',
+     callback:()=>{verified=true;button.disabled=false;show('验证完成，可提交审核。','info');},
+     'expired-callback':()=>{verified=false;button.disabled=true;show('验证已过期，请重新验证。','error');},
+     'error-callback':()=>{verified=false;button.disabled=true;show('人机验证失败，请刷新重试。','error');}
+    });
+   }catch{show('人机验证初始化失败，请刷新重试。','error');}
+   return;
   }
-  form.addEventListener('submit',async(event)=>{
-    event.preventDefault();
-    if(!ready||widgetId===null||button.disabled)return;
-    const question=document.getElementById('submissionQuestion').value.trim();
-    const subquestions=document.getElementById('submissionSubs').value.trim();
-    const source=document.getElementById('submissionSource').value;
-    const token=window.turnstile.getResponse(widgetId);
-    if(question.length<8||question.length>1000||subquestions.length>2000||!token){
-      show('请检查题目长度并完成人机验证。','error'); return;
-    }
-    button.disabled=true;
-    show('正在安全提交，请稍候……','info');
-    try {
-      const response=await fetch(config.apiEndpoint,{
-        method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({term:term.value,question,subquestions,source,turnstileToken:token})
-      });
-      const data=await response.json().catch(()=>({}));
-      if(!response.ok||!data.ok)throw new Error(data.message||'提交失败，请稍后再试。');
-      form.reset();term.value=year+' Fall';
-      show('提交成功！题目已进入公开待审核队列，尚未收录到正式题库。感谢分享！','success');
-    }catch(error){
-      show(error.message||'网络异常，请稍后重试。','error');
-    }finally{
-      if(widgetId!==null && window.turnstile)window.turnstile.reset(widgetId);
-      button.disabled=true;
-    }
+  if(Date.now()-start<12000)setTimeout(render,200);
+  else show('人机验证加载失败，请刷新重试。','error');
+ }
+ render();
+}
+form.addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!ready||widgetId===null||!verified||button.disabled)return;
+ const data=draft();if(!data)return;
+ const token=window.turnstile.getResponse(widgetId);
+ if(!token){show('请重新完成人机验证。','error');return;}
+ const body={...data,turnstileToken:token};
+ if(new TextEncoder().encode(JSON.stringify(body)).length>24576){
+  show('投稿内容过长，请精简后重试。','error');return;
+ }
+ button.disabled=true;show('正在提交，请稍候……','info');
+ let success=false;
+ try{
+  const res=await fetch(config.apiEndpoint,{
+   method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
   });
+  const result=await res.json().catch(()=>({}));
+  if(!res.ok||!result.ok)throw Error(result.message||'提交失败，请稍后重试。');
+  success=true;
+  form.reset();rows.replaceChildren();renumber();updateKind();preview.hidden=true;
+  year.value=String(Math.min(2099,Math.max(2022,new Date().getFullYear())));
+  show('提交成功，内容已进入公开审核队列。感谢分享！','success');
+ }catch(error){show(error.message||'网络异常，请稍后重试。','error');}
+ finally{
+  verified=false;button.disabled=true;
+  if(widgetId!==null&&window.turnstile)window.turnstile.reset(widgetId);
+ }
+});
+updateKind();
 })();
 </script>
 </body>
