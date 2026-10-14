@@ -6,15 +6,10 @@ on:
       - '*.html'
       - 'site.css'
       - 'question-bank/questions.js'
-      - 'submit.html'
       - 'submission-config.js'
       - 'scripts/**'
       - 'tests/**'
-      - '.github/workflows/approved-submission.yml'
-      - 'submit.html'
-      - 'submission-config.js'
-      - 'scripts/**'
-      - 'tests/**'
+      - 'worker/**'
       - '.github/workflows/approved-submission.yml'
       - 'assets/Administration-Building-14-1536x864.jpg'
       - '.github/workflows/site-checks.yml'
@@ -24,6 +19,11 @@ on:
       - '*.html'
       - 'site.css'
       - 'question-bank/questions.js'
+      - 'submission-config.js'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'worker/**'
+      - '.github/workflows/approved-submission.yml'
       - 'assets/Administration-Building-14-1536x864.jpg'
       - '.github/workflows/site-checks.yml'
 
@@ -114,6 +114,8 @@ jobs:
           node --check /tmp/elpa-practice.html.js
           node --check /tmp/elpa-submit.html.js
           node --check submission-config.js
+          cp worker/src/index.js /tmp/elpa-worker.mjs
+          node --check /tmp/elpa-worker.mjs
           node --check question-bank/questions.js
       - name: Test approved-question import and stable IDs
         run: |
