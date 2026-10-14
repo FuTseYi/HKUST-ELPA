@@ -63,3 +63,29 @@ never added to the question bank.
 **Pending**: verify external health endpoint, browser Turnstile flow, rejected/valid submissions,
 GitHub Issues, label-triggered PR, and the final GitHub Pages path after deploying the merged code.
 Do not remove the kill switch until these checks pass.
+
+
+## Time-bounded live verification
+
+The Worker accepts submissions only when `SUBMISSIONS_DISABLED=false` **and**
+`SUBMISSION_MODE` is explicitly `test` or `public`.
+
+For a controlled browser smoke test, set:
+
+- `SUBMISSION_MODE=test`
+- `SUBMISSION_TEST_DEADLINE_MS`: an absolute **13-digit Unix timestamp in milliseconds**.
+  All submissions automatically fail after this time, regardless of other settings.
+- `SUBMISSION_TEST_QUESTION`: the exact synthetic question to permit.
+- `SUBMISSIONS_DISABLED=false` only after verifying the deadline and allowlist.
+
+During test mode, the Worker rejects all other questions; the permitted question
+must use `term=2026 Fall`, empty `subquestions`, and `source=firsthand`.
+It still requires Turnstile Siteverify, rate limiting and a functioning GitHub
+Issue token. Clearly label the test question as **TEST ONLY / DO NOT PUBLISH**.
+Close any test Issue / generated PR without merging. Keep the test branch for
+development traceability.
+
+For immediate rollback set `SUBMISSIONS_DISABLED=true` and
+`SUBMISSION_MODE=closed`. **Production launch must be deliberate**:
+`SUBMISSION_MODE=public` together with `SUBMISSIONS_DISABLED=false`.
+Never enable the public mode as part of this test.
