@@ -115,8 +115,9 @@ module.exports=function importV2(event){
      updated=original.slice(0,begin)+section.replace('items:[]','items:['+
        JSON.stringify(item)+']')+original.slice(finish);
    }else{
-     const relative=section.lastIndexOf('\n  ]');
-     if(relative<0||relative<section.indexOf('items: ['))throw Error('Invalid bank structure');
+     const pretty=section.lastIndexOf('\n  ]');
+     const relative=pretty>=0?pretty:section.lastIndexOf(']');
+     if(relative<0||relative<section.indexOf('items:['))throw Error('Invalid bank structure');
      const already=banks[bankKey].items.length>0;
      updated=original.slice(0,begin+relative)+(already?',':'')+
        '\n    '+JSON.stringify(item)+original.slice(begin+relative);
