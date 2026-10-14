@@ -17,7 +17,7 @@ HKUST-ELPA 是学生维护的非官方 ELPA 备考资源。目前内容以香港
 
 ## 快速开始
 
-- **[独立题库 · Question Bank](./question-bank/README.md)**：按学期自动区分**最新学期题库**与**过往题库**（2026 Fall 为首批反馈学期），保留提示小问，必要时简要标注回忆不完整的信息。
+- **[独立题库 · Question Bank](./question-bank/README.md)**：提供**南沙 / 清水湾**校区来源切换及**常规 ELPA / ELPA Fast Track**考试类型切换。常规 ELPA 依最新已收录学期自动分类；Fast Track 独立展示 12 道回忆题及 8 要点自我介绍任务。
 - **[网站首页](https://futseyi.github.io/HKUST-ELPA/)**：网站导航与功能概览。
 - **[考试指南](https://futseyi.github.io/HKUST-ELPA/guide.html)**：常见流程与 FAQ。
 - **[题库练习](https://futseyi.github.io/HKUST-ELPA/practice.html)**：两组题库、关键词与状态筛选、每页 8 题、计时与个人笔记。
@@ -39,7 +39,7 @@ HKUST-ELPA 是学生维护的非官方 ELPA 备考资源。目前内容以香港
 
 ### 题目维护方式
 
-`practice.html` 从 [`question-bank/questions.js`](./question-bank/questions.js) 加载结构化题目数据。题目、中文释义与提示小问请优先在该文件更新，并同步检查对应的[来源与场次文档](./question-bank/README.md)；无需改动页面 HTML 的功能代码。页面根据已审核入库题目的最新学期自动分组，新学期首次入库即切换展示，与访问日期无关。题目内部编号保持不变，用于准确关联练习状态、笔记和备份。
+`practice.html` 从 [`question-bank/questions.js`](./question-bank/questions.js) 和 [`question-bank/fast-track.js`](./question-bank/fast-track.js) 加载各自独立的结构化题目数据。题目、中文释义与提示小问请优先在该文件更新，并同步检查对应的[来源与场次文档](./question-bank/README.md)；无需改动页面 HTML 的功能代码。页面根据已审核入库题目的最新学期自动分组，新学期首次入库即切换展示，与访问日期无关。题目内部编号保持不变，用于准确关联练习状态、笔记和备份。
 
 ### 学习记录、备份与恢复
 
