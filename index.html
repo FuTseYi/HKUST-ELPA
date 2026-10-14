@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="香港科技大学（广州）ELPA 非官方备考资源：考试指南、往年题库、2026 Fall 新题库、模拟练习与个人进度。">
+<meta name="description" content="香港科技大学（广州）ELPA 非官方备考资源：考试指南、往年题库、社区反馈题库、模拟练习与个人进度。">
 <meta name="theme-color" content="#003e74">
 <title>HKUST(GZ) ELPA｜首页</title>
 <link rel="preload" href="./assets/Administration-Building-14-1536x864.jpg" as="image">
@@ -35,21 +35,23 @@
 <div class="elpa-feature-grid">
 <a class="elpa-feature" href="./guide.html"><span class="elpa-feature-icon" aria-hidden="true">🗓️</span><strong>考试指南</strong><p>了解考生反馈中的考试流程、口头陈述、提问环节与常见问题。不同场次要求以现场通知为准。</p><span class="arrow">查看指南 →</span></a>
 <a class="elpa-feature" href="./practice.html#sec-bankA"><span class="elpa-feature-icon" aria-hidden="true">📚</span><strong>往年题库</strong><p>25 道整理去重后的练习题，保留已有提示小问，支持搜索、分页、笔记和练习状态。</p><span class="arrow">开始练习 →</span></a>
-<a class="elpa-feature" href="./practice.html#sec-bankD"><span class="elpa-feature-icon" aria-hidden="true">🎓</span><strong>2026 Fall 新题库</strong><p>12 道当期新题与反馈题，独立展示，题干回忆不完整时进行必要标注。</p><span class="arrow">查看新题 →</span></a>
+<a class="elpa-feature" href="./practice.html#sec-bankD"><span class="elpa-feature-icon" aria-hidden="true">🎓</span><strong>社区反馈题库</strong><p>保留 2026 Fall 及后续考试批次的考生反馈，题目回忆不完整时会明确标注。</p><span class="arrow">查看新题 →</span></a>
 </div>
 <div class="elpa-nums" aria-label="网站内容概览">
 <div class="elpa-num"><strong>25</strong><small>往年题库练习题</small></div>
-<div class="elpa-num"><strong>12</strong><small>2026 Fall 新题</small></div>
+<div class="elpa-num"><strong id="homeNewCount">12</strong><small>社区反馈题</small></div>
 <div class="elpa-num"><strong id="homeDoneCount">—</strong><small>已掌握题目（当前浏览器）</small></div>
 </div>
 <div class="elpa-panel"><h2>持续学习，记录自己的进度</h2><p>题目练习时可以搜索关键词、按状态筛选、随机抽题、计时模拟，并在浏览器中保存笔记。支持 JSON 备份与恢复，原有学习进度无需重新开始。</p><a class="elpa-button primary" href="./practice.html">进入练习工具 →</a></div>
 <div class="elpa-panel"><h2>题目来源与项目说明</h2><p>本站为非官方学生整理资料，不代表学校公布的正式题库。来源、考生回忆与整理表达的区别，统一在资料页面说明。</p><a href="./sources.html">查看原始资料与贡献方式 →</a></div>
 </section></main>
 <footer class="elpa-footer">HKUST(GZ) ELPA · 学生维护的非官方备考资源 · <a href="./sources.html">资料来源与声明</a> · <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer>
+<script src="./question-bank/questions.js"></script>
 <script>
 try {
   const snapshot = JSON.parse(localStorage.getItem('elpa-data-snapshot-v2') || '{}');
-  const ids = ['A-1','A-2','A-3','A-4','A-5','A-6','A-7',...Array.from({length:17},(_,i)=>'C-'+(i+1)),'B-9',...Array.from({length:12},(_,i)=>'D-'+(i+1))];
+  const ids = PAST_QUESTION_IDS.concat(BANKS.D.items.map(it => "D-" + it.num));
+  document.getElementById("homeNewCount").textContent = String(BANKS.D.items.length);
   const statuses = snapshot.statuses || {};
   document.getElementById('homeDoneCount').textContent = String(ids.filter(id=>statuses[id]==='done').length);
 } catch (e) { document.getElementById('homeDoneCount').textContent='—'; }
