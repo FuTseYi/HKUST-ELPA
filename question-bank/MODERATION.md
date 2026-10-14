@@ -31,3 +31,15 @@ Limitations:
   `pull_request` workflows. Check the PR manually and run the normal site CI
   against any human-updated branch before merging.
 - No personally identifiable details should be copied into public questions.
+
+## Release policy
+
+The Cloudflare Worker must remain closed until a repository-scoped GitHub token,
+Turnstile verification, both `submission:pending` and `submission:approved`
+labels, and permission for Actions to create PRs are available.
+Set `SUBMISSIONS_DISABLED=false` **only after** the full workflow has been
+verified. Missing or misspelled values are treated as disabled.
+
+For a new question, review the generated PR diff, provenance and any similar
+questions. Do not merge a PR generated from a synthetic test report.
+Do not delete implementation branches after PR merges.

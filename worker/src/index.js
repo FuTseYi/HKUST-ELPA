@@ -5,7 +5,7 @@ const ORIGIN = 'https://futseyi.github.io';
 const HOSTNAME = 'futseyi.github.io';
 const OWNER = 'FuTseYi';
 const REPO = 'HKUST-ELPA';
-const MAX_BODY_BYTES = 6500;
+const MAX_BODY_BYTES = 16384;
 
 function json(payload, status = 200, origin = false) {
   return new Response(JSON.stringify(payload), {
@@ -73,7 +73,7 @@ export default {
         'Access-Control-Allow-Headers':'Content-Type','Access-Control-Max-Age':'600'
       }});
     if (request.method !== 'POST') return invalid('Method not allowed',405);
-    if (env.SUBMISSIONS_DISABLED === 'true') return invalid('投稿暂时关闭，请稍后再试。',503);
+    if (env.SUBMISSIONS_DISABLED !== 'false') return invalid('投稿暂时关闭，请稍后再试。',503);
     if (!env.GITHUB_TOKEN || !env.TURNSTILE_SECRET || !env.SUBMISSION_LIMITER)
       return invalid('投稿服务尚未配置完成。',503);
     if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type') || ''))
@@ -143,7 +143,7 @@ export default {
           'X-GitHub-Api-Version':'2022-11-28',
           'User-Agent':'HKUST-ELPA-Submission'
         },
-        body:JSON.stringify({title,body:issueBody}),
+        body:JSON.stringify({title,body:issueBody,labels:['submission:pending']}),
         signal:AbortSignal.timeout(10000)
       });
       if (!response.ok) throw new Error('GitHub issue create failed: '+response.status);

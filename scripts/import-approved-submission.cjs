@@ -11,7 +11,7 @@ if(!eventFile)throw Error('GitHub event payload required');
 const event=JSON.parse(fs.readFileSync(eventFile,'utf8'));
 const issue=event.issue||{};
 const number=issue.number;
-const marker=(issue.body||'').match(/<!-- elpa-submission-v1:([A-Za-z0-9_-]+) -->/);
+const marker=(issue.body||'').match(/^<!-- elpa-submission-v1:([A-Za-z0-9_-]+) -->\s*$/m);
 if(!Number.isSafeInteger(number)||number<1||!marker||!String(issue.title||'').startsWith('[ELPA 投稿]')){
   throw Error('Issue is not a structured ELPA submission');
 }
@@ -43,14 +43,15 @@ const num=1000000+number;
 if(banks.D.items.some(x=>x.num===num))throw Error('Duplicate generated question ID');
 const subs=data.subquestions.trim()
   ?data.subquestions.split(/\r?\n/).map(x=>x.trim()).filter(Boolean)
-     .slice(0,30).map(en=>({en,cn:''}))
   :[];
+if(subs.length>30)throw Error('Too many subquestions; review the original Issue');
+const subItems=subs.map(en=>({en,cn:''}));
 const item={
   num,
   en:data.question.trim(),
   cn:data.term+'｜社区投稿（'+(data.source==='firsthand'?'考生亲历':'同学转述')+'；非官方核实原题）',
-  recallTag:'考生回忆，非官方原题',
-  subs
+  recallTag:/[\u3400-\u9fff]/u.test(data.question) ? '中文题意回忆，未核实英文原题' : '考生英文回忆，非官方原题',
+  subs:subItems
 };
 const start=content.indexOf('BANKS.D = {');
 const end=content.indexOf('\n};',start);
