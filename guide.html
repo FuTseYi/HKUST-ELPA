@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#003e74"><meta name="description" content="HKUST(GZ) ELPA 口语考试流程、考生反馈和常见问题。"><title>考试指南｜HKUST(GZ) ELPA</title><link rel="stylesheet" href="./site.css"><link rel="icon" type="image/svg+xml" href="./assets/elpa-mark.svg"></head><body class="elpa-body">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#003e74"><meta name="description" content="HKUST(GZ) ELPA 口语考试流程、考生反馈和常见问题。"><title>考试与备考指南｜HKUST-ELPA</title><link rel="stylesheet" href="./site.css"><link rel="icon" type="image/svg+xml" href="./assets/elpa-mark.svg"></head><body class="elpa-body">
 <nav class="elpa-nav" aria-label="主导航">
   <div class="elpa-nav-inner">
     <a class="elpa-brand" href="./index.html" aria-label="HKUST-ELPA 首页"><span class="elpa-brand-icon"><img src="./assets/elpa-mark.svg" alt="" width="38" height="38"></span><span class="elpa-brand-name">HKUST-<strong>ELPA</strong><small>Speaking Preparation</small></span></a>
@@ -40,9 +40,31 @@
       </div>
     </div>
   </section>
+<section class="elpa-advice-section" id="sec-advice" aria-labelledby="adviceTitle">
+  <span class="elpa-kicker">Preparation Insights</span>
+  <h2 class="elpa-heading" id="adviceTitle">备考经验 · Preparation Advice</h2>
+  <p class="elpa-desc">来自考生的独立经验分享，经维护者审核收录；不代表学校官方考试要求。</p>
+  <div class="elpa-advice-filters">
+    <label for="advicePhaseFilter">备考阶段
+      <select id="advicePhaseFilter">
+        <option value="">全部阶段</option>
+        <option value="before">考前准备</option>
+        <option value="during">考试现场</option>
+        <option value="after">考后反馈</option>
+      </select>
+    </label>
+    <label for="adviceTagFilter">经验主题
+      <select id="adviceTagFilter"><option value="">全部主题</option></select>
+    </label>
+  </div>
+  <div id="guideAdviceList" class="elpa-advice-grid" aria-live="polite"></div>
+  <p id="guideAdviceEmpty" class="elpa-advice-empty">暂无已收录的社区经验。<a href="./submit.html">欢迎分享你的备考建议 →</a></p>
+</section>
 <section class="elpa-guide-faq" id="sec-faq"><span class="elpa-kicker">Questions & Answers</span><h2 class="elpa-heading">常见问题 FAQ</h2><p class="elpa-desc">来自考生经验汇总，其中的“最新”“今年”等描述仅反映原分享时间，不应视为当前实时信息。</p><div id="guideFaqList"></div></section>
 <div class="elpa-panel"><h2>准备好练习了吗？</h2><p>建议先按主题选择题目，再模拟 1 分钟准备与 2 分钟陈述，并练习向其他考生提一个相关问题。</p><a class="elpa-button primary" href="./practice.html">前往题库练习 →</a></div>
 </div></main><footer class="elpa-footer">HKUST(GZ) ELPA · 学生维护的非官方备考资源 · <a href="./sources.html">资料来源与声明</a> · <a href="https://github.com/FuTseYi/HKUST-ELPA" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer>
+<script src="./question-bank/taxonomy.js"></script>
+<script src="./question-bank/advice.js"></script>
 <script>
 const FAQS = [
   { q: "往年旧题今年还会考吗？", a: [
@@ -97,4 +119,54 @@ for(const item of FAQS){
   for(const answer of item.a){const p=document.createElement('p');p.textContent=answer;details.append(p);}
   faqList.append(details);
 }
+
+// Community advice: category codes stay bilingual, authored text is displayed unchanged.
+const advicePhaseFilter=document.getElementById('advicePhaseFilter');
+const adviceTagFilter=document.getElementById('adviceTagFilter');
+const adviceList=document.getElementById('guideAdviceList');
+const adviceEmpty=document.getElementById('guideAdviceEmpty');
+for(const [code,label] of Object.entries(ELPA_TAXONOMY.adviceTags)){
+  const option=document.createElement('option');
+  option.value=code;option.textContent=label.zh+' · '+label.en;adviceTagFilter.append(option);
+}
+function renderCommunityAdvice(){
+  adviceList.replaceChildren();
+  const selectedPhase=advicePhaseFilter.value,selectedTag=adviceTagFilter.value;
+  const visible=ELPA_ADVICE.filter(entry=>entry&&
+    (!selectedPhase||entry.phase===selectedPhase)&&
+    (!selectedTag||Array.isArray(entry.tags)&&entry.tags.includes(selectedTag)));
+  adviceEmpty.hidden=visible.length!==0;
+  if(!visible.length){
+    adviceEmpty.firstChild.textContent=ELPA_ADVICE.length===0
+      ?'暂无已收录的社区经验。':'该分类下暂无已收录的社区经验。';
+    return;
+  }
+  for(const entry of visible){
+    const article=document.createElement('article');article.className='elpa-advice-card';
+    const chips=document.createElement('div');chips.className='elpa-advice-chips';
+    const phase=document.createElement('span');phase.className='elpa-advice-chip';
+    const phaseText=ELPA_TAXONOMY.advicePhases[entry.phase];
+    phase.textContent=phaseText?(phaseText.zh+' / '+phaseText.en):entry.phase;
+    chips.append(phase);
+    for(const key of entry.tags||[]){
+      const names=ELPA_TAXONOMY.adviceTags[key];
+      if(!names)continue;
+      const tag=document.createElement('span');tag.className='elpa-advice-chip';
+      tag.textContent=names.zh+' / '+names.en;chips.append(tag);
+    }
+    const title=document.createElement('h3');title.textContent=entry.title;
+    const body=document.createElement('p');body.textContent=entry.body;body.className='elpa-advice-content';
+    article.append(chips,title,body);
+    if(Number.isSafeInteger(entry.issueNumber)&&entry.issueNumber>0){
+      const source=document.createElement('a');source.className='elpa-advice-source';
+      source.href='https://github.com/FuTseYi/HKUST-ELPA/issues/'+entry.issueNumber;
+      source.target='_blank';source.rel='noopener noreferrer';
+      source.textContent='查看原始投稿 ↗';article.append(source);
+    }
+    adviceList.append(article);
+  }
+}
+advicePhaseFilter.addEventListener('change',renderCommunityAdvice);
+adviceTagFilter.addEventListener('change',renderCommunityAdvice);
+renderCommunityAdvice();
 </script></body></html>

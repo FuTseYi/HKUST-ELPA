@@ -78,6 +78,11 @@ jobs:
                   Path("/tmp/elpa-"+filename+".js").write_text(scripts[0],encoding="utf-8")
 
           practice=pages["practice.html"]
+          assert 'id="termFilter"' in practice and 'id="examStageFilter"' in practice, "Session filters missing"
+          assert 'function toggleTranslation(' in practice and 'function toggleFollowupChinese(' in practice, "Chinese-on-click controls missing"
+          assert 'src="./question-bank/appearances.js"' in practice and 'src="./question-bank/taxonomy.js"' in practice, "Session metadata scripts missing"
+          assert 'function legacyCommunityNote(' in practice, "Historical provenance guard missing"
+
           inspector=Inspector()
           inspector.feed(practice)
           for key in ("searchInput","statusFilter","matchCount","backupBtn","restoreBtn","restoreInput",
@@ -90,6 +95,10 @@ jobs:
           assert 'src="./question-bank/questions.js"' in practice, "Structured question bank not loaded"
 
           guide=pages["guide.html"]
+          assert 'id="guideAdviceList"' in guide and 'id="advicePhaseFilter"' in guide and 'id="adviceTagFilter"' in guide, "Advice filters or container missing"
+          assert 'src="./question-bank/advice.js"' in guide and 'src="./question-bank/taxonomy.js"' in guide, "Reviewed advice data scripts missing"
+          assert "renderCommunityAdvice(" in guide, "Advice listing renderer missing"
+
           assert 'guideFaqList' in guide and 'Step 5' in guide, "Exam guide content missing"
           assert "FAQS" in guide, "Guide questions not included"
           submit=pages["submit.html"]

@@ -658,6 +658,17 @@
       <input type="search" id="searchInput" aria-label="搜索题目" placeholder="搜索题目关键词…（如 AI / research / HKUST / integrity）">
       <button class="search-clear" id="searchClear" title="清空搜索">✕</button>
     </div>
+    <label class="sr-only" for="termFilter">按考试学期筛选</label>
+    <select id="termFilter" class="filter-select" aria-label="按考试学期筛选">
+      <option value="">全部考试学期</option>
+    </select>
+    <label class="sr-only" for="examStageFilter">按考试场次筛选</label>
+    <select id="examStageFilter" class="filter-select" aria-label="按考试场次筛选">
+      <option value="">全部考试场次</option>
+      <option value="start">开学阶段</option>
+      <option value="mid">学期中</option>
+      <option value="end">学期末</option>
+    </select>
     <label for="statusFilter" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">练习状态筛选</label>
     <select id="statusFilter" class="filter-select" aria-label="练习状态筛选">
       <option value="all">全部状态</option><option value="new">未练</option>
@@ -773,6 +784,8 @@
 <button class="to-top" id="toTop" title="回到顶部" aria-label="返回页面顶部">↑</button>
 
 <script src="./question-bank/questions.js"></script>
+<script src="./question-bank/appearances.js"></script>
+<script src="./question-bank/taxonomy.js"></script>
 <script>
 /* ============ 应用逻辑 ============ */
 
@@ -1123,6 +1136,51 @@ restoreInput.addEventListener('change', async () => {
 });
 
 function qId(bank, num) { return bank + '-' + num; }
+function legacyCommunityNote(bankKey,item) {
+  // Historical D.cn has mixed provenance, not a confirmed translation.
+  return bankKey === 'D' &&
+    (item.num < 1000000 || /^(?:20\d{2} (?:Spring|Fall)|Other \/ Unknown)｜/.test(item.cn || ''));
+}
+function questionTranslation(bankKey,item) {
+  return legacyCommunityNote(bankKey,item) ? '' : (item.cn || '');
+}
+function questionSourceNote(bankKey,item) {
+  return legacyCommunityNote(bankKey,item) ? (item.cn || '') : '';
+}
+function appearancesFor(id){
+  const records=ELPA_APPEARANCES[id];
+  return Array.isArray(records)?records:[];
+}
+function sessionBadges(id){
+  const unique=new Set();
+  return appearancesFor(id).filter(x=>x&&x.term&&x.examStage).map(x=>{
+    const stage=ELPA_TAXONOMY.examStages[x.examStage];
+    if(!stage)return '';
+    const key=x.term+' / '+x.examStage;
+    if(unique.has(key))return '';
+    unique.add(key);
+    return '<span class="session-chip">'+esc(x.term)+' · '+esc(stage.zh)+'</span>';
+  }).join('');
+}
+function toggleTranslation(id,button){
+  const target=document.getElementById(id);
+  if(!target||!button)return;
+  const showing=target.hidden;
+  target.hidden=!showing;
+  button.setAttribute('aria-expanded',String(showing));
+  button.textContent=showing?'隐藏中文':'查看中文';
+}
+function toggleFollowupChinese(id,button){
+  const section=document.getElementById('subq-'+id);
+  if(!section||!button)return;
+  const targets=[...section.querySelectorAll('.subq-cn.translation')];
+  if(!targets.length)return;
+  const showing=targets[0].hidden;
+  for(const node of targets)node.hidden=!showing;
+  button.setAttribute('aria-expanded',String(showing));
+  button.textContent=showing?'隐藏小问中文':'查看小问中文';
+}
+
 
 function esc(s) {
   return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -1168,6 +1226,9 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
     const hasSubs = item.subs && item.subs.length > 0;
     const qnoteKey = 'qn-' + id;
     const qnoteSaved = notes[qnoteKey] || '';
+    const translation=questionTranslation(bankKey,item);
+    const sourceNote=questionSourceNote(bankKey,item);
+    const badges=sessionBadges(id);
     const searchText = (item.en + ' ' + (item.cn||'') + ' ' + (item.subs||[]).map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
     return `
     <div class="qcard status-${st}" id="q-${id}" data-search="${escAttr(searchText)}">
@@ -1176,7 +1237,9 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
         <div class="q-title">
           <div class="en">${esc(item.en)}</div>
           ${item.recallTag ? `<span class="recall-mark">${esc(item.recallTag)}</span>` : ""}
-          ${item.cn ? `<div class="cn">${esc(item.cn)}</div>` : ''}
+          ${badges ? `<div class="session-badges">${badges}</div>` : ''}
+          ${translation ? `<button type="button" class="translation-toggle" aria-expanded="false" aria-controls="cn-${id}" onclick="toggleTranslation('cn-${id}',this)">查看中文</button><div class="cn translation" id="cn-${id}" hidden>${esc(translation)}</div>` : ''}
+          ${sourceNote ? `<div class="question-provenance">${esc(sourceNote)}</div>` : ''}
         </div>
         <div class="q-actions">
           <button class="copy-btn" onclick="copyQuestion('${id}')" title="复制题目">📋 复制</button>
@@ -1188,14 +1251,15 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
         <button type="button" class="subq-head" onclick="toggleSub('${id}')" aria-expanded="false" aria-controls="subq-list-${id}">
           <span class="arrow">▶</span>查看提示小问（${item.subs.length} 个）
         </button>
-        <div class="subq-list" id="subq-list-${id}"><ol>
+        <div class="subq-list" id="subq-list-${id}">
+        ${item.subs.some(x=>x.cn) ? `<button type="button" class="translation-toggle translation-toggle-sub" aria-expanded="false" onclick="toggleFollowupChinese('${id}',this)">查看小问中文</button>` : ''}<ol>
           ${item.subs.map((s, si) => {
             const nk = id + '-' + si;
             const saved = notes[nk] || '';
             return `
             <li>
               <span class="subq-en">${esc(s.en)}</span>
-              ${s.cn ? `<span class="subq-cn">${esc(s.cn)}</span>` : ''}
+              ${s.cn ? `<span class="subq-cn translation" hidden>${esc(s.cn)}</span>` : ''}
               <div class="note-wrap" id="nw-${nk}">
                 <div class="note-toolbar">
                   <button class="note-toggle" onclick="toggleNote('${nk}')" title="记录灵感/答案（保存到 elpa_data.json）">📝 记笔记</button>
@@ -1404,7 +1468,10 @@ function copyQuestion(id) {
   const section = pastIndex >= 0 ? '往年题库' : '社区反馈题库';
   const number = pastIndex >= 0 ? pastIndex + 1 : BANKS.D.items.findIndex(it => qId('D', it.num) === id) + 1;
   let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
-  if (item.cn) text += `（${item.cn}）\n`;
+  const copyCn=questionTranslation(id.split('-')[0],item);
+  if (copyCn) text += `（${copyCn}）\n`;
+  const copyNote=questionSourceNote(bankKey,item);
+  if (copyNote) text += `来源说明：${copyNote}\n`;
   if (item.subs && item.subs.length) {
     text += '\n提示小问：\n' + item.subs.map(s => '• ' + s.en + (s.cn ? '  (' + s.cn + ')' : '')).join('\n');
   }
@@ -1456,6 +1523,22 @@ function updateProgress() {
 /* ============ 组合筛选（关键词 + 练习状态） ============ */
 const searchInput = document.getElementById('searchInput');
 const statusFilter = document.getElementById('statusFilter');
+const termFilter=document.getElementById('termFilter');
+const examStageFilter=document.getElementById('examStageFilter');
+function populateExamFilters(){
+  const terms=[...new Set(Object.values(ELPA_APPEARANCES).flatMap(records=>
+    Array.isArray(records)?records.filter(r=>r&&r.term).map(r=>r.term):[]))].sort().reverse();
+  for(const term of terms){
+    const opt=document.createElement('option');
+    opt.value=term;opt.textContent=term;termFilter.append(opt);
+  }
+  termFilter.disabled=terms.length===0;
+  examStageFilter.disabled=terms.length===0;
+  termFilter.title=terms.length?'筛选已审核投稿的考试学期':'尚无标注具体场次的已审核投稿';
+  examStageFilter.title=terms.length?'筛选已审核投稿的考试阶段':'尚无标注具体场次的已审核投稿';
+}
+populateExamFilters();
+
 /* Search and study-status filtering cover every question, regardless of pagination. */
 const PAGE_SIZE=8;
 const bankPages={past:1,fall:1};
@@ -1479,13 +1562,17 @@ function renderPager(kind,total,pages){
 function applyFilters(reset=false){
   if(reset){bankPages.past=1;bankPages.fall=1;}
   const kw=searchInput.value.trim().toLowerCase(),filter=statusFilter.value;
+  const selectedTerm=termFilter.value,selectedStage=examStageFilter.value;
   document.getElementById('searchClear').classList.toggle('show',!!searchInput.value);
   let total=0;
   for(const kind of ['past','fall']){
     const cards=bankCards(kind);
     const matches=cards.filter(card=>{
       const state=statuses[card.id.slice(2)]||'new';
-      const yes=(!kw||card.dataset.search.includes(kw))&&(filter==='all'||state===filter);
+      const records=appearancesFor(card.id.slice(2));
+      const sessionOK=(!selectedTerm&&!selectedStage)||records.some(r=>
+        (!selectedTerm||r.term===selectedTerm)&&(!selectedStage||r.examStage===selectedStage));
+      const yes=(!kw||card.dataset.search.includes(kw))&&(filter==='all'||state===filter)&&sessionOK;
       card.dataset.filterMatch=yes?'1':'0';return yes;
     });
     const pages=Math.max(1,Math.ceil(matches.length/PAGE_SIZE));
@@ -1501,6 +1588,8 @@ function applyFilters(reset=false){
 }
 searchInput.addEventListener('input',()=>applyFilters(true));
 statusFilter.addEventListener('change',()=>applyFilters(true));
+termFilter.addEventListener('change',()=>applyFilters(true));
+examStageFilter.addEventListener('change',()=>applyFilters(true));
 
 /* ============ 快捷键：文本编辑 + 保存 + 帮助 ============ */
 function toggleHelp() {
@@ -1846,7 +1935,10 @@ document.getElementById('exportBtn').addEventListener('click', () => {
       const st = statuses[id] || 'new';
       const stLabel = { new: '未练', doing: '练习中', done: '已掌握' }[st];
       md += '### ' + (i + 1) + '. ' + it.en + '\n';
-      if (it.cn) md += '> ' + it.cn + '\n';
+      const cn=questionTranslation(id.split('-')[0],it);
+      const historicalNote=questionSourceNote(id.split('-')[0],it);
+      if (cn) md += '> ' + cn + '\n';
+      if (historicalNote) md += '> 来源说明：' + historicalNote + '\n';
       md += '*状态：' + stLabel + '*\n\n';
       const qn = notes['qn-' + id];
       if (qn && qn.trim()) md += '**大问题笔记：**\n\n' + qn.trim() + '\n\n';
