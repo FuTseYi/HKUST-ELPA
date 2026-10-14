@@ -8,6 +8,13 @@
 > [!IMPORTANT]
 > 本项目由学生自主整理，**不代表 HKUST(GZ) 官方立场**。题目、流程和考生反馈可能因年份、批次或考场而异；请以学校当期通知与现场要求为准。除非有明确依据，不将考生回忆题标注为“官方题库”或“必考真题”。
 
+## 网站访问
+
+- **[Vercel · 主要访问入口](https://hkust-elpa.vercel.app/)**：独立域名入口。
+- **[GitHub Pages · 备用入口](https://futseyi.github.io/HKUST-ELPA/)**：与 Vercel 使用同一 GitHub 仓库。
+- 两个域名都通过独立校验的 Cloudflare Turnstile 向同一个 GitHub Issues 审核队列匿名投稿；只有维护者批准并合并相应更新 PR，题目才进入正式题库。
+- **学习记录不会自动跨域同步**：练习进度与笔记保存在各自域名的浏览器存储中，切换入口前可用「备份／恢复」迁移。
+
 ## 快速开始
 
 - **[独立题库 · Question Bank](./question-bank/README.md)**：保留**往年题库**与**社区反馈题库（始于 2026 Fall）**，保留提示小问，必要时简要标注回忆不完整的信息。
