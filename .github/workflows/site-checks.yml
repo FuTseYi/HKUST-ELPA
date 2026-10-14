@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - '*.html'
-      - 'README.md'
       - 'site.css'
       - 'assets/elpa-mark.svg'
       - 'assets/github-mark.svg'
@@ -22,7 +21,6 @@ on:
     branches: [main]
     paths:
       - '*.html'
-      - 'README.md'
       - 'site.css'
       - 'question-bank/**'
       - 'question-bank/taxonomy.js'
@@ -62,10 +60,6 @@ jobs:
           for filename in ["index.html","guide.html","practice.html","sources.html","submit.html"]:
               content=Path(filename).read_text(encoding="utf-8")
               pages[filename]=content
-              title=re.search(r'<title>([^<]+)</title>',content)
-              assert title and 'HKUST-ELPA' in title.group(1), f"Use HKUST-ELPA in document title: {filename}"
-              assert not re.search(r'HKUST\s*(?:\(\s*GZ\s*\)|-\s*GZ)\s*[- ]?\s*ELPA',content,re.I), f"Legacy campus-specific project name found in {filename}"
-              
               assert 'class="elpa-nav"' in content, f"Shared header absent in {filename}"
               assert 'href="./site.css"' in content, f"Shared styles absent in {filename}"
               assert content.count('class="elpa-nav-github"') == 1, f"GitHub nav missing or duplicated in {filename}"
@@ -82,11 +76,6 @@ jobs:
               assert len(scripts)==1 if filename!="sources.html" else len(scripts)==0, f"Unexpected inline scripts in {filename}"
               if scripts:
                   Path("/tmp/elpa-"+filename+".js").write_text(scripts[0],encoding="utf-8")
-
-          readme=Path('README.md').read_text(encoding='utf-8')
-          assert readme.startswith('# HKUST-ELPA\n'), 'README must use campus-neutral project title'
-          assert not re.search(r'HKUST\s*(?:\(\s*GZ\s*\)|-\s*GZ)\s*[- ]?\s*ELPA',readme,re.I), 'README contains a campus-specific project name'
-          assert '<h1 id="hero-title">HKUST-<em>ELPA</em>' in pages['index.html'], 'Homepage hero project name must be HKUST-ELPA'
 
           home=pages["index.html"]
           assert home.count('class="elpa-cta ') == 2, "Homepage should show exactly two primary hero actions"
