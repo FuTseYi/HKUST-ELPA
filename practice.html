@@ -2129,15 +2129,36 @@ toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoot
 /* ============ 渲染（读取数据后统一执行） ============ */
 function renderAll() {
   if (migrateLegacyPractice()) markDirty();
-  const currentIds=elpaCurrentQuestionIds(),archivedIds=elpaArchivedQuestionIds();
-  document.getElementById('bankD').innerHTML = currentIds.length
-    ? renderQuestionIds(currentIds)
-    : '<p class="sec-desc">暂无已收录学期的考生反馈题目。欢迎通过「贡献内容」补充新题。</p>';
-  document.getElementById('bankPast').innerHTML = renderQuestionIds(archivedIds);
-  renderTOC();
-  updateProgress();
-  applyFilters();
+  const regular=isNanshaRegular();
+  const currentIds=regular?elpaCurrentQuestionIds():activePracticeIds();
+  const archivedIds=regular?elpaArchivedQuestionIds():[];
+  document.getElementById('bankD').innerHTML=currentIds.length?renderQuestionIds(currentIds):
+    '<p class="sec-desc">该分类暂无已收录题目。可通过「贡献内容」分享考试回忆。</p>';
+  document.getElementById('bankPast').innerHTML=renderQuestionIds(archivedIds);
+  const intro=document.getElementById('fastIntroDetails');
+  if(!intro.hasChildNodes()){
+    const summary=document.createElement('p');summary.textContent=ELPA_FAST_TRACK_INTRO.en;
+    const list=document.createElement('ol');
+    for(const task of ELPA_FAST_TRACK_INTRO.subs){
+      const li=document.createElement('li');li.textContent=task.en;
+      const zh=document.createElement('span');zh.textContent=task.cn;li.append(zh);list.append(li);
+    }
+    intro.append(summary,list);
+  }
+  renderTOC();updateProgress();applyFilters();
 }
+function setExamChoice(axis,value){
+  if(axis==='campus')activeCampus=value;
+  else activeTrack=value;
+  document.querySelectorAll('[data-campus]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.campus===activeCampus)));
+  document.querySelectorAll('[data-track]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.track===activeTrack)));
+  termFilter.value='';examStageFilter.value='';statusFilter.value='all';searchInput.value='';
+  bankPages.past=1;bankPages.fall=1;searchFeedback.hidden=true;
+  renderAll();populateExamFilters();
+  if(location.hash==='#sec-bankA'&&!isNanshaRegular())history.replaceState(null,'',location.pathname+'#sec-bankD');
+}
+document.querySelectorAll('[data-campus]').forEach(b=>b.addEventListener('click',()=>setExamChoice('campus',b.dataset.campus)));
+document.querySelectorAll('[data-track]').forEach(b=>b.addEventListener('click',()=>setExamChoice('track',b.dataset.track)));
 
 /* ============ 初始化：先读取同目录 JSON，再渲染 ============ */
 (async function init() {
