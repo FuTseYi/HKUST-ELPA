@@ -28,6 +28,33 @@
 .submission-message[data-state="info"]{color:#39566e}
 .submission-turnstile{min-height:65px}
 @media(max-width:540px){.submission-main{margin-top:25px}.submission-button{width:100%}}
+
+.submission-group{display:grid;gap:18px;border-top:1px solid #e1eaf3;padding-top:18px}
+.submission-group[hidden],.submission-preview[hidden]{display:none!important}
+.submission-group h2{margin:2px 0 0;font-size:1.03rem;color:#123e68}
+.submission-group h2 small{font-weight:450;font-size:.78rem;color:#65768a;margin-left:7px}
+.submission-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.submission-section-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.submission-help{margin:0}
+.followup-rows{display:grid;gap:12px}
+.followup-item{padding:16px;border:1px solid #dbe5ef;border-radius:12px;background:#f8fbff;display:grid;gap:12px}
+.followup-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.followup-head strong{color:#123e68}
+.followup-actions{display:flex;flex-wrap:wrap;gap:6px}
+.followup-actions button{border:1px solid #c8d6e5;border-radius:6px;background:white;color:#244867;padding:5px 9px;cursor:pointer}
+.followup-actions button:disabled{opacity:.4;cursor:not-allowed}
+.submission-secondary{border:1px solid #b9ccdf;border-radius:9px;padding:10px 15px;background:#fff;color:#174c79;font:inherit;font-weight:650;cursor:pointer}
+.submission-secondary:hover{background:#eef6ff}
+.submission-tags{border:0;margin:0;padding:0;min-width:0}
+.submission-tags legend{font-weight:700;color:#16365e;margin-bottom:10px}
+.submission-tags legend small{font-size:.85rem;font-weight:400;color:#64748b}
+.submission-tag-grid{display:flex;flex-wrap:wrap;gap:8px}
+.submission-tag-grid label{display:flex;align-items:center;gap:6px;border:1px solid #cfddec;border-radius:8px;padding:7px 11px;cursor:pointer;font-size:.9rem}
+.submission-tag-grid label:has(input:checked){border-color:#3172ab;background:#eaf4fe}
+.submission-preview{white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f7fc;border:1px solid #d7e4f3;border-radius:10px;padding:15px;font-size:.88rem;font-family:inherit;max-height:400px;overflow:auto}
+.submission-preview-wrap{display:grid;gap:12px}
+@media(max-width:540px){.submission-cols{grid-template-columns:1fr}.followup-head{align-items:flex-start}.submission-secondary{width:100%}}
+
 </style>
 </head>
 <body class="elpa-body">
@@ -45,32 +72,86 @@
 </nav>
 <main class="submission-main">
   <header class="submission-intro">
-    <h1>贡献新题 <span lang="en">Submit a Question</span></h1>
-    <p>感谢分享 ELPA 口语题目回忆。无需 GitHub 账号，投稿会进入<strong>公开的 GitHub Issues 待审核区</strong>，只有通过维护者审核的题目才可能进入正式练习题库。</p>
+    <h1>社区贡献 <span lang="en">Community Contributions</span></h1>
+    <p>欢迎贡献 ELPA 考题与备考经验。所有投稿先进入公开审核队列，通过人工审核后才会更新网站。</p>
   </header>
   <section class="submission-panel" aria-label="提交题目">
-    <form id="submissionForm" class="submission-form">
-      <p class="submission-note">仅填写考试题目相关信息。请勿提交姓名、学号、联系方式、个人经历或其他可识别个人身份的信息。题目可能来自考生回忆，并非官方原题。</p>
+    <form id="submissionForm" class="submission-form" novalidate>
+      <p class="submission-note">投稿无需账号，将公开显示于 GitHub Issues，审核通过后才会收录。请勿填写姓名、学号、联系方式或其他个人敏感信息。</p>
       <div class="submission-field">
-        <label for="submissionTerm">考试批次 *</label>
-        <select id="submissionTerm" name="term" required></select>
-      </div>
-      <div class="submission-field">
-        <label for="submissionQuestion">题目内容 *</label>
-        <textarea id="submissionQuestion" name="question" maxlength="1000" minlength="8" rows="4" placeholder="尽量填写现场英文题干；如果只记得中文题意，也可以填写中文回忆并注明不确定的部分。" required></textarea>
-        <div class="submission-help">最多 1000 字符。仅记录确实记得的内容，不必自行补全。</div>
-      </div>
-      <div class="submission-field">
-        <label for="submissionSubs">提示小问（选填）</label>
-        <textarea id="submissionSubs" name="subquestions" maxlength="2000" rows="4" placeholder="例如：a. Why is it important?&#10;b. Can you give an example?"></textarea>
-        <div class="submission-help">最多 2000 字符；没有记住就留空。</div>
-      </div>
-      <div class="submission-field">
-        <label for="submissionSource">来源类型 *</label>
-        <select id="submissionSource" name="source" required>
-          <option value="firsthand">本人亲历（考生回忆）</option>
-          <option value="secondhand">同学转述（非一手）</option>
+        <label for="submissionKind">投稿类型 *</label>
+        <select id="submissionKind">
+          <option value="question">贡献考题 · Submit a Question</option>
+          <option value="advice">分享备考经验 · Share Preparation Advice</option>
         </select>
+      </div>
+      <section id="questionFields" class="submission-group" aria-label="考题投稿">
+        <h2>考试场次 <small>Exam Session</small></h2>
+        <div class="submission-cols">
+          <div class="submission-field"><label for="submissionYear">考试年份 *</label><select id="submissionYear"></select></div>
+          <div class="submission-field"><label for="submissionSession">学期及场次 *</label>
+            <select id="submissionSession">
+              <option value="">请选择考试场次</option>
+              <option value="Fall/start">Fall · 开学阶段</option>
+              <option value="Fall/mid">Fall · 学期中</option>
+              <option value="Fall/end">Fall · 学期末</option>
+              <option value="Spring/start">Spring · 开学阶段</option>
+              <option value="Spring/mid">Spring · 学期中</option>
+              <option value="Spring/end">Spring · 学期末</option>
+            </select>
+          </div>
+        </div>
+        <h2>主问题 <small>Main Question</small></h2>
+        <div class="submission-field">
+          <label for="questionEn">English *</label>
+          <textarea id="questionEn" maxlength="1000" rows="3" placeholder="Enter the question in English"></textarea>
+        </div>
+        <div class="submission-field">
+          <label for="questionCn">中文 *</label>
+          <textarea id="questionCn" maxlength="1000" rows="3" placeholder="填写主问题的中文表述"></textarea>
+        </div>
+        <div class="submission-section-top">
+          <h2>提示小问 <small>Follow-up Questions</small></h2>
+          <span class="submission-help">选填 · 每项中英文必填</span>
+        </div>
+        <div id="followupRows" class="followup-rows"></div>
+        <button id="addFollowup" type="button" class="submission-secondary">＋ 添加提示小问</button>
+        <div class="submission-field">
+          <label for="submissionSource">投稿来源 *</label>
+          <select id="submissionSource">
+            <option value="firsthand">本人亲历 · Firsthand</option>
+            <option value="secondhand">同学转述 · Secondhand</option>
+          </select>
+        </div>
+      </section>
+      <section id="adviceFields" class="submission-group" aria-label="备考经验投稿" hidden>
+        <h2>备考阶段 <small>Preparation Stage</small></h2>
+        <div class="submission-field">
+          <label for="advicePhase">所属阶段 *</label>
+          <select id="advicePhase">
+            <option value="before">考前准备 · Before the Exam</option>
+            <option value="during">考试现场 · During the Exam</option>
+            <option value="after">考后反馈 · After the Exam</option>
+          </select>
+        </div>
+        <fieldset class="submission-tags">
+          <legend>经验标签 * <small>选择 1–4 项</small></legend>
+          <div id="adviceTags" class="submission-tag-grid"></div>
+        </fieldset>
+        <h2>经验分享 <small>Share Your Experience</small></h2>
+        <div class="submission-field">
+          <label for="adviceTitle">经验标题 *</label>
+          <input id="adviceTitle" type="text" maxlength="120" placeholder="填写经验标题">
+        </div>
+        <div class="submission-field">
+          <label for="adviceBody">经验内容 *</label>
+          <textarea id="adviceBody" maxlength="6000" rows="6" placeholder="分享具体方法或经验"></textarea>
+          <p class="submission-help">中文或英文均可，无需重复翻译。</p>
+        </div>
+      </section>
+      <div class="submission-preview-wrap">
+        <button id="previewSubmission" type="button" class="submission-secondary">预览投稿内容</button>
+        <pre id="submissionPreview" class="submission-preview" hidden aria-live="polite"></pre>
       </div>
       <div id="submissionTurnstile" class="submission-turnstile" aria-label="人机验证"></div>
       <div class="submission-actions">
