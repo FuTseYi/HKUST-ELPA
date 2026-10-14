@@ -190,3 +190,40 @@ body { margin:0; }
   .elpa-advice-filters label,.elpa-advice-filters select {width:100%;}
   .elpa-advice-card {padding:17px;}
 }
+
+
+/* 2026 UI consistency: restrained navigation, two predictable hero actions. */
+@view-transition { navigation:auto; }
+@keyframes elpa-reveal {from{opacity:.88}to{opacity:1}}
+::view-transition-old(root){animation-duration:.09s}
+::view-transition-new(root){animation:elpa-reveal .13s ease-out}
+.elpa-nav-links a{border-bottom-width:2px;}
+.elpa-nav-links a.active{background:transparent;border-bottom-color:var(--site-gold);}
+.elpa-hero::after,.page-practice .campus-hero::after{display:none;content:none;}
+.elpa-subhero{border-bottom:0;}
+.elpa-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:stretch;margin-top:28px;}
+.elpa-cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;min-width:210px;padding:12px 20px;border-radius:12px;
+  border:1px solid transparent;text-align:center;text-decoration:none!important;
+  font-size:14px;font-weight:750;line-height:1.35;letter-spacing:0;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.elpa-cta-primary{background:var(--site-gold);color:#18344e!important;}
+.elpa-cta-primary:hover{background:#ffdc80;transform:translateY(-1px);}
+.elpa-cta-secondary{background:rgba(7,37,70,.2);border-color:rgba(255,255,255,.68);color:#fff!important;}
+.elpa-cta-secondary:hover{background:rgba(255,255,255,.16);transform:translateY(-1px);}
+.elpa-cta:focus-visible{outline:3px solid #fff;outline-offset:3px;}
+.page-practice .campus-hero .elpa-actions{margin-top:22px;}
+.page-practice .campus-hero{min-height:276px;padding:38px 24px 44px;}
+@media(max-width:650px){
+  .elpa-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:25px;width:100%;}
+  .elpa-cta{min-width:0;padding:11px 9px;min-height:46px;font-size:13px;white-space:nowrap;}
+  .page-practice .campus-hero{min-height:265px;padding:34px 19px 42px;}
+  .page-practice .campus-hero .elpa-actions{margin-top:20px;}
+}
+@media(max-width:360px){.elpa-cta{font-size:12px;padding-inline:6px;}}
+@media(prefers-reduced-motion:reduce){
+  ::view-transition-old(root),::view-transition-new(root){animation:none;}
+  .elpa-cta{transition:none;transform:none!important;}
+}
