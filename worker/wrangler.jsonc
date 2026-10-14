@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "hkust-gz-elpa-submissions",
+  "name": "hkust-elpa-submissions",
   "main": "src/index.js",
   "compatibility_date": "2026-10-14",
   "workers_dev": true,
