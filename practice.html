@@ -668,7 +668,7 @@
   </div>
 </nav>
 
-<header class="campus-hero"><div class="hero-inner"><span class="hero-eyebrow">ELPA · Speaking Practice</span><h1>题库练习 <span class="hero-highlight">Practice</span></h1><p class="hero-lead">往年题库与 社区反馈题库 · 搜索 · 分页 · 模拟计时</p><p class="hero-description">笔记与练习状态自动保存在当前浏览器，支持导出与恢复。</p><nav class="elpa-actions" aria-label="题库快速跳转"><a class="elpa-cta elpa-cta-primary" href="#sec-bankA">往年题库 <span aria-hidden="true">↓</span></a><a class="elpa-cta elpa-cta-secondary" href="#sec-bankD">社区反馈题库 <span aria-hidden="true">↓</span></a></nav></div></header>
+<header class="campus-hero"><div class="hero-inner"><span class="hero-eyebrow">ELPA · Speaking Practice</span><h1>题库练习 <span class="hero-highlight">Practice</span></h1><p class="hero-lead">本学期新题 · 往年题库 · 搜索 · 分页 · 模拟计时</p><p class="hero-description">笔记与练习状态自动保存在当前浏览器，支持导出与恢复。</p><nav class="elpa-actions" aria-label="题库快速跳转"><a class="elpa-cta elpa-cta-primary" href="#sec-bankD">本学期新题 <span aria-hidden="true">↓</span></a><a class="elpa-cta elpa-cta-secondary" href="#sec-bankA">往年题库 <span aria-hidden="true">↓</span></a></nav></div></header>
 
 <div class="wrap">
   <aside class="source-notice" role="note">
@@ -792,18 +792,18 @@
   <!-- TOC -->
   <nav class="toc" id="toc"></nav>
 
-  <section id="sec-bankA">
-    <div class="sec-head"><span class="emoji">📚</span><h2>往年题库</h2><span class="tag">25 题 · 合并去重</span></div>
-    <p class="sec-desc">涵盖本科经历、研究介绍、学术诚信、跨学科、AI 等话题，可直接抽题练习。少数回忆信息不完整的条目会简要标注。</p>
-    <div id="bankPast"></div>
-    <nav class="bank-pagination" id="pagerPast" aria-label="往年题库分页"></nav>
+  <section id="sec-bankD">
+    <div class="sec-head"><span class="emoji">🎓</span><h2 id="currentBankTitle">本学期新题库</h2><span class="tag" id="feedbackBankCount">当前学期 · 持续更新</span></div>
+    <p class="sec-desc">优先呈现当前学期已经反馈的考题；题目按考生分享整理成中英双语，供直接练习。学期变化后，旧场次自动转入下方往年题库。<a href="./sources.html">查看题目来源 ↗</a></p>
+    <div id="bankD"></div>
+    <nav class="bank-pagination" id="pagerFall" aria-label="本学期新题库分页"></nav>
   </section>
 
-  <section id="sec-bankD">
-    <div class="sec-head"><span class="emoji">🎓</span><h2>社区反馈题库</h2><span class="tag" id="feedbackBankCount">12 题 · 持续更新</span></div>
-    <p class="sec-desc">保留 2026 Fall 及后续考试批次的新增考生反馈；英文为整理译文的题目会单独标注。<a href="https://github.com/FuTseYi/HKUST-ELPA/blob/main/question-bank/2026-fall.md">查看场次与来源 ↗</a></p>
-    <div id="bankD"></div>
-    <nav class="bank-pagination" id="pagerFall" aria-label="社区反馈题库分页"></nav>
+  <section id="sec-bankA">
+    <div class="sec-head"><span class="emoji">📚</span><h2>往年题库</h2><span class="tag" id="pastBankCount">历年题目 · 持续归档</span></div>
+    <p class="sec-desc">往届经典题与其他学期的考生反馈统一归档，题目保留原有编号与学习进度，随时可以继续练习。</p>
+    <div id="bankPast"></div>
+    <nav class="bank-pagination" id="pagerPast" aria-label="往年题库分页"></nav>
   </section>
 
   <footer>学生维护的非官方备考资源 · 原题出处和补充资料见 <a href="https://github.com/FuTseYi/HKUST-ELPA/tree/main/question-bank">独立题库</a><br>感谢历届同学分享题目与备考经验<br>具体考试要求以对应校区的官方通知为准<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
@@ -1166,15 +1166,14 @@ restoreInput.addEventListener('change', async () => {
 
 function qId(bank, num) { return bank + '-' + num; }
 function legacyCommunityNote(bankKey,item) {
-  // Historical D.cn has mixed provenance, not a confirmed translation.
-  return bankKey === 'D' &&
-    (item.num < 1000000 || /^(?:20\d{2} (?:Spring|Fall)|Other \/ Unknown)｜/.test(item.cn || ''));
+  // Optional provenance remains separate from the readable Chinese translation.
+  return bankKey === 'D' && typeof item.sourceNote === 'string' ? item.sourceNote : '';
 }
 function questionTranslation(bankKey,item) {
-  return legacyCommunityNote(bankKey,item) ? '' : (item.cn || '');
+  return item.cn || '';
 }
 function questionSourceNote(bankKey,item) {
-  return legacyCommunityNote(bankKey,item) ? (item.cn || '') : '';
+  return legacyCommunityNote(bankKey,item);
 }
 function appearancesFor(id){
   const records=ELPA_APPEARANCES[id];
@@ -1219,10 +1218,12 @@ function escAttr(s) {
 }
 
 function renderTOC() {
-  document.getElementById("feedbackBankCount").textContent = BANKS.D.items.length + " 题 · 持续更新";
+  document.getElementById('currentBankTitle').textContent = elpaActiveTerm() + ' · 本学期新题库';
+  document.getElementById('feedbackBankCount').textContent = elpaCurrentQuestionIds().length + ' 题 · 持续更新';
+  document.getElementById('pastBankCount').textContent = elpaArchivedQuestionIds().length + ' 题 · 历年归档';
   const items = [
-    ['sec-bankA', '📚', '往年题库'],
-    ['sec-bankD', '🎓', '社区反馈题库']
+    ['sec-bankD', '🎓', elpaActiveTerm() + ' 本学期新题'],
+    ['sec-bankA', '📚', '往年题库']
   ];
   document.getElementById('toc').innerHTML =
     '<h2>📑 题库导航</h2><div class="toc-grid">' +
@@ -1235,7 +1236,13 @@ function questionById(id) {
   return BANKS[key].items.find(it => qId(key, it.num) === id);
 }
 function allPracticeIds() {
-  return PAST_QUESTION_IDS.concat(BANKS.D.items.map(it => qId('D', it.num)));
+  return elpaAllPracticeIds();
+}
+function renderQuestionIds(ids) {
+  return ids.map((id,index) => {
+    const key=id.split('-')[0],item=questionById(id);
+    return renderBank(key,[item],index);
+  }).join('');
 }
 function migrateLegacyPractice() {
   let changed = false;
@@ -1493,9 +1500,10 @@ function copyQuestion(id) {
   const bankKey = id.split('-')[0];
   const item = questionById(id);
   if (!item) return;
-  const pastIndex = PAST_QUESTION_IDS.indexOf(id);
-  const section = pastIndex >= 0 ? '往年题库' : '社区反馈题库';
-  const number = pastIndex >= 0 ? pastIndex + 1 : BANKS.D.items.findIndex(it => qId('D', it.num) === id) + 1;
+  const currentIds=elpaCurrentQuestionIds();
+  const inCurrent=currentIds.includes(id);
+  const section=inCurrent ? elpaActiveTerm() + ' 本学期新题库' : '往年题库';
+  const number=(inCurrent ? currentIds : elpaArchivedQuestionIds()).indexOf(id) + 1;
   let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
   const copyCn=questionTranslation(id.split('-')[0],item);
   if (copyCn) text += `（${copyCn}）\n`;
@@ -1555,8 +1563,7 @@ const statusFilter = document.getElementById('statusFilter');
 const termFilter=document.getElementById('termFilter');
 const examStageFilter=document.getElementById('examStageFilter');
 function populateExamFilters(){
-  const terms=[...new Set(Object.values(ELPA_APPEARANCES).flatMap(records=>
-    Array.isArray(records)?records.filter(r=>r&&r.term).map(r=>r.term):[]))].sort().reverse();
+  const terms=[...new Set(allPracticeIds().flatMap(id=>elpaReportedTerms(id)))].sort().reverse();
   for(const term of terms){
     const opt=document.createElement('option');
     opt.value=term;opt.textContent=term;termFilter.append(opt);
@@ -1598,9 +1605,11 @@ function applyFilters(reset=false){
     const cards=bankCards(kind);
     const matches=cards.filter(card=>{
       const state=statuses[card.id.slice(2)]||'new';
-      const records=appearancesFor(card.id.slice(2));
-      const sessionOK=(!selectedTerm&&!selectedStage)||records.some(r=>
-        (!selectedTerm||r.term===selectedTerm)&&(!selectedStage||r.examStage===selectedStage));
+      const id=card.id.slice(2);
+      const records=appearancesFor(id);
+      const termOK=!selectedTerm||elpaReportedTerms(id).includes(selectedTerm);
+      const stageOK=!selectedStage||records.some(r=>r&&r.examStage===selectedStage&&(!selectedTerm||r.term===selectedTerm));
+      const sessionOK=termOK&&stageOK;
       const yes=(!kw||card.dataset.search.includes(kw))&&(filter==='all'||state===filter)&&sessionOK;
       card.dataset.filterMatch=yes?'1':'0';return yes;
     });
@@ -1651,7 +1660,7 @@ searchForm.addEventListener('submit',event=>{
   }
   searchFeedback.textContent='找到 '+total+' 道匹配题目，已定位至第一条。';
   searchFeedback.hidden=false;
-  const first=matchingCards('past')[0]||matchingCards('fall')[0];
+  const first=matchingCards('fall')[0]||matchingCards('past')[0];
   if(!first)return;
   first.classList.add('search-target');
   first.setAttribute('tabindex','-1');
@@ -1998,8 +2007,8 @@ document.getElementById('timerDrill').addEventListener('click', () => {
 document.getElementById('exportBtn').addEventListener('click', () => {
   let md = '# ELPA 备考笔记导出\n\n> 导出时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
   const sections = [
-    { name: '往年题库', ids: PAST_QUESTION_IDS },
-    { name: '社区反馈题库', ids: BANKS.D.items.map(it => qId('D', it.num)) }
+    { name: elpaActiveTerm() + ' · 本学期新题库', ids: elpaCurrentQuestionIds() },
+    { name: '往年题库', ids: elpaArchivedQuestionIds() }
   ];
   for (const section of sections) {
     md += '\n## ' + section.name + '\n\n';
@@ -2055,12 +2064,12 @@ toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoot
 /* ============ 渲染（读取数据后统一执行） ============ */
 function renderAll() {
   if (migrateLegacyPractice()) markDirty();
-  const aItems = BANKS.A.items.filter(it => typeof it.num === 'number' && it.num <= 7);
-  const cItems = BANKS.C.items.filter(it => it.num <= 17);
-  const bItems = BANKS.B.items.filter(it => it.num === 9);
-  document.getElementById('bankPast').innerHTML =
-    renderBank('A', aItems) + renderBank('C', cItems, 7) + renderBank('B', bItems, 24);
-  document.getElementById('bankD').innerHTML = renderBank('D');
+  const currentIds=elpaCurrentQuestionIds(),archivedIds=elpaArchivedQuestionIds();
+  document.getElementById('bankD').innerHTML = currentIds.length
+    ? renderQuestionIds(currentIds)
+    : '<p class="sec-desc">本学期暂未收录考生反馈题目。欢迎通过「贡献内容」补充新题。</p>';
+  document.getElementById('bankPast').innerHTML = renderQuestionIds(archivedIds);
+  renderTOC();
   updateProgress();
   applyFilters();
 }
