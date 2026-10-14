@@ -1568,10 +1568,12 @@ function populateExamFilters(){
     const opt=document.createElement('option');
     opt.value=term;opt.textContent=term;termFilter.append(opt);
   }
+  const hasStages=Object.values(ELPA_APPEARANCES).some(records=>
+    Array.isArray(records)&&records.some(entry=>entry&&entry.examStage));
   termFilter.disabled=terms.length===0;
-  examStageFilter.disabled=terms.length===0;
-  termFilter.title=terms.length?'筛选已审核投稿的考试学期':'尚无标注具体场次的已审核投稿';
-  examStageFilter.title=terms.length?'筛选已审核投稿的考试阶段':'尚无标注具体场次的已审核投稿';
+  examStageFilter.disabled=!hasStages;
+  termFilter.title=terms.length?'按已知反馈学期筛选':'尚无标注学期的反馈';
+  examStageFilter.title=hasStages?'按已确认考试阶段筛选':'暂无已确认考试阶段的投稿';
 }
 populateExamFilters();
 
