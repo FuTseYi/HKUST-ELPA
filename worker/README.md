@@ -8,9 +8,8 @@ It does **not** edit website files or publish a question. Maintainer review rema
 
 1. Create a Cloudflare Turnstile widget restricted to hostname **futseyi.github.io**.
    Use action **elpa_submit**. Keep the Site Key public; keep the Secret private.
-2. Use Wrangler 4.36+ in `worker/`. Edit `wrangler.jsonc`'s `namespace_id`
-   to an account-unique positive integer string (example value `1001` is provisional).
-3. Create a **fine-grained GitHub PAT** restricted to only
+2. Use Wrangler 4.36+ in `worker/`. The configured `namespace_id` is `11247601` (account-specific; already deployed).
+3. Create the GitHub labels `submission:pending` and `submission:approved` in the repository before accepting submissions. The pending label is applied by the Worker when it creates an Issue. Then create a **fine-grained GitHub PAT** restricted to only
    `FuTseYi/HKUST-ELPA`, permission **Issues: Read and write**;
    no Contents/Actions/Admin permissions. Store it only as a Worker secret.
 4. Configure Worker secrets via:
@@ -30,7 +29,7 @@ It does **not** edit website files or publish a question. Maintainer review rema
   the Worker also checks token server-side with Siteverify.
 - Cloudflare native binding limits attempted POSTs to **3 per 60 seconds per IP
   at each edge location**. This is approximate/edge-local, not a globally strict quota.
-- Request body is streamed with a 6.5 KB cap; text lengths, types and
+- Request body is streamed with a 16 KiB cap; text lengths, types and
   allowed source/term values are validated. Requests fail closed if secrets,
   limiter or external verification are unavailable.
 - No DB, no submitted attachments, no contact details requested, no visitor IP
@@ -47,3 +46,19 @@ and `turnstileToken`. Successful response: HTTP 201 `{"ok":true,"issueUrl":"..."
 The Issue includes readable Markdown and a base64url machine-readable marker
 (`elpa-submission-v1`) for the stage-3 review workflow. Unapproved Issues are
 never added to the question bank.
+
+## Verified provisioned resources (2026-10-14)
+
+- Worker: `hkust-elpa-submissions`; endpoint `https://hkust-elpa-submissions.futseyi.workers.dev/submit`
+- Turnstile widget: `HKUST-ELPA Question Submissions`, hostname `futseyi.github.io`
+- Public Turnstile Site Key: `0x4AAAAAAFWWsgbB9w0JPOm3` (safe to publish)
+- Turnstile secret: bound to Worker (never commit or paste it)
+- Rate limiter: `SUBMISSION_LIMITER`, namespace `11247601`, 3 requests / 60 seconds per IP per Cloudflare location
+- Worker plaintext switch: `SUBMISSIONS_DISABLED=true` (submission remains closed)
+- GitHub token: **not configured**; private owner setup is required
+- Old Worker public endpoint disabled; historical script retained
+- GitHub repository is `FuTseYi/HKUST-ELPA`; keep all existing development branches after merges
+
+**Pending**: verify external health endpoint, browser Turnstile flow, rejected/valid submissions,
+GitHub Issues, label-triggered PR, and the final GitHub Pages path after deploying the merged code.
+Do not remove the kill switch until these checks pass.
