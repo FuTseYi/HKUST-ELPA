@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>题库练习｜HKUST(GZ) ELPA</title><link rel="stylesheet" href="./site.css"><link rel="icon" type="image/svg+xml" href="./assets/elpa-mark.svg">
+<title>题库练习｜HKUST(GZ) ELPA</title><link rel="prefetch" href="./sources.html"><link rel="stylesheet" href="./site.css"><link rel="icon" type="image/svg+xml" href="./assets/elpa-mark.svg">
 <link rel="preload" as="image" href="./assets/Administration-Building-14-1536x864.jpg">
 <meta name="description" content="非官方 HKUST(GZ) ELPA 口语备考资源：历年题目、2026 Fall 考生反馈、关键词检索、模拟计时与本地学习笔记。">
 <meta name="theme-color" content="#1e3a8a">
@@ -558,13 +558,8 @@
     background: linear-gradient(90deg, rgba(0,33,63,.89) 0%, rgba(0,48,91,.75) 33%, rgba(0,47,88,.31) 72%, rgba(0,47,88,.17) 100%), url('./assets/Administration-Building-14-1536x864.jpg') center 55% / cover no-repeat;
     text-align: left;
   }
-  .campus-hero::after {
-    position: absolute;
-    inset: auto 0 0;
-    height: 5px;
-    background: linear-gradient(90deg, var(--gold) 0 18%, #f8d67d 18% 24%, transparent 24%);
-    pointer-events: none;
-  }
+  /* Hero punctuation is provided by typography, not asymmetric stripes. */
+  .campus-hero::after { display:none; content:none; }
   .hero-inner { position: relative; z-index: 1; width: min(100%, 1140px); margin: 0 auto; }
   .hero-eyebrow {
     display: inline-block; margin-bottom: 18px;
@@ -628,6 +623,28 @@
     .quick-arrow { display: none; }
   }
   @media (max-width: 360px) { .quick-grid { grid-template-columns: 1fr; } }
+
+  /* Clear search action and feedback are separate from live filtering. */
+  .search-box {display:flex;align-items:center;min-width:0;position:relative;}
+  .search-box input {width:100%;min-width:0;height:48px;min-height:48px;padding:11px 122px 11px 40px;border-radius:12px;font-size:15px;}
+  .search-box .icon {font-size:22px;line-height:1;left:15px;pointer-events:none;}
+  .search-box .search-clear {right:91px;top:50%;transform:translateY(-50%);width:26px;height:26px;z-index:2;display:none;align-items:center;justify-content:center;position:absolute;border:0;background:#e8edf4;color:#52677d;border-radius:7px;cursor:pointer;font-size:18px;}
+  .search-box .search-clear.show {display:flex;}
+  .search-box .search-submit {position:absolute;top:5px;right:5px;bottom:5px;border:0;border-radius:9px;background:#003e74;color:#fff;min-width:77px;padding:0 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;}
+  .search-box .search-submit:hover {background:#135e9b;}
+  .search-box .search-submit:focus-visible {outline:3px solid #e3b34b;outline-offset:2px;}
+  .search-feedback {flex:1 0 100%;font-size:13px;color:#245579;background:#ecf5fe;padding:9px 12px;border-radius:9px;line-height:1.6;border:1px solid #cbdfee;margin:0;}
+  .search-feedback[hidden]{display:none;}
+  .qcard.search-target {outline:2px solid #21659b;outline-offset:2px;box-shadow:0 0 0 6px rgba(19,94,155,.08);}
+  .qcard[tabindex="-1"]:focus {outline:2px solid #21659b;outline-offset:2px;}
+  .qcard {scroll-margin-top:155px;}
+  @media(max-width:640px){
+    .search-box input {font-size:16px;height:48px;padding-right:119px;}
+    .search-box .search-submit {min-width:74px;}
+    .search-box .search-clear {right:86px;}
+    .qcard{scroll-margin-top:128px;}
+  }
+
 </style>
 </head>
 <body class="page-practice">
@@ -644,7 +661,7 @@
   </div>
 </nav>
 
-<header class="campus-hero"><div class="hero-inner"><span class="hero-eyebrow">ELPA · Speaking Practice</span><h1>题库练习 <span class="hero-highlight">Practice</span></h1><p class="hero-lead">往年题库与 社区反馈题库 · 搜索 · 分页 · 模拟计时</p><p class="hero-description">笔记与练习状态自动保存在当前浏览器，支持导出与恢复。</p><nav class="hero-actions" aria-label="题库快速跳转"><a class="hero-action hero-primary" href="#sec-bankA">往年题库 ↓</a><a class="hero-action hero-secondary" href="#sec-bankD">社区反馈题库 ↓</a><a class="hero-text-link" href="./guide.html">考试指南 ↗</a><a class="hero-text-link" href="./submit.html">贡献新题 ↗</a></nav></div></header>
+<header class="campus-hero"><div class="hero-inner"><span class="hero-eyebrow">ELPA · Speaking Practice</span><h1>题库练习 <span class="hero-highlight">Practice</span></h1><p class="hero-lead">往年题库与 社区反馈题库 · 搜索 · 分页 · 模拟计时</p><p class="hero-description">笔记与练习状态自动保存在当前浏览器，支持导出与恢复。</p><nav class="elpa-actions" aria-label="题库快速跳转"><a class="elpa-cta elpa-cta-primary" href="#sec-bankA">往年题库 <span aria-hidden="true">↓</span></a><a class="elpa-cta elpa-cta-secondary" href="#sec-bankD">社区反馈题库 <span aria-hidden="true">↓</span></a></nav></div></header>
 
 <div class="wrap">
   <aside class="source-notice" role="note">
@@ -653,11 +670,14 @@
 
   <!-- Toolbar -->
   <div class="toolbar">
-    <div class="search-box">
-      <span class="icon">🔍</span>
-      <input type="search" id="searchInput" aria-label="搜索题目" placeholder="搜索题目关键词…（如 AI / research / HKUST / integrity）">
-      <button class="search-clear" id="searchClear" title="清空搜索">✕</button>
-    </div>
+    <form class="search-box" id="searchForm" role="search" aria-label="题目搜索">
+      <label class="sr-only" for="searchInput">搜索题目或关键词</label>
+      <span class="icon" aria-hidden="true">⌕</span>
+      <input type="search" id="searchInput" name="query" aria-label="搜索题目或关键词" placeholder="搜索题目或关键词" enterkeyhint="search" autocomplete="off">
+      <button type="button" class="search-clear" id="searchClear" title="清空搜索" aria-label="清空搜索">×</button>
+      <button type="submit" class="search-submit" id="searchSubmit">搜索 <span aria-hidden="true">↗</span></button>
+    </form>
+    <p id="searchFeedback" class="search-feedback" role="status" aria-live="polite" hidden></p>
     <label class="sr-only" for="termFilter">按考试学期筛选</label>
     <select id="termFilter" class="filter-select" aria-label="按考试学期筛选">
       <option value="">全部考试学期</option>
@@ -1590,6 +1610,50 @@ searchInput.addEventListener('input',()=>applyFilters(true));
 statusFilter.addEventListener('change',()=>applyFilters(true));
 termFilter.addEventListener('change',()=>applyFilters(true));
 examStageFilter.addEventListener('change',()=>applyFilters(true));
+
+/* Live filtering remains unchanged; an explicit search moves to results. */
+const searchForm=document.getElementById('searchForm');
+const searchFeedback=document.getElementById('searchFeedback');
+function clearSearchHighlight(){
+  document.querySelectorAll('.qcard.search-target').forEach(card=>card.classList.remove('search-target'));
+}
+searchInput.addEventListener('input',()=>{
+  searchFeedback.hidden=true;
+  clearSearchHighlight();
+});
+searchForm.addEventListener('submit',event=>{
+  event.preventDefault();
+  const keyword=searchInput.value.trim();
+  if(!keyword){
+    searchFeedback.textContent='输入关键词后即可搜索。';
+    searchFeedback.hidden=false;
+    searchInput.focus();
+    return;
+  }
+  applyFilters(true);
+  clearSearchHighlight();
+  const total=Number(document.getElementById('matchCount').textContent)||0;
+  if(!total){
+    searchFeedback.textContent='未找到匹配“'+keyword+'”的题目，请尝试其他关键词。';
+    searchFeedback.hidden=false;
+    searchInput.blur();
+    searchFeedback.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  searchFeedback.textContent='找到 '+total+' 道匹配题目，已定位至第一条。';
+  searchFeedback.hidden=false;
+  const first=matchingCards('past')[0]||matchingCards('fall')[0];
+  if(!first)return;
+  first.classList.add('search-target');
+  first.setAttribute('tabindex','-1');
+  searchInput.blur();
+  requestAnimationFrame(()=>{
+    const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    first.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});
+    first.focus({preventScroll:true});
+  });
+});
+
 
 /* ============ 快捷键：文本编辑 + 保存 + 帮助 ============ */
 function toggleHelp() {

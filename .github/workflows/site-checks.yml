@@ -77,7 +77,17 @@ jobs:
               if scripts:
                   Path("/tmp/elpa-"+filename+".js").write_text(scripts[0],encoding="utf-8")
 
+          home=pages["index.html"]
+          assert home.count('class="elpa-cta ') == 2, "Homepage should show exactly two primary hero actions"
+          assert home.count('href="./submit.html"') >= 1, "Site contribution entry absent"
           practice=pages["practice.html"]
+          assert practice.count('class="elpa-cta ') == 2, "Practice hero should contain exactly two matched actions"
+          assert '<form class="search-box" id="searchForm" role="search"' in practice, "Search submission form missing"
+          assert 'id="searchFeedback"' in practice, "Search status announcement missing"
+          assert 'enterkeyhint="search"' in practice, "Mobile search action not configured"
+          assert "searchForm.addEventListener('submit'" in practice, "Search button and Enter key must invoke result navigation"
+          assert "first.scrollIntoView(" in practice, "Explicit search should navigate to the first match"
+
           assert 'id="termFilter"' in practice and 'id="examStageFilter"' in practice, "Session filters missing"
           assert 'function toggleTranslation(' in practice and 'function toggleFollowupChinese(' in practice, "Chinese-on-click controls missing"
           assert 'src="./question-bank/appearances.js"' in practice and 'src="./question-bank/taxonomy.js"' in practice, "Session metadata scripts missing"
@@ -126,6 +136,9 @@ jobs:
               assert mark.startswith("<svg") and "</svg>" in mark and "<path" in mark, f"SVG invalid: {svgfile}"
           css=Path("site.css").read_text(encoding="utf-8")
           assert "bank-pagination" in css and "elpa-nav-links" in css, "Page and pagination styling missing"
+          assert "@view-transition { navigation:auto; }" in css, "Progressive page transition missing"
+          assert ".elpa-cta-primary" in css and ".elpa-cta-secondary" in css, "Shared hero action system absent"
+          assert "elpa-hero::after,.page-practice .campus-hero::after{display:none" in css, "Decorative stripes not disabled"
           asset=Path("assets/Administration-Building-14-1536x864.jpg").read_bytes()
           assert asset[:3]==b"\xff\xd8\xff" and asset[-2:]==b"\xff\xd9", "Invalid JPEG"
           assert len(asset)>8000
