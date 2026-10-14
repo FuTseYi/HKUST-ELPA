@@ -62,6 +62,9 @@ jobs:
               pages[filename]=content
               assert 'class="elpa-nav"' in content, f"Shared header absent in {filename}"
               assert 'href="./site.css"' in content, f"Shared styles absent in {filename}"
+              assert content.count('class="elpa-nav-github"') == 1, f"GitHub nav missing or duplicated in {filename}"
+              assert 'aria-label="HKUST-ELPA GitHub 仓库（新窗口打开）"' in content, f"Accessible GitHub link name absent in {filename}"
+              assert 'title="GitHub · HKUST-ELPA"><svg viewBox="0 0 24 24"' in content, f"Visible GitHub logo absent in {filename}"
               for linked in pages.keys():
                   pass
               for route in ["index.html","guide.html","practice.html","sources.html"]:
@@ -106,9 +109,9 @@ jobs:
 
           for filename, markup in pages.items():
               assert 'href="./assets/elpa-mark.svg"' in markup, f"Favicon missing on {filename}"
-              assert 'class="elpa-nav-submit"' in markup or 'class="elpa-nav-submit" aria-current="page"' in markup, f"Contribution action missing on {filename}"
-              assert 'src="./assets/github-mark.svg"' in markup, f"GitHub mark missing on {filename}"
-              assert 'src="./assets/elpa-mark.svg"' in markup, f"Project mark missing on {filename}"
+              assert 'class="elpa-nav-submit"' in markup, f"Contribution button missing on {filename}"
+              assert 'src="./assets/github-mark.svg"' in markup, f"GitHub icon missing on {filename}"
+              assert 'src="./assets/elpa-mark.svg"' in markup, f"Site mark missing on {filename}"
           for svgfile in ("assets/elpa-mark.svg","assets/github-mark.svg"):
               mark=Path(svgfile).read_text(encoding="utf-8")
               assert mark.startswith("<svg") and "</svg>" in mark and "<path" in mark, f"SVG invalid: {svgfile}"
