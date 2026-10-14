@@ -12,7 +12,9 @@ body { margin:0; }
 .elpa-nav-links { display:flex; align-items:stretch; align-self:stretch; gap:4px; margin-left:auto; }
 .elpa-nav-links a { display:flex; align-items:center; padding:0 17px; border-bottom:3px solid transparent; text-decoration:none; color:#475569; font-size:14px; font-weight:600; transition:.2s ease; }
 .elpa-nav-links a:hover, .elpa-nav-links a.active { color:var(--site-navy); border-bottom-color:var(--site-gold); background:rgba(14,69,123,.035); }
-.elpa-nav-github { padding:9px 13px; border:1px solid #cedde9; border-radius:999px; text-decoration:none; color:var(--site-navy); font-size:12px; font-weight:700; white-space:nowrap; }
+.elpa-nav-github { display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; flex:0 0 44px; padding:0; border:1px solid #cedde9; border-radius:999px; text-decoration:none; color:var(--site-navy); }
+.elpa-nav-github svg { display:block; width:23px; height:23px; }
+.elpa-nav-github:focus-visible { outline:3px solid var(--site-blue); outline-offset:3px; }
 .elpa-nav-github:hover { background:#eaf2fa; }
 .elpa-body { background:var(--site-bg); color:var(--site-ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"PingFang SC","Microsoft YaHei",sans-serif; line-height:1.7; }
 .elpa-body a { color:var(--site-blue); }
@@ -90,7 +92,7 @@ body { margin:0; }
  .elpa-brand {font-size:12px;}
  .elpa-brand small {font-size:9px;}
  .elpa-brand-icon {width:33px;height:33px;font-size:18px;}
- .elpa-nav-github {margin-left:auto;font-size:11px;}
+ .elpa-nav-github {margin-left:auto;}
  .elpa-nav-links {order:3;flex-basis:100%;overflow:auto; margin:0;justify-content:space-between;gap:0;}
  .elpa-nav-links a {padding:8px 10px 10px;font-size:12px;white-space:nowrap;}
  .elpa-hero {min-height:450px;}
