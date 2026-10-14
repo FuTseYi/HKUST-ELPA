@@ -185,3 +185,31 @@ test('existing Fast Track English wording is reused, not duplicated',()=>{
   assert.doesNotMatch(f.read('fast-track.js'),/1000505/);
  }finally{f.close();}
 });
+
+test('regular and Fast Track each show their own latest reviewed term and historic reports',()=>{
+ const f=fixture();try{
+  const fast={...question('How did you prepare to communicate effectively with your research supervisor?'),
+    campus:'nansha',track:'fast-track',term:'2027 Spring'};
+  const older={...question('How did you prepare to explain your research to new students?'),
+    campus:'nansha',track:'fast-track',term:'2026 Fall'};
+  assert.equal(f.run(fast,601).status,0);
+  assert.equal(f.run(older,602).status,0);
+  const source=f.read('questions.js')+'\n'+f.read('fast-track.js')+'\n'+
+    f.read('appearances.js')+'\n';
+  const grouping=new Function(source+`
+    const fastIds=BANKS.F.items.map(x=>'F-'+x.num);
+    const nanshaRegular=elpaLatestTerm();
+    const fastLatest=elpaLatestTermForIds(fastIds);
+    const current=fastIds.filter(id=>elpaReportedTerms(id).includes(fastLatest));
+    return {nanshaRegular,fastLatest,current,past:fastIds.filter(id=>!current.includes(id)),
+      originalSource:elpaReportedTerms('F-1')};
+  `)();
+  assert.equal(grouping.nanshaRegular,'2026 Fall');
+  assert.equal(grouping.fastLatest,'2027 Spring');
+  assert.deepEqual([...grouping.current],['F-1000601']);
+  assert.ok(grouping.past.includes('F-1'));
+  assert.ok(grouping.past.includes('F-1000602'));
+  assert.deepEqual([...grouping.originalSource],[]);
+  assert.equal(grouping.current.length+grouping.past.length,14);
+ }finally{f.close();}
+});
