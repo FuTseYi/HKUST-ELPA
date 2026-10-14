@@ -219,6 +219,32 @@ test('v2 bilingual question passes verification and only creates a review Issue'
   assert.match(issue.body,/可能遇到什么挑战/);
   assert.doesNotMatch(issue.body,/mock-valid-token/);
 });
+test('v2 campus and track are carried through the Issue marker, without leaking Turnstile tokens',async()=>{
+  const x=makeWorker();
+  const q={...v2Question,campus:'clear-water-bay',track:'fast-track'};
+  const response=await x.handler.fetch(x.request(q),x.env);
+  assert.equal(response.status,201,await response.text());
+  const issue=JSON.parse(x.calls[1].init.body);
+  assert.match(issue.body,/清水湾校区/);
+  assert.match(issue.body,/ELPA Fast Track/);
+  const marker=issue.body.match(/elpa-submission-v2:([A-Za-z0-9_-]+)/);
+  assert.ok(marker,'machine-readable marker exists');
+  const embedded=JSON.parse(Buffer.from(marker[1],'base64url').toString('utf8'));
+  assert.equal(embedded.campus,'clear-water-bay');
+  assert.equal(embedded.track,'fast-track');
+  assert.equal(embedded.term,v2Question.term);
+  assert.equal(Object.hasOwn(embedded,'turnstileToken'),false);
+});
+test('legacy v2 submissions remain compatible with default Nansha regular metadata',async()=>{
+  const x=makeWorker();
+  const response=await x.handler.fetch(x.request(v2Question),x.env);
+  assert.equal(response.status,201);
+  const issue=JSON.parse(x.calls[1].init.body);
+  const marker=issue.body.match(/elpa-submission-v2:([A-Za-z0-9_-]+)/);
+  const embedded=JSON.parse(Buffer.from(marker[1],'base64url').toString('utf8'));
+  assert.equal(embedded.campus,'nansha');
+  assert.equal(embedded.track,'regular');
+});
 test('v2 advice accepts one original-language title and article',async()=>{
   const x=makeWorker();
   const response=await x.handler.fetch(x.request(v2Advice),x.env);
@@ -234,6 +260,8 @@ test('v2 rejects incomplete bilingual text and noncanonical categories before si
     {...v2Question,main:{...v2Question.main,cn:''}},
     {...v2Question,subs:[{en:'Why?',cn:''}]},
     {...v2Question,examStage:'unknown'},
+    {...v2Question,campus:'untrusted-campus'},
+    {...v2Question,track:'untrusted-track'},
     {...v2Question,subs:Array.from({length:21},()=>({en:'Why?',cn:'为什么？'}))},
     {...v2Advice,tags:['arbitrary-tag']},
     {...v2Advice,tags:['speaking-strategy','speaking-strategy']},
