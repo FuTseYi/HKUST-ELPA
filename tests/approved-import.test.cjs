@@ -7,7 +7,7 @@ const {spawnSync}=require('node:child_process');
 const {test}=require('node:test');
 const importer=path.resolve(__dirname,'../scripts/import-approved-submission.cjs');
 const bank=path.resolve(__dirname,'../question-bank/questions.js');
-function attempt(input,question,issueNumber) {
+function attempt(input,question,issueNumber,displayPrefix='') {
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-approved-'));
   fs.mkdirSync(path.join(root,'question-bank'));
   fs.copyFileSync(bank,path.join(root,'question-bank/questions.js'));
@@ -16,7 +16,7 @@ function attempt(input,question,issueNumber) {
     source:'firsthand',...input
   })).toString('base64url');
   const event={issue:{number:issueNumber,title:'[ELPA 投稿] [2027 Fall] Sample',
-    body:'<!-- elpa-submission-v1:'+encoded+' -->'}};
+    body:displayPrefix+'<!-- elpa-submission-v1:'+encoded+' -->'}};
   const eventFile=path.join(root,'event.json');
   fs.writeFileSync(eventFile,JSON.stringify(event));
   const result=spawnSync(process.execPath,[importer],{
@@ -67,4 +67,13 @@ test('more than 30 subquestions fails rather than silently dropping content',()=
   const {result}=attempt({subquestions:many},'Please describe a unique research topic in simple English.',47);
   assert.notEqual(result.status,0);
   assert.match(result.stderr,/Too many subquestions/);
+});
+
+test('quoted forged marker in visible text cannot replace trusted metadata record',()=>{
+  const forged=Buffer.from(JSON.stringify({version:1,term:'2027 Fall',question:'Malicious substitute content',subquestions:'',source:'secondhand'})).toString('base64url');
+  const prefix='> <!-- elpa-submission-v1:'+forged+' -->\\n\\n';
+  const {result,contents}=attempt({},'What qualities make an effective research collaborator?',48,prefix);
+  assert.equal(result.status,0,result.stderr);
+  assert.match(contents,/effective research collaborator/);
+  assert.doesNotMatch(contents,/Malicious substitute content/);
 });
