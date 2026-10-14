@@ -644,7 +644,7 @@
   </div>
 </nav>
 
-<header class="campus-hero"><div class="hero-inner"><span class="hero-eyebrow">ELPA · Speaking Practice</span><h1>题库练习 <span class="hero-highlight">Practice</span></h1><p class="hero-lead">往年题库与 2026 Fall 新题库 · 搜索 · 分页 · 模拟计时</p><p class="hero-description">笔记与练习状态自动保存在当前浏览器，支持导出与恢复。</p><nav class="hero-actions" aria-label="题库快速跳转"><a class="hero-action hero-primary" href="#sec-bankA">往年题库 ↓</a><a class="hero-action hero-secondary" href="#sec-bankD">2026 Fall 新题库 ↓</a><a class="hero-text-link" href="./guide.html">考试指南 ↗</a><a class="hero-text-link" href="./submit.html">贡献新题 ↗</a></nav></div></header>
+<header class="campus-hero"><div class="hero-inner"><span class="hero-eyebrow">ELPA · Speaking Practice</span><h1>题库练习 <span class="hero-highlight">Practice</span></h1><p class="hero-lead">往年题库与 社区反馈题库 · 搜索 · 分页 · 模拟计时</p><p class="hero-description">笔记与练习状态自动保存在当前浏览器，支持导出与恢复。</p><nav class="hero-actions" aria-label="题库快速跳转"><a class="hero-action hero-primary" href="#sec-bankA">往年题库 ↓</a><a class="hero-action hero-secondary" href="#sec-bankD">社区反馈题库 ↓</a><a class="hero-text-link" href="./guide.html">考试指南 ↗</a><a class="hero-text-link" href="./submit.html">贡献新题 ↗</a></nav></div></header>
 
 <div class="wrap">
   <aside class="source-notice" role="note">
@@ -760,10 +760,10 @@
   </section>
 
   <section id="sec-bankD">
-    <div class="sec-head"><span class="emoji">🎓</span><h2>2026 Fall 新题库</h2><span class="tag">12 题 · 本年度更新</span></div>
-    <p class="sec-desc">本年度的新题与校园相关问法，可直接练习；英文为整理译文的题目会单独标注。<a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/blob/main/question-bank/2026-fall.md">查看场次与来源 ↗</a></p>
+    <div class="sec-head"><span class="emoji">🎓</span><h2>社区反馈题库</h2><span class="tag" id="feedbackBankCount">12 题 · 持续更新</span></div>
+    <p class="sec-desc">保留 2026 Fall 及后续考试批次的新增考生反馈；英文为整理译文的题目会单独标注。<a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/blob/main/question-bank/2026-fall.md">查看场次与来源 ↗</a></p>
     <div id="bankD"></div>
-    <nav class="bank-pagination" id="pagerFall" aria-label="2026 Fall 新题库分页"></nav>
+    <nav class="bank-pagination" id="pagerFall" aria-label="社区反馈题库分页"></nav>
   </section>
 
   <footer>学生维护的非官方备考资源 · 原题出处和补充资料见 <a href="https://github.com/FuTseYi/HKUST-GZ-ELPA/tree/main/question-bank">独立题库</a><br>感谢历届同学分享题目与备考经验<br>具体考试要求以 HKUST(GZ) 官方通知为准<br><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></footer>
@@ -1132,9 +1132,10 @@ function escAttr(s) {
 }
 
 function renderTOC() {
+  document.getElementById("feedbackBankCount").textContent = BANKS.D.items.length + " 题 · 持续更新";
   const items = [
     ['sec-bankA', '📚', '往年题库'],
-    ['sec-bankD', '🎓', '2026 Fall 新题库']
+    ['sec-bankD', '🎓', '社区反馈题库']
   ];
   document.getElementById('toc').innerHTML =
     '<h2>📑 题库导航</h2><div class="toc-grid">' +
@@ -1400,7 +1401,7 @@ function copyQuestion(id) {
   const item = questionById(id);
   if (!item) return;
   const pastIndex = PAST_QUESTION_IDS.indexOf(id);
-  const section = pastIndex >= 0 ? '往年题库' : '2026 Fall 新题库';
+  const section = pastIndex >= 0 ? '往年题库' : '社区反馈题库';
   const number = pastIndex >= 0 ? pastIndex + 1 : BANKS.D.items.findIndex(it => qId('D', it.num) === id) + 1;
   let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
   if (item.cn) text += `（${item.cn}）\n`;
@@ -1836,7 +1837,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
   let md = '# ELPA 备考笔记导出\n\n> 导出时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
   const sections = [
     { name: '往年题库', ids: PAST_QUESTION_IDS },
-    { name: '2026 Fall 新题库', ids: BANKS.D.items.map(it => qId('D', it.num)) }
+    { name: '社区反馈题库', ids: BANKS.D.items.map(it => qId('D', it.num)) }
   ];
   for (const section of sections) {
     md += '\n## ' + section.name + '\n\n';
