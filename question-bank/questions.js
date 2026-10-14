@@ -224,7 +224,7 @@ const BANKS = {
 
 /* 2026 Fall 场次回忆：在原 A/B/C 题目 ID 后增补，保留已有进度映射 */
 BANKS.D = {
-  name: '2026 Fall 新题库',
+  name: '社区反馈题库',
   items: [
     { num:1, en:'How would you explain a term such as supply chain or fluid dynamics to undergraduates?', cn:'8.24 09:30｜向本科生解释专业术语；考生英文回忆经轻微规范化，非核实原文', subs:[] },
     { num:2, en:'How would you guide students to use AI?', cn:'8.24 09:30｜指导学生使用 AI；考生英文回忆', subs:[] },
