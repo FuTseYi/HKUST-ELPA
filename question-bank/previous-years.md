@@ -244,4 +244,4 @@
 
 整理自此前汇总的往年题、补充题和考生分享。原有不同来源中的重复提问已合并；仍可能有问法或小问的差异，考试要求以当期通知为准。
 
-[2026 Fall 新题库](./2026-fall.md) · [反馈缺失信息](https://github.com/FuTseYi/HKUST-GZ-ELPA/issues)
+[2026 Fall 新题库](./2026-fall.md) · [反馈缺失信息](https://github.com/FuTseYi/HKUST-ELPA/issues)
