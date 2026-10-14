@@ -191,3 +191,83 @@ test('disabled mode returns CORS-scoped response on both official sites',async()
     assert.equal(x.calls.length,0);
   }
 });
+
+const v2Question={
+  version:2,kind:'question',term:'2027 Spring',examStage:'mid',
+  main:{en:'How does interdisciplinary research help solve complex problems?',
+    cn:'跨学科研究如何帮助解决复杂问题？'},
+  subs:[
+    {en:'Give an example.',cn:'请举例说明。'},
+    {en:'What challenges could arise?',cn:'可能遇到什么挑战？'}
+  ],source:'firsthand',turnstileToken:'mock-valid-token'
+};
+const v2Advice={
+  version:2,kind:'advice',phase:'during',tags:['speaking-strategy','time-management'],
+  title:'我的现场时间管理经验',
+  body:'先明确表达观点，再结合真实例子说明，最后注意回答时间。',
+  turnstileToken:'mock-valid-token'
+};
+test('v2 bilingual question passes verification and only creates a review Issue',async()=>{
+  const x=makeWorker();
+  const response=await x.handler.fetch(x.request(v2Question),x.env);
+  assert.equal(response.status,201,await response.text());
+  assert.equal(x.calls.length,2);
+  const issue=JSON.parse(x.calls[1].init.body);
+  assert.equal(issue.labels[0],'submission:pending');
+  assert.match(issue.body,/elpa-submission-v2:/);
+  assert.match(issue.body,/跨学科研究如何帮助解决复杂问题/);
+  assert.match(issue.body,/可能遇到什么挑战/);
+  assert.doesNotMatch(issue.body,/mock-valid-token/);
+});
+test('v2 advice accepts one original-language title and article',async()=>{
+  const x=makeWorker();
+  const response=await x.handler.fetch(x.request(v2Advice),x.env);
+  assert.equal(response.status,201,await response.text());
+  const issue=JSON.parse(x.calls[1].init.body);
+  assert.match(issue.title,/备考经验/);
+  assert.match(issue.body,/speaking-strategy/);
+  assert.match(issue.body,/elpa-submission-v2:/);
+  assert.ok(!issue.body.includes('mock-valid-token'));
+});
+test('v2 rejects incomplete bilingual text and noncanonical categories before siteverify',async()=>{
+  const bads=[
+    {...v2Question,main:{...v2Question.main,cn:''}},
+    {...v2Question,subs:[{en:'Why?',cn:''}]},
+    {...v2Question,examStage:'unknown'},
+    {...v2Question,subs:Array.from({length:21},()=>({en:'Why?',cn:'为什么？'}))},
+    {...v2Advice,tags:['arbitrary-tag']},
+    {...v2Advice,tags:['speaking-strategy','speaking-strategy']},
+    {...v2Advice,body:'too short'}
+  ];
+  for(const invalid of bads){
+    const x=makeWorker();
+    const response=await x.handler.fetch(x.request(invalid),x.env);
+    assert.equal(response.status,400);
+    assert.equal(x.calls.length,0);
+  }
+});
+test('v2 test-mode never enables arbitrary submissions',async()=>{
+  const x=makeWorker();
+  x.env.SUBMISSION_MODE='test';
+  x.env.SUBMISSION_TEST_DEADLINE_MS=String(Date.now()+120000);
+  x.env.SUBMISSION_TEST_QUESTION='TEST ONLY - approved';
+  const response=await x.handler.fetch(x.request(v2Question),x.env);
+  assert.equal(response.status,403);
+  assert.equal(x.calls.length,0);
+});
+test('Vercel v2 verified hostname must match the caller',async()=>{
+  const yes=makeWorker({siteverify:{success:true,hostname:'hkust-elpa.vercel.app',action:'elpa_submit'}});
+  const accepted=await yes.handler.fetch(yes.request(v2Question,{Origin:'https://hkust-elpa.vercel.app'}),yes.env);
+  assert.equal(accepted.status,201);
+  const no=makeWorker({siteverify:{success:true,hostname:'futseyi.github.io',action:'elpa_submit'}});
+  const rejected=await no.handler.fetch(no.request(v2Question,{Origin:'https://hkust-elpa.vercel.app'}),no.env);
+  assert.equal(rejected.status,403);
+  assert.equal(no.calls.length,1);
+});
+test('v2 body enforces byte-size bound with no external requests',async()=>{
+  const x=makeWorker();
+  const huge={...v2Advice,body:'考'.repeat(9000)};
+  const response=await x.handler.fetch(x.request(huge),x.env);
+  assert.ok(response.status===400||response.status===413);
+  assert.equal(x.calls.length,0);
+});
