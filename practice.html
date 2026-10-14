@@ -652,6 +652,24 @@
     .search-box .search-submit {width:100%;min-height:42px;}
   }
 
+  .elpa-choices{background:#fff;border:1px solid #dbe5f0;border-radius:16px;padding:18px 20px;margin:20px 0;}
+  .elpa-choice-row{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+  .elpa-choice-row+.elpa-choice-row{margin-top:13px}
+  .elpa-choice-label{min-width:68px;font-size:13px;font-weight:700;color:#52677d}
+  .elpa-choice-buttons{display:inline-flex;gap:3px;max-width:100%;padding:4px;border-radius:12px;background:#f0f4f9;border:1px solid #dce5ef}
+  .elpa-choice-buttons button{min-height:38px;padding:8px 17px;white-space:nowrap;border:0;border-radius:9px;background:transparent;color:#445b73;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .elpa-choice-buttons button[aria-pressed="true"]{background:#003e74;color:#fff;box-shadow:0 2px 8px rgba(0,48,91,.14)}
+  .elpa-choice-buttons button:focus-visible{outline:3px solid #e3b34b;outline-offset:2px}
+  .elpa-choice-note{font-size:12px;color:#60758b;line-height:1.7;margin:12px 0 0}
+  .page-practice section[hidden],.page-practice .elpa-fast-intro[hidden]{display:none!important}
+  .elpa-fast-intro{background:#fff;border:1px solid #dbe5f0;border-radius:14px;padding:22px;margin:20px 0 28px}
+  .elpa-fast-intro h2{font-size:18px;color:#003e74;margin:0 0 7px}
+  .elpa-fast-intro p{font-size:13px;color:#5d6b7c;margin:0 0 12px}
+  .elpa-fast-intro ol{margin:0;padding-left:22px}
+  .elpa-fast-intro li{margin:8px 0;color:#233c57;font-size:14px}
+  .elpa-fast-intro li span{display:block;color:#64748b;font-size:12px}
+  @media(max-width:640px){.elpa-choices{padding:14px}.elpa-choice-row{gap:7px;flex-direction:column;align-items:stretch}.elpa-choice-row+.elpa-choice-row{margin-top:14px}.elpa-choice-buttons{width:100%}.elpa-choice-buttons button{flex:1 1 0;min-width:0;padding:8px 6px;font-size:12px}}
+
 </style>
 </head>
 <body class="page-practice">
@@ -675,6 +693,17 @@
     本站为学生维护的<strong>非官方备考资料</strong>。题库可以直接用于模拟练习；少数回忆不完整的题目会单独标注。考试信息以学校当期通知为准。<a href="https://github.com/FuTseYi/HKUST-ELPA/tree/main/question-bank">查看题目来源与分类说明</a>。
   </aside>
 
+  <section class="elpa-choices" id="examChoices" aria-label="考试校区和类型">
+    <div class="elpa-choice-row"><span class="elpa-choice-label">考试校区</span><div class="elpa-choice-buttons" role="group" aria-label="选择考试校区">
+      <button type="button" data-campus="nansha" aria-pressed="true">南沙校区</button>
+      <button type="button" data-campus="clear-water-bay" aria-pressed="false">清水湾校区</button>
+    </div></div>
+    <div class="elpa-choice-row"><span class="elpa-choice-label">考试类型</span><div class="elpa-choice-buttons" role="group" aria-label="选择考试类型">
+      <button type="button" data-track="regular" aria-pressed="true">常规 ELPA</button>
+      <button type="button" data-track="fast-track" aria-pressed="false">ELPA Fast Track</button>
+    </div></div>
+    <p class="elpa-choice-note" id="elpaChoiceNote" role="status">南沙校区 · 常规 ELPA</p>
+  </section>
   <!-- Toolbar -->
   <div class="toolbar">
     <form class="search-box" id="searchForm" role="search" aria-label="题目搜索">
@@ -794,11 +823,16 @@
 
   <section id="sec-bankD">
     <div class="sec-head"><span class="emoji">🎓</span><h2 id="currentBankTitle">最新学期题库</h2><span class="tag" id="feedbackBankCount">最新已收录学期 · 持续更新</span></div>
-    <p class="sec-desc">优先展示已收录的最新考试学期题目；新学期考题审核入库后自动切换，原有场次归入下方过往题库。题目采用中英双语整理，供直接练习。<a href="./sources.html">查看题目来源 ↗</a></p>
+    <p class="sec-desc" id="currentBankDescription">优先展示已收录的最新考试学期题目；新学期考题审核入库后自动切换，原有场次归入下方过往题库。</p>
     <div id="bankD"></div>
     <nav class="bank-pagination" id="pagerFall" aria-label="最新学期题库分页"></nav>
   </section>
 
+  <section class="elpa-fast-intro" id="fastIntroSection" hidden aria-labelledby="fastIntroTitle">
+    <h2 id="fastIntroTitle">补充准备 · 完整自我介绍任务</h2>
+    <p>另行收集的独立任务，包含 8 个准备要点，不计入 12 道题目。</p>
+    <div id="fastIntroDetails"></div>
+  </section>
   <section id="sec-bankA">
     <div class="sec-head"><span class="emoji">📚</span><h2>过往题库</h2><span class="tag" id="pastBankCount">历年题目 · 持续归档</span></div>
     <p class="sec-desc">往届经典题与其他学期的考生反馈统一归档，题目保留原有编号与学习进度，随时可以继续练习。</p>
@@ -813,6 +847,7 @@
 <button class="to-top" id="toTop" title="回到顶部" aria-label="返回页面顶部">↑</button>
 
 <script src="./question-bank/questions.js"></script>
+<script src="./question-bank/fast-track.js"></script>
 <script src="./question-bank/appearances.js"></script>
 <script src="./question-bank/taxonomy.js"></script>
 <script>
