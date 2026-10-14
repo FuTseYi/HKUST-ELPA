@@ -47,3 +47,22 @@ and `turnstileToken`. Successful response: HTTP 201 `{"ok":true,"issueUrl":"..."
 The Issue includes readable Markdown and a base64url machine-readable marker
 (`elpa-submission-v1`) for the stage-3 review workflow. Unapproved Issues are
 never added to the question bank.
+
+
+## Deployment status (2026-10-14)
+
+- Cloudflare account: `FuTseYi`.
+- Worker script: `hkust-gz-elpa-submissions`.
+- Worker URL: `https://hkust-gz-elpa-submissions.futseyi.workers.dev/submit`.
+- Turnstile widget: `HKUST-GZ ELPA Question Submissions`.
+- Public Site Key: `0x4AAAAAAFWWsgbB9w0JPOm3`.
+- Server-side `TURNSTILE_SECRET`: **configured** as a Worker Secret.
+- `SUBMISSIONS_DISABLED=true`: **configured** (submission endpoint remains closed).
+- `GITHUB_TOKEN`: **not configured yet**; requires an owner-created fine-grained PAT.
+- Public `submission-config.js`: deliberately left disabled pending protected end-to-end tests.
+- The existing `visit-counter` Worker was not altered.
+- All feature branches should be retained after merging PRs (do not delete PR heads).
+
+**Not yet verified:** external `/health` reachability, live Turnstile
+Siteverify, GitHub issue creation, and approved-issue import end-to-end.
+Never set `SUBMISSIONS_DISABLED=false` until these tests pass.
