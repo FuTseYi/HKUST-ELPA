@@ -87,3 +87,14 @@ test('empty or unconfigured secrets fail closed',async()=>{
  const r=await x.handler.fetch(x.request(baseBody),x.env);
  assert.equal(r.status,503);assert.equal(x.calls.length,0);
 });
+
+test('missing or malformed enable flag fails closed (opt-in only)',async()=>{
+ for(const value of [undefined,'TRUE','0','false ']){
+  const x=makeWorker();
+  if(value===undefined)delete x.env.SUBMISSIONS_DISABLED;
+  else x.env.SUBMISSIONS_DISABLED=value;
+  const r=await x.handler.fetch(x.request(baseBody),x.env);
+  assert.equal(r.status,503);
+  assert.equal(x.calls.length,0);
+ }
+});
