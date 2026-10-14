@@ -1,4 +1,4 @@
-# ELPA submission Worker (stage 2)
+# HKUST-ELPA submission Worker
 
 This **separate Cloudflare Worker** accepts anonymous submissions from
 `https://futseyi.github.io/HKUST-ELPA/submit.html` and
@@ -18,8 +18,13 @@ It does **not** edit website files or publish a question. Maintainer review rema
    - `npx wrangler secret put GITHUB_TOKEN`
    Optional kill switch (plaintext Worker environment variable):
    `SUBMISSIONS_DISABLED=true` disables POST submissions; requests are accepted **only** when set explicitly to `false` and all other validations succeed. If the binding is missing, submissions remain disabled.
-5. Deploy with `npx wrangler deploy`. In the public `submission-config.js`,
-   fill in the deployed **https** Worker URL ending in `/submit` and public Turnstile Site Key.
+5. Deploy with `npx wrangler deploy`. The checked-in `wrangler.jsonc` deliberately
+   defaults to `SUBMISSION_MODE=closed` and `SUBMISSIONS_DISABLED=true`.
+   **After every production deployment**, explicitly verify the live Worker settings
+   and restore `SUBMISSION_MODE=public`, `SUBMISSIONS_DISABLED=false` only if submissions
+   are intended to remain open. Never check secrets into the repository. In the public
+   `submission-config.js`, set the HTTPS Worker URL ending in `/submit` and the public
+   Turnstile Site Key.
 6. Verify CORS and protection with invalid requests **before** activating the frontend.
    Only submit actual question reports after successful end-to-end testing.
    Any manual test Issues must be clearly marked as tests and closed without approval.
@@ -30,7 +35,7 @@ It does **not** edit website files or publish a question. Maintainer review rema
   the Worker also checks token server-side with Siteverify. The endpoint is opt-in: `SUBMISSIONS_DISABLED` must be explicitly `false`.
 - Cloudflare native binding limits attempted POSTs to **3 per 60 seconds per IP
   at each edge location**. This is approximate/edge-local, not a globally strict quota.
-- Request body is streamed with a 16 KiB cap; text lengths, types and
+- Request body is streamed with a **24 KiB (24,576 bytes)** cap; text lengths, types and
   allowed source/term values are validated. Requests fail closed if secrets,
   limiter or external verification are unavailable.
 - No DB, no submitted attachments, no contact details requested, no visitor IP
@@ -40,13 +45,24 @@ It does **not** edit website files or publish a question. Maintainer review rema
 
 ## Interface
 
-`POST /submit` with JSON keys:
-`term`, `question`, `subquestions`, `source` (`firsthand` / `secondhand`),
-and `turnstileToken`. Successful response: HTTP 201 `{"ok":true,"issueUrl":"..."}`.
+`POST /submit` accepts **v2 submissions** from the current website:
 
-The Issue includes readable Markdown and a base64url machine-readable marker
-(`elpa-submission-v1`) for the stage-3 review workflow. Unapproved Issues are
-never added to the question bank.
+- **Question:** `version: 2`, `kind: "question"`, `term` (e.g. `2026 Fall`),
+  `examStage` (`start` / `mid` / `end`), bilingual `main: {en, cn}`,
+  optional bilingual `subs: [{en, cn}]`, `source` (`firsthand` / `secondhand`),
+  and `turnstileToken`.
+- **Preparation advice:** `version: 2`, `kind: "advice"`, `phase`
+  (`before` / `during` / `after`), `tags` (1–4 predefined taxonomy tags),
+  `title`, `body`, and `turnstileToken`.
+- **Legacy v1 compatibility:** `term`, `question`, `subquestions`, `source`,
+  and `turnstileToken`. The time-bounded `test` mode accepts only its exact
+  allowlisted legacy payload; it does not accept v2 submissions.
+
+Successful response: HTTP 201 `{"ok":true,"issueUrl":"..."}`. The Issue
+contains readable Markdown and a base64url machine-readable marker
+(`elpa-submission-v1` or `elpa-submission-v2`). Both versions enter the
+same `submission:pending` review queue. Unapproved Issues are never added
+straight to the question bank.
 
 ## Verified provisioned resources (2026-10-14)
 
