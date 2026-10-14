@@ -64,7 +64,7 @@ jobs:
               assert 'href="./site.css"' in content, f"Shared styles absent in {filename}"
               assert content.count('class="elpa-nav-github"') == 1, f"GitHub nav missing or duplicated in {filename}"
               assert 'aria-label="HKUST-ELPA GitHub 仓库（新窗口打开）"' in content, f"Accessible GitHub link name absent in {filename}"
-              assert 'title="GitHub · HKUST-ELPA"><svg viewBox="0 0 24 24"' in content, f"Visible GitHub logo absent in {filename}"
+              assert 'title="GitHub · HKUST-ELPA"><img src="./assets/github-mark.svg"' in content, f"Visible GitHub logo absent in {filename}"
               for linked in pages.keys():
                   pass
               for route in ["index.html","guide.html","practice.html","sources.html"]:
