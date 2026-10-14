@@ -5,6 +5,8 @@ on:
     paths:
       - '*.html'
       - 'site.css'
+      - 'assets/elpa-mark.svg'
+      - 'assets/github-mark.svg'
       - 'question-bank/**'
       - 'question-bank/taxonomy.js'
       - 'docs/submission-v2-spec.md'
@@ -102,6 +104,14 @@ jobs:
           data=Path("question-bank/questions.js").read_text(encoding="utf-8")
           assert 'BANKS.D = {' in data and 'PAST_QUESTION_IDS' in data, "Question data invalid"
 
+          for filename, markup in pages.items():
+              assert 'href="./assets/elpa-mark.svg"' in markup, f"Favicon missing on {filename}"
+              assert 'class="elpa-nav-submit"' in markup or 'class="elpa-nav-submit" aria-current="page"' in markup, f"Contribution action missing on {filename}"
+              assert 'src="./assets/github-mark.svg"' in markup, f"GitHub mark missing on {filename}"
+              assert 'src="./assets/elpa-mark.svg"' in markup, f"Project mark missing on {filename}"
+          for svgfile in ("assets/elpa-mark.svg","assets/github-mark.svg"):
+              mark=Path(svgfile).read_text(encoding="utf-8")
+              assert mark.startswith("<svg") and "</svg>" in mark and "<path" in mark, f"SVG invalid: {svgfile}"
           css=Path("site.css").read_text(encoding="utf-8")
           assert "bank-pagination" in css and "elpa-nav-links" in css, "Page and pagination styling missing"
           asset=Path("assets/Administration-Building-14-1536x864.jpg").read_bytes()
