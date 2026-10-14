@@ -5,7 +5,7 @@ const ORIGIN = 'https://futseyi.github.io';
 const HOSTNAME = 'futseyi.github.io';
 const OWNER = 'FuTseYi';
 const REPO = 'HKUST-ELPA';
-const MAX_BODY_BYTES = 6500;
+const MAX_BODY_BYTES = 16384;
 
 function json(payload, status = 200, origin = false) {
   return new Response(JSON.stringify(payload), {
@@ -143,7 +143,7 @@ export default {
           'X-GitHub-Api-Version':'2022-11-28',
           'User-Agent':'HKUST-ELPA-Submission'
         },
-        body:JSON.stringify({title,body:issueBody}),
+        body:JSON.stringify({title,body:issueBody,labels:['submission:pending']}),
         signal:AbortSignal.timeout(10000)
       });
       if (!response.ok) throw new Error('GitHub issue create failed: '+response.status);
