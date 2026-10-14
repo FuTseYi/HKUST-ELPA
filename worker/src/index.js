@@ -1,8 +1,8 @@
 /* Anonymous ELPA submissions: minimal, fail-closed Cloudflare Worker.
  * Deploy separately from GitHub Pages. Secrets must never enter this repository.
  */
-const ORIGIN = 'https://futseyi.github.io';
-const HOSTNAME = 'futseyi.github.io';
+// Only production origins, never preview domains or wildcard subdomains.
+const ORIGINS = new Set(['https://futseyi.github.io', 'https://hkust-elpa.vercel.app']);
 const OWNER = 'FuTseYi';
 const REPO = 'HKUST-ELPA';
 const MAX_BODY_BYTES = 16384;
@@ -15,7 +15,7 @@ function json(payload, status = 200, origin = false) {
       'Cache-Control': 'no-store',
       'X-Content-Type-Options': 'nosniff',
       ...(origin ? {
-        'Access-Control-Allow-Origin': ORIGIN,
+        'Access-Control-Allow-Origin': origin,
         'Vary': 'Origin',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type'
@@ -23,8 +23,8 @@ function json(payload, status = 200, origin = false) {
     }
   });
 }
-function invalid(message, status = 400) {
-  return json({ok:false,message}, status, true);
+function invalid(message, status = 400, origin = false) {
+  return json({ok:false,message}, status, origin);
 }
 async function readLimitedJSON(request) {
   if (!request.body) throw new Error('missing body');
@@ -61,58 +61,61 @@ function encodeBase64Url(text) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const originOK = request.headers.get('Origin') === ORIGIN;
+    const origin = request.headers.get('Origin');
+    const originOK = ORIGINS.has(origin);
     if (request.method === 'GET' && url.pathname === '/health')
       return json({ok:true,service:'elpa-submission'});
     if (url.pathname !== '/submit') return json({ok:false,message:'Not found'},404);
     if (!originOK) return json({ok:false,message:'Forbidden'},403);
     if (request.method === 'OPTIONS')
       return new Response(null,{status:204,headers:{
-        'Access-Control-Allow-Origin':ORIGIN,'Vary':'Origin',
+        'Access-Control-Allow-Origin':origin,'Vary':'Origin',
         'Access-Control-Allow-Methods':'POST, OPTIONS',
         'Access-Control-Allow-Headers':'Content-Type','Access-Control-Max-Age':'600'
       }});
-    if (request.method !== 'POST') return invalid('Method not allowed',405);
-    if (env.SUBMISSIONS_DISABLED !== 'false') return invalid('投稿暂时关闭，请稍后再试。',503);
+    // All subsequent errors inherit the verified request origin, not a wildcard.
+    const reject=(message,status=400)=>invalid(message,status,origin);
+    if (request.method !== 'POST') return reject('Method not allowed',405);
+    if (env.SUBMISSIONS_DISABLED !== 'false') return reject('投稿暂时关闭，请稍后再试。',503);
     // The API only operates in an explicitly selected mode.
     const testMode = env.SUBMISSION_MODE === 'test';
     if (!testMode && env.SUBMISSION_MODE !== 'public')
-      return invalid('投稿服务尚未开放。',503);
+      return reject('投稿服务尚未开放。',503);
     if (testMode) {
       const deadline = Number(env.SUBMISSION_TEST_DEADLINE_MS);
       if (!/^\d{13}$/.test(String(env.SUBMISSION_TEST_DEADLINE_MS || '')) ||
           !Number.isSafeInteger(deadline) || Date.now() >= deadline)
-        return invalid('本次测试窗口已结束。',503);
+        return reject('本次测试窗口已结束。',503);
     }
     if (!env.GITHUB_TOKEN || !env.TURNSTILE_SECRET || !env.SUBMISSION_LIMITER)
-      return invalid('投稿服务尚未配置完成。',503);
+      return reject('投稿服务尚未配置完成。',503);
     if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type') || ''))
-      return invalid('仅支持 JSON 格式。',415);
+      return reject('仅支持 JSON 格式。',415);
     const length = Number(request.headers.get('Content-Length')||0);
-    if (length > MAX_BODY_BYTES) return invalid('内容过长。',413);
+    if (length > MAX_BODY_BYTES) return reject('内容过长。',413);
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     try {
       const limited = await env.SUBMISSION_LIMITER.limit({key:ip});
-      if (!limited.success) return invalid('提交过于频繁，请稍后再试。',429);
+      if (!limited.success) return reject('提交过于频繁，请稍后再试。',429);
     } catch {
-      return invalid('投稿服务暂时繁忙。',503); // fail closed
+      return reject('投稿服务暂时繁忙。',503); // fail closed
     }
     let body;
     try {body = await readLimitedJSON(request);}
-    catch {return invalid('投稿数据无效或内容过长。',400);}
+    catch {return reject('投稿数据无效或内容过长。',400);}
     const {term,question,subquestions,source,turnstileToken} = body || {};
     const termOK = typeof term==='string' && (/^20\d{2} (Spring|Fall)$/.test(term) || term==='Other / Unknown');
     if (!termOK || !validText(question,8,1000) ||
         !validText(subquestions,0,2000) ||
         !['firsthand','secondhand'].includes(source) ||
         !validText(turnstileToken,1,2048))
-      return invalid('请检查必填项、内容格式和字符长度。');
+      return reject('请检查必填项、内容格式和字符长度。');
     // A short-lived test window accepts only an exact synthetic question,
     // and never needs to accept arbitrary public submissions.
     if (testMode &&
        (question.trim() !== env.SUBMISSION_TEST_QUESTION ||
         term !== '2026 Fall' || subquestions.trim() !== '' || source !== 'firsthand'))
-      return invalid('测试窗口只接收指定测试内容。',403);
+      return reject('测试窗口只接收指定测试内容。',403);
     // Never send unverified submissions to GitHub.
     let verified;
     try {
@@ -125,10 +128,10 @@ export default {
       if (!response.ok) throw new Error('Turnstile unavailable');
       verified=await response.json();
     }catch{
-      return invalid('人机验证暂不可用，请稍后重试。',503);
+      return reject('人机验证暂不可用，请稍后重试。',503);
     }
-    if (!verified.success || verified.hostname!==HOSTNAME || verified.action!=='elpa_submit')
-      return invalid('人机验证失败或已过期，请重试。',403);
+    if (!verified.success || verified.hostname!==new URL(origin).hostname || verified.action!=='elpa_submit')
+      return reject('人机验证失败或已过期，请重试。',403);
     const record={version:1,term,question:question.trim(),subquestions:subquestions.trim(),source};
     const encoded=encodeBase64Url(JSON.stringify(record));
     const quoted=(t)=>t.split('\n').map(s=>'> '+s).join('\n');
@@ -166,8 +169,8 @@ export default {
       github=await response.json();
     }catch(e){
       console.error('Submission delivery failed',String(e));
-      return invalid('投稿暂时未能保存，请稍后重试。',503);
+      return reject('投稿暂时未能保存，请稍后重试。',503);
     }
-    return json({ok:true,issueUrl:github.html_url},201,true);
+    return json({ok:true,issueUrl:github.html_url},201,origin);
   }
 };

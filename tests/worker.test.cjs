@@ -137,3 +137,57 @@ test('test window accepts only exact allowlisted synthetic payload',async()=>{
   assert.equal(x.calls.length,2);
   assert.match(JSON.parse(x.calls[1].init.body).title,/TEST ONLY/);
 });
+
+test('both exact production origins have scoped CORS preflight, previews are rejected',async()=>{
+  const x=makeWorker();
+  for (const origin of ['https://futseyi.github.io','https://hkust-elpa.vercel.app']){
+    const res=await x.handler.fetch(new Request('https://hkust-elpa-submissions.futseyi.workers.dev/submit',{
+      method:'OPTIONS',headers:{Origin:origin,'Access-Control-Request-Method':'POST'}
+    }),x.env);
+    assert.equal(res.status,204);
+    assert.equal(res.headers.get('Access-Control-Allow-Origin'),origin);
+    assert.equal(res.headers.get('Vary'),'Origin');
+  }
+  for (const origin of ['https://hkust-elpa-git-main.vercel.app','https://hkust-elpa.vercel.app.evil.test',
+    'http://hkust-elpa.vercel.app','https://bad.example','null']){
+    const res=await x.handler.fetch(new Request('https://hkust-elpa-submissions.futseyi.workers.dev/submit',{
+      method:'OPTIONS',headers:{Origin:origin}
+    }),x.env);
+    assert.equal(res.status,403);
+    assert.equal(res.headers.get('Access-Control-Allow-Origin'),null);
+  }
+  assert.equal(x.calls.length,0);
+});
+
+test('Vercel-origin successful submission uses matching hostname from siteverify',async()=>{
+  const x=makeWorker({siteverify:{success:true,hostname:'hkust-elpa.vercel.app',action:'elpa_submit'}});
+  const response=await x.handler.fetch(x.request(baseBody,{Origin:'https://hkust-elpa.vercel.app'}),x.env);
+  assert.equal(response.status,201);
+  assert.equal(response.headers.get('Access-Control-Allow-Origin'),'https://hkust-elpa.vercel.app');
+  assert.equal(x.calls.length,2);
+  assert.equal(JSON.parse(x.calls[1].init.body).labels[0],'submission:pending');
+});
+
+test('Turnstile siteverify hostname must match the exact calling origin',async()=>{
+  for (const [origin,verifiedHostname] of [
+    ['https://futseyi.github.io','hkust-elpa.vercel.app'],
+    ['https://hkust-elpa.vercel.app','futseyi.github.io'],
+    ['https://hkust-elpa.vercel.app','preview.vercel.app']
+  ]){
+    const x=makeWorker({siteverify:{success:true,hostname:verifiedHostname,action:'elpa_submit'}});
+    const response=await x.handler.fetch(x.request(baseBody,{Origin:origin}),x.env);
+    assert.equal(response.status,403);
+    assert.equal(response.headers.get('Access-Control-Allow-Origin'),origin);
+    assert.equal(x.calls.length,1);
+  }
+});
+
+test('disabled mode returns CORS-scoped response on both official sites',async()=>{
+  for(const origin of ['https://futseyi.github.io','https://hkust-elpa.vercel.app']){
+    const x=makeWorker();x.env.SUBMISSIONS_DISABLED='true';
+    const response=await x.handler.fetch(x.request(baseBody,{Origin:origin}),x.env);
+    assert.equal(response.status,503);
+    assert.equal(response.headers.get('Access-Control-Allow-Origin'),origin);
+    assert.equal(x.calls.length,0);
+  }
+});

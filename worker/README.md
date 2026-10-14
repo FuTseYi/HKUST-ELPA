@@ -1,12 +1,13 @@
 # ELPA submission Worker (stage 2)
 
 This **separate Cloudflare Worker** accepts anonymous submissions from
-`https://futseyi.github.io/HKUST-ELPA/submit.html` and creates a **public GitHub Issue**.
+`https://futseyi.github.io/HKUST-ELPA/submit.html` and
+`https://hkust-elpa.vercel.app/submit.html`; both create a **public GitHub Issue**.
 It does **not** edit website files or publish a question. Maintainer review remains mandatory.
 
 ## Deploy prerequisites
 
-1. Create a Cloudflare Turnstile widget restricted to hostname **futseyi.github.io**.
+1. Create a Cloudflare Turnstile widget restricted to **futseyi.github.io** and **hkust-elpa.vercel.app**.
    Use action **elpa_submit**. Keep the Site Key public; keep the Secret private.
 2. Use Wrangler 4.36+ in `worker/`. The configured `namespace_id` is `11247601` (account-specific; already deployed).
 3. Create the GitHub labels `submission:pending` and `submission:approved` in the repository before accepting submissions. The pending label is applied by the Worker when it creates an Issue. Then create a **fine-grained GitHub PAT** restricted to only
@@ -25,7 +26,7 @@ It does **not** edit website files or publish a question. Maintainer review rema
 
 ## Security posture
 
-- Exact-origin CORS, exact Turnstile hostname and action validation;
+- Exact-origin CORS for the two production domains (no wildcard/preview hosts), with the verified Turnstile hostname matched against each request's own origin and action validation;
   the Worker also checks token server-side with Siteverify. The endpoint is opt-in: `SUBMISSIONS_DISABLED` must be explicitly `false`.
 - Cloudflare native binding limits attempted POSTs to **3 per 60 seconds per IP
   at each edge location**. This is approximate/edge-local, not a globally strict quota.
@@ -50,19 +51,17 @@ never added to the question bank.
 ## Verified provisioned resources (2026-10-14)
 
 - Worker: `hkust-elpa-submissions`; endpoint `https://hkust-elpa-submissions.futseyi.workers.dev/submit`
-- Turnstile widget: `HKUST-ELPA Question Submissions`, hostname `futseyi.github.io`
+- Turnstile widget: `HKUST-ELPA Question Submissions`, hostnames `futseyi.github.io` and `hkust-elpa.vercel.app`
 - Public Turnstile Site Key: `0x4AAAAAAFWWsgbB9w0JPOm3` (safe to publish)
 - Turnstile secret: bound to Worker (never commit or paste it)
 - Rate limiter: `SUBMISSION_LIMITER`, namespace `11247601`, 3 requests / 60 seconds per IP per Cloudflare location
-- Worker plaintext switch: `SUBMISSIONS_DISABLED=true` (submission remains closed)
+- Worker plaintext switch: production uses `SUBMISSION_MODE=public` and `SUBMISSIONS_DISABLED=false`; repository Wrangler defaults stay closed to prevent accidental public re-enablement.
 - GitHub token: configured as encrypted Worker Secret `GITHUB_TOKEN`; its value is never committed
 - Old Worker public endpoint disabled; historical script retained
 - GitHub repository is `FuTseYi/HKUST-ELPA`; moderation labels and Actions PR-creation permission have been configured by the owner
 - Existing `visit-counter` Worker is unaffected; keep all development branches after merges
 
-**Pending**: verify external health endpoint, browser Turnstile flow, rejected/valid submissions,
-GitHub Issues, label-triggered PR, and the final GitHub Pages path after deploying the merged code.
-Do not remove the kill switch until these checks pass.
+**Production status**: The GitHub Pages form completed real Turnstile-to-Issue testing (test Issue #13, closed); the owner-approved Issue-to-PR automation was separately verified (test Issue #9 / PR #10, closed). The Vercel form requires a final live-browser verification after its domain has been added to the widget and the Worker deployed. Never merge test questions into the bank. To stop submissions immediately, set `SUBMISSIONS_DISABLED=true` in Cloudflare.
 
 
 ## Time-bounded live verification
