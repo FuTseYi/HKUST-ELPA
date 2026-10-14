@@ -89,8 +89,8 @@ module.exports=function importV2(event){
  if(!matched){
    const num=1000000+number;
    if(banks.D.items.some(x=>x.num===num))throw Error('Duplicate question ID');
-   const item={num,en:text(data.main.en),cn:text(data.main.cn),
-     subs:data.subs.map(x=>({en:text(x.en),cn:text(x.cn)})),recallTag:'社区投稿，非官方核实原题'};
+   const item={num,term:data.term,en:text(data.main.en),cn:text(data.main.cn),
+     subs:data.subs.map(x=>({en:text(x.en),cn:text(x.cn)}))};
    const start=content.indexOf('BANKS.D = {'),end=content.indexOf('\n};',start);
    if(start<0||end<start)throw Error('Missing community bank');
    const section=content.slice(start,end);
