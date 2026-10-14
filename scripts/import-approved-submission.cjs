@@ -68,7 +68,7 @@ const doc=fs.existsSync(docPath)?fs.readFileSync(docPath,'utf8'):
 const quote=(text)=>String(text).split(/\r?\n/).map(s=>'> '+s.replace(/</g,'&lt;')).join('\n');
 const source=data.source==='firsthand'?'本人亲历':'同学转述';
 const addition='\n## '+data.term+' · Issue #'+number+
-  '\n\n来源：'+source+' ｜ [投稿记录](https://github.com/FuTseYi/HKUST-GZ-ELPA/issues/'+number+')'+
+  '\n\n来源：'+source+' ｜ [投稿记录](https://github.com/FuTseYi/HKUST-ELPA/issues/'+number+')'+
   ' ｜ 练习题 ID：D-'+num+
   '\n\n**主问题（回忆版）**\n\n'+quote(data.question)+
   '\n\n**提示小问**\n\n'+(data.subquestions?quote(data.subquestions):'> 未记录')+'\n';
