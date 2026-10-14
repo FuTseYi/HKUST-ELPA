@@ -136,8 +136,8 @@ test('current-term grouping archives other sessions without renumbering saved ID
   assert.equal(groups.latest,'2027 Spring');
   const older=question('How should a student plan a research project with limited time?');
   assert.equal(f.run(older,303).status,0);
-  const latestAfterOlder=new Function(f.read('questions.js')+'\\n'+f.read('appearances.js')+
-    '\\nreturn elpaLatestTerm();')();
+  const latestAfterOlder=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+
+    '\nreturn elpaLatestTerm();')();
   assert.equal(latestAfterOlder,'2027 Spring');
   assert.ok(groups.sorted.includes('D-1'));
   assert.ok(!groups.sorted.includes('D-1000302'));
