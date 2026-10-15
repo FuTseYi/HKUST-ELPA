@@ -1447,6 +1447,16 @@ function toggleTranslation(id,button){
   button.setAttribute('aria-expanded',String(showing));
   button.textContent=showing?'隐藏中文':'查看中文';
 }
+function toggleVariantChinese(id,button){
+  const section=document.getElementById('variants-'+id);
+  if(!section||!button)return;
+  const targets=[...section.querySelectorAll('.subq-cn.translation')];
+  if(!targets.length)return;
+  const showing=targets[0].hidden;
+  for(const node of targets)node.hidden=!showing;
+  button.setAttribute('aria-expanded',String(showing));
+  button.textContent=showing?'隐藏相似问法中文':'查看相似问法中文';
+}
 function toggleFollowupChinese(id,button){
   const section=document.getElementById('subq-'+id);
   if(!section||!button)return;
@@ -1583,9 +1593,10 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
         <button type="button" class="subq-head" onclick="toggleVariants('${id}')" aria-expanded="false" aria-controls="variants-list-${id}">
           <span class="arrow">▶</span>查看相似问法（${alternatives.length} 个）
         </button>
-        <div class="subq-list" id="variants-list-${id}"><ol>
-          ${alternatives.map(s=>`<li><span class="subq-en">${esc(s.en)}</span>${s.cn?`<span class="subq-cn">${esc(s.cn)}</span>`:''}</li>`).join('')}
-        </ol></div>
+        <div class="subq-list" id="variants-list-${id}">
+          ${alternatives.some(s=>s.cn) ? `<button type="button" class="translation-toggle translation-toggle-sub" aria-expanded="false" aria-controls="variants-list-${id}" onclick="toggleVariantChinese('${id}',this)">查看相似问法中文</button>` : ''}
+          <ol>${alternatives.map(s=>`<li><span class="subq-en">${esc(s.en)}</span>${s.cn?`<span class="subq-cn translation" hidden>${esc(s.cn)}</span>`:''}</li>`).join('')}</ol>
+        </div>
       </div>` : ''}
       ${hasSubs ? `
       <div class="subq" id="subq-${id}">
