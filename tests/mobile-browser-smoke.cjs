@@ -103,10 +103,19 @@ function chromeBinary(){
       const homePage=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
       try{
         await homePage.goto(new URL('/index.html',host).href,{waitUntil:'load'});
-        assert.equal(await homePage.locator('.elpa-capability').count(),3);
-        assert.equal(await homePage.locator('.elpa-next-primary').count(),1);
-        assert.equal(await homePage.locator('.elpa-start-actions').count(),0);
-        assert.match(await homePage.locator('.elpa-community').innerText(),/社区分享/);
+        assert.equal(await homePage.locator('.elpa-home-journey li').count(),4);
+        assert.equal(await homePage.locator('.elpa-home-feature').count(),4);
+        assert.equal(await homePage.locator('.elpa-home-demo').count(),4);
+        assert.equal(await homePage.locator('.elpa-home-more-card').count(),2);
+        assert.equal(await homePage.locator('.elpa-next-primary').count(),0);
+        assert.equal(await homePage.locator('.elpa-cta-primary').count(),1,'Only the original hero CTA remains');
+        assert.match(await homePage.locator('.elpa-home-more').innerText(),/社区分享/);
+        const featureLayout=await homePage.locator('.elpa-home-feature').first().evaluate(el=>{
+          const copy=el.querySelector('.elpa-home-feature-copy').getBoundingClientRect();
+          const demo=el.querySelector('.elpa-home-demo').getBoundingClientRect();
+          return {copy:{top:copy.top,bottom:copy.bottom},demo:{top:demo.top,bottom:demo.bottom}};
+        });
+        if(mobile)assert.ok(featureLayout.demo.top>=featureLayout.copy.bottom-3,'Feature explanation should precede the preview on mobile');
         const dimensions=await homePage.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
         assert.ok(dimensions.scroll<=dimensions.width+2,'Home horizontal overflow at '+width+': '+JSON.stringify(dimensions));
         await homePage.goto(new URL('/sources.html',host).href,{waitUntil:'load'});
