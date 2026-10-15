@@ -102,7 +102,7 @@ jobs:
           assert "dataset.filterMatch" in practice, "Search and random-drill coordination missing"
           assert practice.count('<section id="sec-bank')==2, "Expected two practice banks"
           assert 'faqList' not in practice and '<section id="sec-process">' not in practice, "Guide content leaked into practice"
-          assert 'id="quickDrawBtn"' in practice and 'id="mockExamBtn"' in practice, "Two practice actions missing"
+          assert 'id="practiceLauncher"' in practice and 'id="tabMock"' in practice and 'id="timerDrill"' in practice, "Unified practice launcher missing"
           assert 'function feedbackRanked(' in practice and 'function feedbackCount(' in practice, "Feedback sorting missing"
           assert 'id="recordsMenuBtn"' in practice and 'id="recordsBackupBtn"' in practice, "Compact records menu missing"
           assert 'id="matchingPanel"' in pages["submit.html"] and 'function renderSuggestions()' in pages["submit.html"], "Bilingual matching missing"
@@ -182,3 +182,12 @@ jobs:
               assert img.width>=450 and img.height>=240
               print(img.size)
           PY
+
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser driver (test only)
+        run: npm install --no-save --no-package-lock playwright
+      - name: Verify responsive layout and exercise interactions in headless Chrome
+        run: node tests/mobile-browser-smoke.cjs
