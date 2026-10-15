@@ -255,10 +255,10 @@ test('v2 advice accepts one original-language title and article',async()=>{
   assert.match(issue.body,/elpa-submission-v2:/);
   assert.ok(!issue.body.includes('mock-valid-token'));
 });
-test('v2 rejects incomplete bilingual text and noncanonical categories before siteverify',async()=>{
+test('v2 rejects missing English and noncanonical categories before siteverify',async()=>{
   const bads=[
-    {...v2Question,main:{...v2Question.main,cn:''}},
-    {...v2Question,subs:[{en:'Why?',cn:''}]},
+    {...v2Question,main:{...v2Question.main,en:''}},
+    {...v2Question,subs:[{en:'',cn:'为什么？'}]},
     {...v2Question,examStage:'unknown'},
     {...v2Question,campus:'untrusted-campus'},
     {...v2Question,track:'untrusted-track'},
