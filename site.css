@@ -34,22 +34,32 @@ body { margin:0; }
 .elpa-kicker {font-size:12px; color:#9b6a09; text-transform:uppercase; letter-spacing:.12em; font-weight:800;}
 .elpa-heading {margin:8px 0 6px; font-size:clamp(26px,3vw,36px); color:var(--site-navy); line-height:1.3;}
 .elpa-desc {color:var(--site-muted); max-width:770px; margin:0 0 27px; font-size:14px;}
-.elpa-quickstart {padding:28px 30px;border:1px solid var(--site-line);border-radius:20px;background:#fff;box-shadow:0 12px 35px rgba(17,59,97,.05);}
-.elpa-quickstart .elpa-heading {margin-bottom:22px;}
-.elpa-quickstart>.elpa-desc {margin-bottom:23px;}
-.elpa-capability-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:22px;}
-.elpa-capability {display:flex;gap:13px;padding:16px;border:1px solid var(--site-line);border-radius:14px;background:#f8fbfe;}
-.elpa-capability>span {flex:0 0 auto;color:#a06d0a;font-size:11px;font-weight:850;letter-spacing:.08em;padding-top:3px;}
-.elpa-capability h3 {margin:0 0 5px;color:var(--site-navy);font-size:16px;}
-.elpa-capability p {margin:0;color:var(--site-muted);font-size:12.5px;line-height:1.65;}
-.elpa-capability small {display:block;margin-top:7px;color:var(--site-blue);font-size:11.5px;font-weight:700;}
-.elpa-start-actions {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding-top:20px;border-top:1px solid var(--site-line);}
-.elpa-start-actions a {display:flex;min-width:0;min-height:72px;padding:13px 14px;border:1px solid var(--site-line);border-radius:12px;background:#fff;color:var(--site-navy);text-decoration:none;flex-direction:column;justify-content:center;transition:.18s;}
-.elpa-start-actions a:hover {border-color:#9cbfdd;background:#f5f9fd;transform:translateY(-1px);}
-.elpa-start-actions a.primary {border-color:#efc75f;background:#f7d574;}
-.elpa-start-actions a.primary:hover {background:#f3cc65;}
-.elpa-start-actions strong {font-size:13px;line-height:1.4;}
-.elpa-start-actions small {margin-top:4px;color:var(--site-muted);font-size:10.5px;line-height:1.45;}
+.elpa-quickstart{max-width:1060px;margin:0 auto;padding:0}
+.elpa-quickstart .elpa-heading{margin-bottom:10px}.elpa-quickstart>.elpa-desc{margin-bottom:25px}
+.elpa-capability-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.elpa-capability{display:flex;gap:13px;min-width:0;padding:21px 19px;border:1px solid var(--site-line);border-radius:15px;background:#fff}
+.elpa-capability>span{flex:0 0 auto;color:#a06d0a;font-size:11px;font-weight:850;letter-spacing:.08em;padding-top:3px}
+.elpa-capability h3{margin:0 0 6px;color:var(--site-navy);font-size:16px;line-height:1.45}
+.elpa-capability p{margin:0;color:var(--site-muted);font-size:13px;line-height:1.75}
+.elpa-community{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:27px 29px;border:1px solid #d9e4ef;border-radius:17px;background:linear-gradient(130deg,#f7fafd,#fff)}
+.elpa-community-copy{min-width:0}.elpa-community-label{display:block;color:#406a91;font-size:11px;font-weight:800;letter-spacing:.08em}
+.elpa-community h3{margin:7px 0;color:var(--site-navy);font-size:clamp(17px,2.5vw,21px);line-height:1.45}
+.elpa-community p{margin:0;color:#576a7d;font-size:13.5px;line-height:1.7}
+.elpa-community small{display:block;margin-top:10px;color:#6f8190;font-size:11.5px}
+.elpa-community-link{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-height:42px;padding:9px 17px;border:1px solid #afc9df;border-radius:9px;background:#fff;color:var(--site-navy)!important;text-decoration:none;font-size:13px;font-weight:750;white-space:nowrap}
+.elpa-community-link:hover{background:#edf5fc}
+.elpa-home-next{margin-top:27px;padding-top:26px;border-top:1px solid var(--site-line)}
+.elpa-next-primary{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:86px;padding:19px 23px;border:1px solid #efc75f;border-radius:14px;background:#f7d574;text-decoration:none;color:#16385b!important;transition:background .16s ease,transform .16s ease}
+.elpa-next-primary:hover{background:#f4ce68;transform:translateY(-1px)}
+.elpa-next-primary span:first-child{display:flex;flex-direction:column;gap:5px}
+.elpa-next-primary strong{font-size:17px;line-height:1.3}.elpa-next-primary small{color:#566270;font-size:12px}
+.elpa-next-arrow{font-size:25px;font-weight:500;line-height:1}
+.elpa-next-links{display:flex;justify-content:center;gap:28px;margin-top:19px}
+.elpa-next-links a{font-size:13px;font-weight:700;text-decoration:none;color:var(--site-navy);text-underline-offset:5px}
+.elpa-next-links a:hover{text-decoration:underline}.elpa-next-links span{margin-left:5px}
+@media(max-width:780px){.elpa-capability-grid{grid-template-columns:1fr;gap:10px}.elpa-capability{padding:16px 17px}.elpa-community{align-items:flex-start;flex-direction:column;gap:16px;padding:22px 19px}.elpa-community-link{width:100%}}
+@media(max-width:380px){.elpa-next-links{gap:16px}.elpa-next-links a{font-size:12px}.elpa-next-primary{padding:17px}}
+@media(prefers-reduced-motion:reduce){.elpa-next-primary{transition:none;transform:none!important}}
 .elpa-subhero {background:linear-gradient(100deg,#062a50,#07538c); color:#fff; padding:54px 24px 48px; border-bottom:0;}
 .elpa-subhero-inner {max-width:1180px; margin:0 auto;}
 .elpa-subhero h1 {font-size:clamp(28px,4vw,43px); margin:13px 0 8px;}
@@ -69,7 +79,7 @@ body { margin:0; }
 .elpa-resource p {font-size:13px; color:var(--site-muted);}
 .elpa-resource a {font-size:13px; font-weight:700; text-decoration:none;}
 .elpa-cta::after,
-.elpa-start-actions strong::after,
+
 .elpa-guide-practice::after,
 .elpa-resource a::after,
 .elpa-footer-action::after,
@@ -81,7 +91,7 @@ body { margin:0; }
   transform:rotate(45deg);transition:transform .16s ease;
 }
 .elpa-cta:hover::after,
-.elpa-start-actions a:hover strong::after,
+
 .elpa-guide-practice:hover::after,
 .elpa-resource a:hover::after,
 .elpa-footer-action:hover::after,
@@ -141,11 +151,7 @@ body { margin:0; }
  .elpa-hero-inner {padding:58px 0 60px;}
  .elpa-main {padding:34px 16px 58px;}
  .elpa-resource-grid {grid-template-columns:1fr;}
- .elpa-quickstart {padding:22px 19px;}
- .elpa-capability-grid {grid-template-columns:1fr;gap:10px;}
- .elpa-capability {padding:14px;}
- .elpa-start-actions {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
- .elpa-start-actions a {min-height:68px;padding:11px 12px;}
+ .elpa-quickstart{padding:0;}
  .elpa-subhero {min-height:224px;padding:40px 17px 35px;}
  .page-practice .campus-hero {min-height:220px;padding:27px 15px 30px;}
  .page-practice .campus-hero h1 {font-size:28px;}
@@ -276,7 +282,7 @@ body { margin:0; }
 @media(prefers-reduced-motion:reduce){
   ::view-transition-old(root),::view-transition-new(root){animation:none;}
   .elpa-cta{transition:none;transform:none!important;}
-  .elpa-cta::after,.elpa-start-actions strong::after,.elpa-guide-practice::after,
+  .elpa-cta::after,.elpa-guide-practice::after,
   .elpa-resource a::after,.elpa-footer-action::after,.elpa-advice-section .elpa-desc a::after,
   .contrib-actions a::after,.question-feedback a::after{transition:none;}
 }
