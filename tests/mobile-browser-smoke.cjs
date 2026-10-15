@@ -106,6 +106,13 @@ function chromeBinary(){
         assert.equal(await homePage.locator('.elpa-home-journey li').count(),4);
         assert.equal(await homePage.locator('.elpa-home-feature').count(),4);
         assert.equal(await homePage.locator('.elpa-home-demo').count(),4);
+        assert.equal(await homePage.locator('.elpa-home-instructions').count(),2);
+        assert.equal(await homePage.locator('.elpa-home-instructions li').count(),6);
+        assert.equal(await homePage.locator('.elpa-home-backup-guide').count(),1);
+        assert.match(await homePage.locator('#home-practice-title').innerText(),/网站负责抽题和计时/);
+        assert.match(await homePage.locator('.elpa-home-backup-guide').innerText(),/备份[\\s\\S]*恢复/);
+        const plainHome=await homePage.locator('main').innerText();
+        assert.doesNotMatch(plainHome,/模拟口语|JSON|Markdown/,'Instructions must stay jargon-free');
         assert.equal(await homePage.locator('.elpa-home-more-card').count(),2);
         assert.equal(await homePage.locator('.elpa-next-primary').count(),0);
         assert.equal(await homePage.locator('.elpa-cta-primary').count(),1,'Only the original hero CTA remains');
