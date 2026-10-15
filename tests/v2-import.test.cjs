@@ -75,9 +75,20 @@ test('advice is single language and classified by exact tag codes',()=>{
   const a=advice();const r=f.run(a,105);
   assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/status: added/);
   assert.match(f.read('advice.js'),/ADV-105/);
+  assert.match(f.read('advice.js'),/"track": "regular"/);
   assert.match(f.read('advice.js'),/speaking-strategy/);
   assert.match(f.read('community-advice.md'),/考前素材准备/);
   assert.equal(f.read('questions.js'),fs.readFileSync(bank,'utf8'));
+ }finally{f.close();}
+});
+test('Fast Track advice imports with its track and never changes question IDs',()=>{
+ const f=fixture();try{
+  const original=f.read('questions.js');
+  const r=f.run({...advice(),track:'fast-track'},205);
+  assert.equal(r.status,0,r.stderr);
+  assert.match(f.read('advice.js'),/"track": "fast-track"/);
+  assert.match(f.read('community-advice.md'),/考试方式：fast-track/);
+  assert.equal(f.read('questions.js'),original);
  }finally{f.close();}
 });
 test('missing English and unknown taxonomy codes are rejected',()=>{
@@ -88,6 +99,7 @@ test('missing English and unknown taxonomy codes are rejected',()=>{
   {...question(),campus:'unknown-campus'},
   {...question(),track:'unknown-assessment'},
   {...advice(),tags:['free-form-label']},
+  {...advice(),track:'unknown-assessment'},
   {...advice(),body:'太短'}
  ];
  const f=fixture();try{
@@ -95,7 +107,7 @@ test('missing English and unknown taxonomy codes are rejected',()=>{
    const r=f.run(data,110+i);
    assert.notEqual(r.status,0,JSON.stringify({i,stdout:r.stdout}));
   }
-  assert.equal(f.read('appearances.js').trim(),'/* Reviewed appearances of a canonical question across semesters. */\nconst ELPA_APPEARANCES = {};'.trim());
+  assert.equal(f.read('appearances.js'),fs.readFileSync(path.resolve(__dirname,'../question-bank/appearances.js'),'utf8'));
  }finally{f.close();}
 });
 test('untrusted quote/JS delimiters remain data without injection',()=>{
@@ -239,8 +251,7 @@ test('tampered linked ID cannot credit a different question',()=>{
   const failure=f.run(wrong,803);
   assert.notEqual(failure.status,0);
   assert.match(failure.stderr,/Linked question ID does not match/);
-  assert.equal(f.read('appearances.js').trim(),
-    '/* Reviewed appearances of a canonical question across semesters. */\nconst ELPA_APPEARANCES = {};');
+  assert.equal(f.read('appearances.js'),fs.readFileSync(path.resolve(__dirname,'../question-bank/appearances.js'),'utf8'));
   const notLinked={...wrong,intent:'supplement',linkedQuestionId:undefined};
   const failed=f.run(notLinked,804);
   assert.notEqual(failed.status,0);

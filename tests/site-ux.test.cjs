@@ -47,7 +47,7 @@ test('feedback count includes reviewed submissions and ties retain original orde
 });
 test('practice cards expose reviewed encounter action and uniform alignment',()=>{
  assert.match(practice,/考过 \$\{feedback\} 次/);
- assert.match(practice,/我也考过 ↗/);
+ assert.match(practice,/我也考过<\/a>/);
  assert.match(practice,/submit\.html\?question=\$\{encodeURIComponent\(id\)\}/);
  assert.match(practice,/margin:0!important/);
  assert.match(submit,/id="contributionIntent"/);
@@ -184,10 +184,11 @@ test('footer is compact and consistent on five pages',()=>{
    assert.ok(footer,p+' missing footer');
    assert.equal((html.match(/<footer class="elpa-footer"/g)||[]).length,1);
    for(const text of ['Built with Passion. Shared with Everyone.','为爱发电 · 开源共建 · 互帮互助',
-     '分享考题与经验，一起让这份资料更好。','Built with GitHub · Vercel · Cloudflare','2026 Fall MPhil']){
+     'Built with GitHub · Vercel · Cloudflare','2026 Fall MPhil']){
      assert.ok(footer[0].includes(text),p+' missing '+text);
    }
    assert.doesNotMatch(footer[0],/Found it useful\?|Contribute on GitHub|class="elpa-footer-project"/);
+   assert.doesNotMatch(footer[0],/分享考题与经验，一起让这份资料更好。/);
    assert.match(footer[0],/href="\.\/submit\.html">分享考题<\/a>/);
    assert.match(footer[0],/aria-label="通过 GitHub Pull Request 参与项目共建">提交 PR<\/a>/);
    assert.match(footer[0],/Not affiliated with or endorsed by HKUST/);
@@ -214,20 +215,23 @@ test('guide separates the official Regular and Fast Track paths with one obvious
  assert.match(guide,/Automatic Exemption/);
  assert.match(guide,/track=regular#sec-bankD/);
  assert.match(guide,/track=fast-track#sec-bankD/);
- assert.doesNotMatch(guide,/报名截止日期|2026 Fall 场次反馈|advicePhaseFilter|adviceTagFilter/);
+ assert.doesNotMatch(guide,/报名截止日期|2026 Fall 场次反馈|你可能想知道|elpa-guide-faq/);
+ assert.match(guide,/id="advicePhaseFilter"/);
+ assert.match(guide,/id="adviceTagFilter"/);
  assert.equal((guide.match(/class="elpa-guide-switch"/g)||[]).length,1);
 });
 test('guide switch preserves accessible state and works without a second page',()=>{
  const html=fs.readFileSync(path.join(__dirname,'../guide.html'),'utf8');
  const code=section(html,'/* Single choice; no extra filters, accounts or persistent state. */',
-   '/* Display approved community tips only when any exist; never show empty filters. */');
+   '/* Show only filters that have reviewed entries for the selected assessment. */');
  const events=new Map();
  const btn=id=>({id,attributes:{},classList:{toggle(name,val){this[name]=val;}},setAttribute(k,v){this.attributes[k]=v;},
    addEventListener(name,cb){events.set(id+':'+name,cb);}});
  const regular=btn('regular'),fast=btn('fast'),one={hidden:false},two={hidden:true};
  const elements={regularGuide:one,fastGuide:two,guideRegularTab:regular,guideFastTab:fast};
- const fn=new Function('document','window',code+';return selectGuideTrack;');
- const select=fn({getElementById:id=>elements[id]},{location:{search:'',hash:''}});
+ const shown=[];
+ const fn=new Function('document','window','selectAdviceTrack',code+';return selectGuideTrack;');
+ const select=fn({getElementById:id=>elements[id]},{location:{search:'',hash:''}},track=>shown.push(track));
  assert.equal(one.hidden,false);assert.equal(two.hidden,true);
  events.get('fast:click')();
  assert.equal(one.hidden,true);assert.equal(two.hidden,false);
@@ -235,7 +239,8 @@ test('guide switch preserves accessible state and works without a second page',(
  events.get('regular:click')();
  assert.equal(one.hidden,false);assert.equal(two.hidden,true);
  assert.equal(regular.attributes['aria-pressed'],'true');
+ assert.deepEqual(shown,['fast-track','regular']);
  const selected=fn({getElementById:id=>elements[id]},
-   {location:{search:'?track=fast-track',hash:''}});
- assert.equal(two.hidden,false);
+   {location:{search:'?track=fast-track',hash:''}},()=>{});
+ selected('fast-track');assert.equal(two.hidden,false);
 });

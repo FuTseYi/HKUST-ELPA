@@ -84,7 +84,8 @@ function validV2(body) {
       (body.intent===undefined||body.linkedQuestionId!==undefined) &&
       (body.intent!=='supplement'||body.subs.length>0);
   if(body.kind==='advice')
-    return ADVICE_PHASES.has(body.phase) &&
+    return (body.track===undefined||ELPA_TRACKS.has(body.track)) &&
+      ADVICE_PHASES.has(body.phase) &&
       Array.isArray(body.tags) && body.tags.length>=1 && body.tags.length<=4 &&
       new Set(body.tags).size===body.tags.length && body.tags.every(tag=>ADVICE_TAGS.has(tag)) &&
       validText(body.title,4,120) && validText(body.body,20,6000);
@@ -99,7 +100,7 @@ function cleanV2(body){
     ...(body.linkedQuestionId?{linkedQuestionId:body.linkedQuestionId,
       intent:body.intent}:{} )
   };
-  return {version:2,kind:'advice',phase:body.phase,tags:[...body.tags],
+  return {version:2,kind:'advice',track:body.track||'regular',phase:body.phase,tags:[...body.tags],
     title:body.title.trim(),body:body.body.trim()};
 }
 const mdQuote=t=>String(t).split('\n').map(s=>'> '+s.replace(/</g,'&lt;')).join('\n');
@@ -109,7 +110,8 @@ function formatV2(record){
       title:'[ELPA 投稿] [备考经验] '+record.title.replace(/\s+/g,' ').slice(0,65),
       body:['## ELPA 备考经验投稿（待审核）','',
         '> 公开匿名投稿；内容为个人经验，尚未经核实。',
-        '', '**阶段：** '+record.phase,
+        '', '**考试方式：** '+(record.track==='fast-track'?'ELPA Fast Track':'常规 ELPA'),
+        '**阶段：** '+record.phase,
         '**主题标签：** '+record.tags.join(', '),
         '', '### 标题',mdQuote(record.title),'',
         '### 正文',mdQuote(record.body),'',

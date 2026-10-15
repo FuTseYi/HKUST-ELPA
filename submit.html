@@ -180,6 +180,7 @@
 </div>
 <div id="adviceFields" class="contrib-section" hidden>
   <h2>01 · 备考阶段 <span lang="en">Preparation Stage</span></h2>
+  <input id="adviceTrack" type="hidden" value="regular">
   <div class="contrib-field"><label for="advicePhase">经验阶段 *</label>
     <select id="advicePhase" required>
       <option value="before">考前准备 · Before the Exam</option>
@@ -216,11 +217,10 @@
 <div class="elpa-footer-intro">
 <p class="elpa-footer-slogan">Built with Passion. Shared with Everyone.</p>
 <p class="elpa-footer-motto">为爱发电 · 开源共建 · 互帮互助</p>
-<p class="elpa-footer-help">分享考题与经验，一起让这份资料更好。</p>
 </div>
 <div class="elpa-footer-actions">
-<a class="elpa-footer-action" href="./submit.html">分享考题</a>
-<a class="elpa-footer-action" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">提交 PR</a>
+<a class="elpa-footer-action elpa-footer-action-primary" href="./submit.html">分享考题</a>
+<a class="elpa-footer-action elpa-footer-action-secondary" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">提交 PR</a>
 </div>
 <div class="elpa-footer-divider" aria-hidden="true"></div>
 <p class="elpa-footer-tech">Built with GitHub · Vercel · Cloudflare</p>
@@ -411,6 +411,7 @@ for(const id of ['submissionCampus','submissionTrack'])get(id).addEventListener(
 function loadQuestionLink(){
   const params=new URLSearchParams(location.search);
   const campus=params.get('campus'),track=params.get('track'),id=params.get('question');
+  if(['regular','fast-track'].includes(track))get('adviceTrack').value=track;
   if(['nansha','clear-water-bay'].includes(campus))get('submissionCampus').value=campus;
   if(['regular','fast-track'].includes(track))get('submissionTrack').value=track;
   const q=id&&findQuestion(id);
@@ -426,7 +427,7 @@ function buildData(){
   if(kind==='advice'){
     const tags=[...list.querySelectorAll('input:checked')].map(x=>x.value);
     if(tags.length<1||tags.length>4)throw new Error('请选择 1–4 个主题标签。');
-    return {version:2,kind:'advice',phase:trimmed('advicePhase'),tags,
+    return {version:2,kind:'advice',track:trimmed('adviceTrack'),phase:trimmed('advicePhase'),tags,
       title:trimmed('adviceTitle'),body:trimmed('adviceBody')};
   }
   const slot=trimmed('submissionSlot');
@@ -474,7 +475,7 @@ function showPreview(){
       addText(preview,'p',s.cn);
     }
   }else{
-    addText(preview,'small',taxonomy.advicePhases[data.phase].zh+' · '+
+    addText(preview,'small',(data.track==='fast-track'?'ELPA Fast Track':'常规 ELPA')+' · '+taxonomy.advicePhases[data.phase].zh+' · '+
       data.tags.map(x=>taxonomy.adviceTags[x].zh).join('、'));
     addText(preview,'strong',data.title);
     addText(preview,'p',data.body);
@@ -529,7 +530,7 @@ form.addEventListener('submit',async event=>{
     say('提交成功！已经收到你的分享，审核通过后会收录到题库。','success');
     if(/^https:\/\/github\.com\/FuTseYi\/HKUST-ELPA\/issues\/\d+$/.test(result.issueUrl||'')){
       const a=document.createElement('a');a.href=result.issueUrl;a.target='_blank';
-      a.rel='noopener noreferrer';a.textContent='查看投稿记录 ↗';message.append(' ',a);
+      a.rel='noopener noreferrer';a.textContent='查看投稿记录';message.append(' ',a);
     }
   }catch(e){say(e.message||'网络异常，请稍后重试。','error');}
   finally{
@@ -537,7 +538,7 @@ form.addEventListener('submit',async event=>{
     if(widgetId!==null&&window.turnstile)window.turnstile.reset(widgetId);
   }
 });
-setKind('question');
+setKind(new URLSearchParams(location.search).get('kind')==='advice'?'advice':'question');
 })();
 </script>
 </body>

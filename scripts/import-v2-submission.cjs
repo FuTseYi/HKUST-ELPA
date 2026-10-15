@@ -37,7 +37,8 @@ function validate(data){
      (data.intent===undefined||data.linkedQuestionId!==undefined) &&
      (data.intent!=='supplement'||data.subs.length>0);
  if(data.kind==='advice')
-   return ['before','during','after'].includes(data.phase) &&
+   return (data.track===undefined||['regular','fast-track'].includes(data.track)) &&
+     ['before','during','after'].includes(data.phase) &&
      Array.isArray(data.tags) && data.tags.length>=1 && data.tags.length<=4 &&
      new Set(data.tags).size===data.tags.length && data.tags.every(t=>tags.includes(t)) &&
      valid(data.title,4,120) && valid(data.body,20,6000);
@@ -66,11 +67,11 @@ module.exports=function importV2(event){
    if(!Array.isArray(existing))throw Error('Advice database invalid');
    const id='ADV-'+number;
    if(existing.some(x=>x.id===id)){output('duplicate');return;}
-   existing.push({id,issueNumber:number,phase:data.phase,tags:data.tags,
+   existing.push({id,issueNumber:number,track:data.track||'regular',phase:data.phase,tags:data.tags,
      title:text(data.title),body:text(data.body)});
    saveJS(adviceFile,'ELPA_ADVICE',existing);
    appendDoc(adviceDoc,'# 社区备考经验 · Reviewed Preparation Advice\n\n> 考生分享，不代表学校官方建议。\n',
-     '\n## '+id+' · '+quote(text(data.title))+'\n\n阶段：'+data.phase+
+     '\n## '+id+' · '+quote(text(data.title))+'\n\n考试方式：'+(data.track||'regular')+' ｜ 阶段：'+data.phase+
      ' ｜ 标签：'+data.tags.join(', ')+' ｜ [原始投稿](https://github.com/FuTseYi/HKUST-ELPA/issues/'+number+')'+
      '\n\n'+quote(text(data.body))+'\n');
    output('added');return;

@@ -255,6 +255,26 @@ test('v2 advice accepts one original-language title and article',async()=>{
   assert.match(issue.body,/elpa-submission-v2:/);
   assert.ok(!issue.body.includes('mock-valid-token'));
 });
+test('Fast Track advice keeps its track through the review Issue',async()=>{
+  const x=makeWorker();
+  const response=await x.handler.fetch(x.request({...v2Advice,track:'fast-track'}),x.env);
+  assert.equal(response.status,201,await response.text());
+  const issue=JSON.parse(x.calls[1].init.body);
+  assert.match(issue.body,/ELPA Fast Track/);
+  const marker=issue.body.match(/elpa-submission-v2:([A-Za-z0-9_-]+)/);
+  const embedded=JSON.parse(Buffer.from(marker[1],'base64url').toString('utf8'));
+  assert.equal(embedded.track,'fast-track');
+  assert.equal(Object.hasOwn(embedded,'turnstileToken'),false);
+});
+test('older advice submissions default to Regular',async()=>{
+  const x=makeWorker();
+  const response=await x.handler.fetch(x.request(v2Advice),x.env);
+  assert.equal(response.status,201,await response.text());
+  const issue=JSON.parse(x.calls[1].init.body);
+  const marker=issue.body.match(/elpa-submission-v2:([A-Za-z0-9_-]+)/);
+  const embedded=JSON.parse(Buffer.from(marker[1],'base64url').toString('utf8'));
+  assert.equal(embedded.track,'regular');
+});
 test('v2 rejects missing English and noncanonical categories before siteverify',async()=>{
   const bads=[
     {...v2Question,main:{...v2Question.main,en:''}},
@@ -264,6 +284,7 @@ test('v2 rejects missing English and noncanonical categories before siteverify',
     {...v2Question,track:'untrusted-track'},
     {...v2Question,subs:Array.from({length:21},()=>({en:'Why?',cn:'为什么？'}))},
     {...v2Advice,tags:['arbitrary-tag']},
+    {...v2Advice,track:'untrusted-track'},
     {...v2Advice,tags:['speaking-strategy','speaking-strategy']},
     {...v2Advice,body:'too short'}
   ];
