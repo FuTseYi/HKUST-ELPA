@@ -40,8 +40,9 @@ function chromeBinary(){
         const card=document.querySelector('#bankD .qcard');
         const buttons=[...card.querySelectorAll('.q-actions button')];
         const rects=buttons.map(button=>{
-          const r=button.getBoundingClientRect();
-          return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right};
+          const r=button.getBoundingClientRect(),style=getComputedStyle(button);
+          return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,
+            marginTop:style.marginTop,marginBottom:style.marginBottom};
         });
         const launcher=document.getElementById('practiceLauncher').getBoundingClientRect();
         return {full,view,rects,launcher:{left:launcher.left,right:launcher.right,bottom:launcher.bottom},
@@ -57,11 +58,31 @@ function chromeBinary(){
         'Question controls must share one tidy row at '+width+': '+JSON.stringify(layout.rects));
       assert.ok(layout.rects.every((r,i)=>i===0||r.x>=layout.rects[i-1].right-2),
         'Question controls overlap at '+width+': '+JSON.stringify(layout.rects));
+      assert.ok(layout.rects.every(r=>r.marginTop==='0px'&&r.marginBottom==='0px'&&r.height===40),
+        'All card buttons must have identical zero margins and 40px height at '+width+': '+JSON.stringify(layout.rects));
       assert.equal(layout.noteEdit,'none','Note editing controls should be collapsed');
       assert.ok(layout.launcher.left>=0&&layout.launcher.right<=width+1,
         'Launcher escapes the mobile viewport at '+width+': '+JSON.stringify(layout.launcher));
 
       if(width===390){
+        const feedback=page.locator('#bankD .qcard .question-feedback').first();
+        assert.match(await feedback.innerText(),/考过 \d+ 次/);
+        const link=feedback.locator('a');
+        assert.match(await link.innerText(),/我也考过/);
+        const contributionHref=await link.getAttribute('href');
+        const contrib=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+        try{
+          await contrib.goto(new URL(contributionHref,host).href,{waitUntil:'load'});
+          assert.equal(await contrib.locator('#linkedQuestion').isVisible(),true);
+          assert.equal(await contrib.locator('input[value="encounter"][name="contributionIntent"]').isChecked(),true);
+          assert.equal(await contrib.locator('#mainEnField').isVisible(),false);
+          assert.equal(await contrib.locator('#mainCnField').isVisible(),false);
+          await contrib.locator('input[value="supplement"][name="contributionIntent"]').check();
+          assert.equal(await contrib.locator('input[value="supplement"][name="contributionIntent"]').isChecked(),true);
+          await contrib.locator('#unlinkQuestion').click();
+          assert.equal(await contrib.locator('#mainEnField').isVisible(),true);
+          assert.equal(await contrib.locator('#mainCn').getAttribute('required'),null);
+        }finally{await contrib.close();}
         await page.click('#practiceLauncher');
         assert.equal(await page.locator('#timerPanel').isVisible(),true);
         assert.equal(await page.locator('#timerDisplay').innerText(),'01:00');

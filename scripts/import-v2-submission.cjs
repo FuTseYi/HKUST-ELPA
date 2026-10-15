@@ -27,10 +27,15 @@ function validate(data){
      (data.campus===undefined||['nansha','clear-water-bay'].includes(data.campus)) &&
      (data.track===undefined||['regular','fast-track'].includes(data.track)) &&
      ['start','mid','end'].includes(data.examStage) &&
-     data.main && valid(data.main.en,8,1000) && valid(data.main.cn,4,1000) &&
+     data.main && valid(data.main.en,8,1000) && valid(data.main.cn,0,1000) &&
      Array.isArray(data.subs) && data.subs.length<=20 &&
-     data.subs.every(s=>s && valid(s.en,1,400)&&valid(s.cn,1,400)) &&
-     ['firsthand','secondhand'].includes(data.source);
+     data.subs.every(s=>s && valid(s.en,1,400)&&valid(s.cn,0,400)) &&
+     ['firsthand','secondhand'].includes(data.source) &&
+     (data.linkedQuestionId===undefined||
+       (/^[A-DFHT]-[0-9]+$/.test(data.linkedQuestionId)&&
+        ['encounter','supplement'].includes(data.intent))) &&
+     (data.intent===undefined||data.linkedQuestionId!==undefined) &&
+     (data.intent!=='supplement'||data.subs.length>0);
  if(data.kind==='advice')
    return ['before','during','after'].includes(data.phase) &&
      Array.isArray(data.tags) && data.tags.length>=1 && data.tags.length<=4 &&
@@ -87,14 +92,24 @@ module.exports=function importV2(event){
    for(const it of banks[bank].items||[])
      if(normalized(it.en)===normalized(data.main.en))exact.push({id:bank+'-'+it.num,item:it});
  exact.sort((a,b)=>Number(known.has(b.id))-Number(known.has(a.id)));
- const matched=exact[0]||null;
+ // Explicit linked ID is accepted only for a real canonical question whose
+ // campus/track and exact original English text both match the current bank.
+ // Old v2 reports without IDs keep their legacy exact-English deduplication.
+ let matched=exact[0]||null;
+ if(data.linkedQuestionId){
+   const linked=exact.find(x=>x.id===data.linkedQuestionId);
+   if(!linked)throw Error('Linked question ID does not match the selected assessment and canonical wording');
+   matched=linked;
+ }
+ if(data.intent==='supplement'&&!matched)throw Error('Content supplements require an existing question');
  const id=matched?matched.id:bankKey+'-'+(1000000+number);
  const app=readJS(appFile,'ELPA_APPEARANCES',{});
  if(!app||typeof app!=='object'||Array.isArray(app))throw Error('Appearance database invalid');
  const appearances=Array.isArray(app[id])?app[id]:[];
  if(appearances.some(x=>x.issueNumber===number)){output('duplicate');return;}
  const occurrence={issueNumber:number,term:data.term,examStage:data.examStage,
-   source:data.source,campus,track};
+   source:data.source,campus,track,intent:data.intent||'encounter',
+   ...(data.subs.length?{subs:data.subs.map(x=>({en:text(x.en),cn:text(x.cn)}))}:{} )};
  app[id]=[...appearances,occurrence];
  if(!matched){
    const num=1000000+number;
@@ -131,6 +146,7 @@ module.exports=function importV2(event){
    '\n## '+data.term+' · '+campusLabel+' · '+trackLabel+' · Issue #'+number+
    '\n\n考试阶段：'+data.examStage+
    ' ｜ 来源：'+(data.source==='firsthand'?'本人亲历':'同学转述')+
+   ' ｜ 类型：'+(data.intent==='supplement'?'仅补充小问':'新增考试经历')+
    ' ｜ 关联题目：'+id+
    ' ｜ [投稿记录](https://github.com/FuTseYi/HKUST-ELPA/issues/'+number+')'+
    '\n\n**English**\n\n'+quote(text(data.main.en))+

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#003e74">
-<meta name="description" content="向 HKUST-ELPA 非官方备考社区贡献双语考题或分享备考经验，由维护者审核后收录。">
+<meta name="description" content="匿名分享 ELPA 考题或备考经验，关联已有题目更省事，审核后收录。">
 <title>社区贡献｜HKUST-ELPA</title>
 <link rel="prefetch" href="./sources.html"><link rel="stylesheet" href="./site.css"><link rel="icon" type="image/svg+xml" href="./assets/elpa-mark.svg">
 <style>
@@ -73,6 +73,18 @@
 #linkedQuestion{background:white;border-radius:8px;padding:10px;font-size:12px;color:#245a77}
 #linkedQuestion button{margin-left:8px;border:0;background:none;color:#16619b;text-decoration:underline;cursor:pointer}
 
+
+/* Existing question feedback is a short path, not another long form. */
+.contrib-field.linked-hidden{display:none!important}
+.contrib-linked-line{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.contrib-linked-line span{overflow-wrap:anywhere;font-size:13px;font-weight:650;line-height:1.6}
+.contrib-linked-line button{flex:0 0 auto;min-height:32px}
+.contrib-intent{margin-top:12px;gap:7px}
+.contrib-intent legend{font-weight:700;font-size:13px;color:#244861;margin-bottom:7px}
+.contrib-intent label{display:flex;align-items:center;gap:8px;min-height:36px;font-size:13px;cursor:pointer}
+.contrib-intent input{accent-color:#003e74}
+.contrib-intent small{color:#64748b;font-size:12px;line-height:1.5}
+
 </style>
 </head>
 <body class="elpa-body">
@@ -91,11 +103,11 @@
 <main class="contrib-main">
 <header class="contrib-intro">
 <h1>社区贡献 <span lang="en">Contribute</span></h1>
-<p>分享 ELPA 考题或备考经验，帮助后来者更好地准备考试。</p>
+<p>记得多少就分享多少，不需要专门整理成文档；审核后收录，帮助后来者备考。</p>
 </header>
 <section class="contrib-panel" aria-label="社区贡献表单">
 <form id="submissionForm" class="contrib-form">
-<p class="contrib-notice">无需账号。投稿内容会公开显示在 GitHub Issues，审核后才可能收录。请勿填写姓名、学号、联系方式或其他个人信息。</p>
+<p class="contrib-notice">无需注册账号，提交后进入公开审核队列，审核通过后收录。请勿填写姓名、学号或联系方式。</p>
 <div class="contrib-tabs" role="group" aria-label="投稿类别">
 <button id="tabQuestion" class="contrib-tab" type="button" aria-pressed="true">贡献考题 · Question</button>
 <button id="tabAdvice" class="contrib-tab" type="button" aria-pressed="false">分享经验 · Advice</button>
@@ -133,26 +145,34 @@
   </div>
   <hr class="contrib-line">
   <h2>03 · 主问题 <span lang="en">Main Question</span></h2>
-  <div class="contrib-field"><label for="mainEn">English *</label>
+  <div class="contrib-field" id="mainEnField"><label for="mainEn">英文题目 *</label>
     <textarea id="mainEn" rows="3" maxlength="1000" minlength="8" required></textarea>
   </div>
-  <div class="contrib-field"><label for="mainCn">中文 *</label>
-    <textarea id="mainCn" rows="3" maxlength="1000" minlength="4" required></textarea>
+  <div class="contrib-field" id="mainCnField"><label for="mainCn">中文理解（选填）</label>
+    <textarea id="mainCn" rows="3" maxlength="1000"></textarea>
   </div>
   <div id="matchingPanel" class="contrib-matches" hidden>
     <strong>题库中可能已有类似题目</strong>
-    <p>选择原题可快速补充考试场次和小问；也可以继续提交自己的题目。</p>
+    <p>选中原题后无需重复输入题干，直接报告自己也考过或补充小问。</p>
     <div id="matchingResults"></div>
-    <div id="linkedQuestion" hidden><span id="linkedQuestionTitle"></span> <button type="button" id="unlinkQuestion">取消关联</button></div>
+    <div id="linkedQuestion" hidden>
+      <div class="contrib-linked-line"><span id="linkedQuestionTitle"></span><button type="button" id="unlinkQuestion">更换题目</button></div>
+      <fieldset class="contrib-fieldset contrib-intent" id="contributionIntent" aria-label="反馈类型">
+        <legend>这次想分享什么？</legend>
+        <label><input type="radio" name="contributionIntent" value="encounter" checked> 我也考过这道题</label>
+        <label><input type="radio" name="contributionIntent" value="supplement"> 仅补充题目或提示小问</label>
+        <small>同一次考试经历如果已有同学提交过，请选「仅补充」，不会重复增加考过次数。</small>
+      </fieldset>
+    </div>
   </div>
   <hr class="contrib-line">
   <h2>04 · 提示小问 <span lang="en">Follow-ups</span></h2>
-  <p>没有提示小问可留空；添加后需同时填写中英文。</p>
+  <p>记得的小问才填写，可只提供英文；中文翻译不强制。</p>
   <div id="followupList" class="contrib-section" aria-live="polite"></div>
   <div class="contrib-actions"><button id="addFollowup" class="contrib-button" type="button">＋ 添加提示小问</button>
     <span id="followupCount" class="contrib-caption">0 / 20</span></div>
   <hr class="contrib-line">
-  <h2>05 · 投稿来源 <span lang="en">Source</span></h2>
+  <h2>05 · 反馈来源 <span lang="en">Source</span></h2>
   <div class="contrib-field"><label for="submissionSource">来源类型 *</label>
     <select id="submissionSource" required><option value="firsthand">本人亲历 · Firsthand</option>
     <option value="secondhand">同学转述 · Secondhand</option></select>
@@ -278,12 +298,12 @@ function addFollowup(en='',cn=''){
   }
   header.append(actions);wrapper.append(header);
   for(const [role,labelText,placeholder,val] of [
-    ['en','English *',ph.subEn,en],['cn','中文 *',ph.subCn,cn]]){
+    ['en','英文小问 *',ph.subEn,en],['cn','中文补充（选填）',ph.subCn,cn]]){
     const field=document.createElement('div');field.className='contrib-field';
     const id='follow-'+String(Date.now())+'-'+Math.random().toString(36).slice(2)+'-'+role;
     const label=document.createElement('label');label.textContent=labelText;label.htmlFor=id;
     const ta=document.createElement('textarea');ta.id=id;ta.dataset.lang=role;
-    ta.rows=2;ta.required=true;ta.maxLength=400;ta.minLength=1;ta.placeholder=placeholder||'';
+    ta.rows=2;ta.required=role==='en';ta.maxLength=400;ta.minLength=role==='en'?1:0;ta.placeholder=placeholder||'';
     ta.value=val;field.append(label,ta);wrapper.append(field);
   }
   followups.append(wrapper);refreshFollowups();
@@ -323,7 +343,10 @@ function findQuestion(id){return availableQuestions().find(x=>x.id===id);}
 function clearLink(){
   linkedId=null;
   get('mainEn').readOnly=false;get('mainCn').readOnly=false;
+  get('mainEnField').classList.remove('linked-hidden');
+  get('mainCnField').classList.remove('linked-hidden');
   get('linkedQuestion').hidden=true;
+  get('mainEn').value='';get('mainCn').value='';
   renderSuggestions();
 }
 function linkQuestion(entry){
@@ -331,11 +354,15 @@ function linkQuestion(entry){
   get('mainEn').value=entry.en;
   get('mainCn').value=entry.cn||'';
   get('mainEn').readOnly=true;
-  get('mainCn').readOnly=Boolean(entry.cn);
-  get('linkedQuestionTitle').textContent='已关联题目 '+entry.id+'，只需补充场次或小问。';
+  get('mainCn').readOnly=true;
+  get('mainEnField').classList.add('linked-hidden');
+  get('mainCnField').classList.add('linked-hidden');
+  get('linkedQuestionTitle').textContent=entry.en+' · '+entry.id;
   get('linkedQuestion').hidden=false;
   get('matchingResults').replaceChildren();
   get('matchingPanel').hidden=false;
+  const selected=get('contributionIntent').querySelector('input[value="encounter"]');
+  selected.checked=true;
 }
 function renderSuggestions(){
   if(kind!=='question'){get('matchingPanel').hidden=true;return;}
@@ -358,7 +385,7 @@ function renderSuggestions(){
 get('unlinkQuestion').addEventListener('click',clearLink);
 for(const id of ['mainEn','mainCn'])get(id).addEventListener('input',()=>{if(!linkedId)renderSuggestions();});
 for(const id of ['submissionCampus','submissionTrack'])get(id).addEventListener('change',()=>{
-  if(linkedId){get('mainEn').readOnly=false;get('mainCn').readOnly=false;linkedId=null;}
+  if(linkedId)clearLink();
   renderSuggestions();
 });
 function loadQuestionLink(){
@@ -367,8 +394,11 @@ function loadQuestionLink(){
   if(['nansha','clear-water-bay'].includes(campus))get('submissionCampus').value=campus;
   if(['regular','fast-track'].includes(track))get('submissionTrack').value=track;
   const q=id&&findQuestion(id);
-  if(q)linkQuestion(q);
-  else renderSuggestions();
+  if(q){
+    linkQuestion(q);
+    if(params.get('intent')==='supplement')
+      get('contributionIntent').querySelector('input[value="supplement"]').checked=true;
+  }else renderSuggestions();
 }
 
 loadQuestionLink();
@@ -386,12 +416,16 @@ function buildData(){
     en:el.querySelector('[data-lang="en"]').value.trim(),
     cn:el.querySelector('[data-lang="cn"]').value.trim()
   }));
-  if(!trimmed('mainEn')||!trimmed('mainCn')||subs.some(x=>!x.en||!x.cn))
-    throw new Error('主问题和每个小问均须填写中英文。');
+  if(!trimmed('mainEn')||subs.some(x=>!x.en))
+    throw new Error('请填写英文主问题；小问只需填写记得的英文内容，中文可留空。');
+  const intent=linkedId?form.querySelector('input[name="contributionIntent"]:checked').value:'encounter';
+  if(intent==='supplement'&&!subs.length)
+    throw new Error('仅补充题目内容时，请至少添加一条新的提示小问。');
   return {version:2,kind:'question',campus:trimmed('submissionCampus'),track:trimmed('submissionTrack'),
     term:trimmed('submissionYear')+' '+semester,
     examStage,main:{en:trimmed('mainEn'),cn:trimmed('mainCn')},
-    subs,source:trimmed('submissionSource')};
+    subs,source:trimmed('submissionSource'),
+    ...(linkedId?{linkedQuestionId:linkedId,intent}:{} )};
 }
 function validateForm(){
   if(!form.reportValidity())return null;
@@ -407,7 +441,9 @@ function showPreview(){
   const preview=get('previewPanel');preview.replaceChildren();
   addText(preview,'h2','投稿预览 · Review');
   if(data.kind==='question'){
-    addText(preview,'small',(data.campus==='nansha'?'GZ':'HK')+' · '+
+    addText(preview,'small',(data.linkedQuestionId?'已关联 '+data.linkedQuestionId+' · '+
+      (data.intent==='supplement'?'仅补充小问':'我也考过')+' · ':'')+
+      (data.campus==='nansha'?'GZ':'HK')+' · '+
       (data.track==='regular'?'常规 ELPA':'ELPA Fast Track')+' · '+data.term+' · '+taxonomy.examStages[data.examStage].zh+
       ' · '+taxonomy.sourceTypes[data.source].zh);
     addText(preview,'strong',data.main.en);
@@ -464,11 +500,13 @@ form.addEventListener('submit',async event=>{
     if(!response.ok||!result.ok)throw new Error(result.message||'提交失败，请稍后重试。');
     form.reset();followups.replaceChildren();refreshFollowups();
     get('mainEn').readOnly=false;get('mainCn').readOnly=false;linkedId=null;
+    get('mainEnField').classList.remove('linked-hidden');
+    get('mainCnField').classList.remove('linked-hidden');
     year.value=String(currentYear);
     get('submissionSlot').value='';
     get('previewPanel').hidden=true;
     setKind(kind);
-    say('提交成功！已进入公开待审核队列。','success');
+    say('提交成功！已经收到你的分享，审核通过后会收录到题库。','success');
     if(/^https:\/\/github\.com\/FuTseYi\/HKUST-ELPA\/issues\/\d+$/.test(result.issueUrl||'')){
       const a=document.createElement('a');a.href=result.issueUrl;a.target='_blank';
       a.rel='noopener noreferrer';a.textContent='查看投稿记录 ↗';message.append(' ',a);
