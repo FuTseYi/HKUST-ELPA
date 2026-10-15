@@ -60,6 +60,19 @@
 .contrib-preview small{color:#5f738b}
 .contrib-preview-line{border-top:1px solid #dce6f0;padding-top:10px}
 @media(max-width:600px){.contrib-main{margin:24px auto 45px;padding:0 14px}.contrib-row{grid-template-columns:1fr}.contrib-panel{padding:18px}.contrib-tab{font-size:14px}.contrib-actions .primary{flex:1}}
+
+.contrib-matches{padding:12px 14px;margin:12px 0 6px;border:1px solid #d7e6f2;border-radius:12px;background:#f5faff}
+.contrib-matches[hidden],#linkedQuestion[hidden]{display:none!important}
+.contrib-matches strong{display:block;color:#244861;font-size:14px}
+.contrib-matches p{margin:5px 0 10px;color:#597188;font-size:12px;line-height:1.5}
+.contrib-match{width:100%;text-align:left;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:10px;margin:7px 0;background:#fff;border:1px solid #d5e4ef;border-radius:8px;cursor:pointer;color:#223b53;font:inherit}
+.contrib-match:hover{border-color:#5796c7;background:#eef7ff}
+.contrib-match span{display:block;font-size:13px;line-height:1.45}
+.contrib-match small{display:block;color:#668096;margin-top:4px;font-size:12px}
+.contrib-match em{font-style:normal;font-size:11px;white-space:nowrap;color:#276b9f}
+#linkedQuestion{background:white;border-radius:8px;padding:10px;font-size:12px;color:#245a77}
+#linkedQuestion button{margin-left:8px;border:0;background:none;color:#16619b;text-decoration:underline;cursor:pointer}
+
 </style>
 </head>
 <body class="elpa-body">
@@ -92,8 +105,8 @@
   <div class="contrib-row">
     <div class="contrib-field"><label for="submissionCampus">考试校区 *</label>
       <select id="submissionCampus" required>
-        <option value="nansha">南沙校区</option>
-        <option value="clear-water-bay">清水湾校区</option>
+        <option value="nansha">GZ</option>
+        <option value="clear-water-bay">HK</option>
       </select>
     </div>
     <div class="contrib-field"><label for="submissionTrack">考试类型 *</label>
@@ -125,6 +138,12 @@
   </div>
   <div class="contrib-field"><label for="mainCn">中文 *</label>
     <textarea id="mainCn" rows="3" maxlength="1000" minlength="4" required></textarea>
+  </div>
+  <div id="matchingPanel" class="contrib-matches" hidden>
+    <strong>题库中可能已有类似题目</strong>
+    <p>选择原题可快速补充考试场次和小问；也可以继续提交自己的题目。</p>
+    <div id="matchingResults"></div>
+    <div id="linkedQuestion" hidden><span id="linkedQuestionTitle"></span> <button type="button" id="unlinkQuestion">取消关联</button></div>
   </div>
   <hr class="contrib-line">
   <h2>04 · 提示小问 <span lang="en">Follow-ups</span></h2>
@@ -173,6 +192,8 @@
 </section>
 </main>
 <footer class="elpa-footer">学生维护的非官方备考资源 · 不代表香港科技大学或任何校区的官方立场 · <a href="./sources.html">资料来源与声明</a></footer>
+<script src="./question-bank/questions.js"></script>
+<script src="./question-bank/fast-track.js"></script>
 <script src="./question-bank/taxonomy.js"></script>
 <script src="./submission-config.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
@@ -226,6 +247,7 @@ function setKind(next){
   for(const item of qFields.querySelectorAll('input,select,textarea'))item.disabled=next!=='question';
   for(const item of aFields.querySelectorAll('input,select,textarea'))item.disabled=next!=='advice';
   get('previewPanel').hidden=true;
+  if(next==='question')renderSuggestions();
 }
 tabQ.addEventListener('click',()=>setKind('question'));
 tabA.addEventListener('click',()=>setKind('advice'));
@@ -267,6 +289,89 @@ function addFollowup(en='',cn=''){
   followups.append(wrapper);refreshFollowups();
 }
 get('addFollowup').addEventListener('click',()=>addFollowup());
+
+/* Local-first bilingual match suggestions; only exact linked canonical text is submitted. */
+let linkedId=null;
+const normMatch=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+const chinese=s=>(String(s||'').match(/[\u3400-\u9fff]/g)||[]).join('');
+function words(s){return normMatch(s).split(/\s+/).filter(w=>w.length>2&&!['how','what','why','the','and','can','would','could','from','with','you','your','for','are','this','that'].includes(w));}
+function matchScore(entry,query){
+  const q=normMatch(query);
+  if(q.length<3)return 0;
+  const corpus=normMatch(entry.en+' '+entry.cn);
+  if(corpus.includes(q))return 2;
+  const queryWords=words(query),targetWords=words(entry.en+' '+entry.cn);
+  const wordHits=queryWords.filter(w=>targetWords.some(t=>t===w||(w.length>=5&&t.startsWith(w)))).length;
+  const wordScore=queryWords.length?wordHits/queryWords.length:0;
+  const h=chinese(query),targetH=chinese(entry.cn);
+  const pairs=h.length>1?Array.from({length:h.length-1},(_,i)=>h.slice(i,i+2)):[];
+  const zhScore=pairs.length?pairs.filter(p=>targetH.includes(p)).length/pairs.length:0;
+  return Math.max(wordScore,zhScore);
+}
+function availableQuestions(){
+  const campus=trimmed('submissionCampus'),track=trimmed('submissionTrack');
+  const keys=campus==='nansha'?(track==='regular'?
+    PAST_QUESTION_IDS.concat(BANKS.D.items.map(it=>'D-'+it.num)):
+    BANKS.F.items.map(it=>'F-'+it.num)):
+    (BANKS[track==='regular'?'H':'T']?.items||[]).map(it=>(track==='regular'?'H-':'T-')+it.num);
+  return keys.map(id=>{
+    const key=id.split('-')[0],entry=BANKS[key].items.find(it=>key+'-'+it.num===id);
+    return entry?{id,en:entry.en,cn:entry.cn||''}:null;
+  }).filter(Boolean);
+}
+function findQuestion(id){return availableQuestions().find(x=>x.id===id);}
+function clearLink(){
+  linkedId=null;
+  get('mainEn').readOnly=false;get('mainCn').readOnly=false;
+  get('linkedQuestion').hidden=true;
+  renderSuggestions();
+}
+function linkQuestion(entry){
+  linkedId=entry.id;
+  get('mainEn').value=entry.en;
+  get('mainCn').value=entry.cn||'';
+  get('mainEn').readOnly=true;
+  get('mainCn').readOnly=Boolean(entry.cn);
+  get('linkedQuestionTitle').textContent='已关联题目 '+entry.id+'，只需补充场次或小问。';
+  get('linkedQuestion').hidden=false;
+  get('matchingResults').replaceChildren();
+  get('matchingPanel').hidden=false;
+}
+function renderSuggestions(){
+  if(kind!=='question'){get('matchingPanel').hidden=true;return;}
+  if(linkedId){get('matchingPanel').hidden=false;return;}
+  const raw=[trimmed('mainEn'),trimmed('mainCn')].filter(Boolean);
+  const matches=availableQuestions().map(entry=>({
+    ...entry,rank:Math.max(...raw.map(q=>matchScore(entry,q)),0)
+  })).filter(e=>e.rank>=0.28).sort((a,b)=>b.rank-a.rank).slice(0,3);
+  const out=get('matchingResults');out.replaceChildren();
+  get('linkedQuestion').hidden=true;
+  get('matchingPanel').hidden=matches.length===0;
+  for(const entry of matches){
+    const button=document.createElement('button');button.type='button';button.className='contrib-match';
+    const block=document.createElement('span');block.textContent=entry.en;
+    const detail=document.createElement('small');detail.textContent=entry.cn;block.append(detail);
+    const action=document.createElement('em');action.textContent='关联这题 →';
+    button.append(block,action);button.addEventListener('click',()=>linkQuestion(entry));out.append(button);
+  }
+}
+get('unlinkQuestion').addEventListener('click',clearLink);
+for(const id of ['mainEn','mainCn'])get(id).addEventListener('input',()=>{if(!linkedId)renderSuggestions();});
+for(const id of ['submissionCampus','submissionTrack'])get(id).addEventListener('change',()=>{
+  if(linkedId){get('mainEn').readOnly=false;get('mainCn').readOnly=false;linkedId=null;}
+  renderSuggestions();
+});
+function loadQuestionLink(){
+  const params=new URLSearchParams(location.search);
+  const campus=params.get('campus'),track=params.get('track'),id=params.get('question');
+  if(['nansha','clear-water-bay'].includes(campus))get('submissionCampus').value=campus;
+  if(['regular','fast-track'].includes(track))get('submissionTrack').value=track;
+  const q=id&&findQuestion(id);
+  if(q)linkQuestion(q);
+  else renderSuggestions();
+}
+
+loadQuestionLink();
 function buildData(){
   if(kind==='advice'){
     const tags=[...list.querySelectorAll('input:checked')].map(x=>x.value);
@@ -302,7 +407,7 @@ function showPreview(){
   const preview=get('previewPanel');preview.replaceChildren();
   addText(preview,'h2','投稿预览 · Review');
   if(data.kind==='question'){
-    addText(preview,'small',(data.campus==='nansha'?'南沙校区':'清水湾校区')+' · '+
+    addText(preview,'small',(data.campus==='nansha'?'GZ':'HK')+' · '+
       (data.track==='regular'?'常规 ELPA':'ELPA Fast Track')+' · '+data.term+' · '+taxonomy.examStages[data.examStage].zh+
       ' · '+taxonomy.sourceTypes[data.source].zh);
     addText(preview,'strong',data.main.en);
@@ -358,6 +463,7 @@ form.addEventListener('submit',async event=>{
     const result=await response.json().catch(()=>({}));
     if(!response.ok||!result.ok)throw new Error(result.message||'提交失败，请稍后重试。');
     form.reset();followups.replaceChildren();refreshFollowups();
+    get('mainEn').readOnly=false;get('mainCn').readOnly=false;linkedId=null;
     year.value=String(currentYear);
     get('submissionSlot').value='';
     get('previewPanel').hidden=true;

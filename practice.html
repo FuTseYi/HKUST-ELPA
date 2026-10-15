@@ -670,6 +670,72 @@
   .elpa-fast-intro li span{display:block;color:#64748b;font-size:12px}
   @media(max-width:640px){.elpa-choices{padding:14px}.elpa-choice-row{gap:7px;flex-direction:column;align-items:stretch}.elpa-choice-row+.elpa-choice-row{margin-top:14px}.elpa-choice-buttons{width:100%}.elpa-choice-buttons button{flex:1 1 0;min-width:0;padding:8px 6px;font-size:12px}}
 
+
+  /* Mobile practice layout: keep title and count on separate aligned rows. */
+  @media (max-width: 760px) {
+    .page-practice .sec-head {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      align-items: start;
+      column-gap: 9px;
+      row-gap: 8px;
+    }
+    .page-practice .sec-head .emoji {grid-column:1;grid-row:1;line-height:1.35;font-size:22px;}
+    .page-practice .sec-head h2 {
+      grid-column:2;grid-row:1;min-width:0;margin:0;
+      font-size:clamp(20px,4.9vw,24px);line-height:1.4;
+      overflow-wrap:break-word;
+    }
+    .page-practice .sec-head .tag {
+      grid-column:2;grid-row:2;justify-self:start;
+      max-width:100%;min-width:0;padding:5px 11px;
+      line-height:1.45;white-space:normal;overflow-wrap:break-word;
+    }
+  }
+  @media (max-width: 640px) {
+    .page-practice .qcard {padding:16px 13px;}
+    .page-practice .qcard .q-top {
+      display:grid;grid-template-columns:36px minmax(0,1fr);
+      align-items:start;column-gap:10px;row-gap:9px;
+    }
+    .page-practice .qcard .q-num {grid-column:1;grid-row:1;}
+    .page-practice .qcard .q-title {grid-column:2;grid-row:1;min-width:0;}
+    .page-practice .qcard .q-title .en {
+      font-size:clamp(15px,4vw,16.5px);line-height:1.48;
+      overflow-wrap:break-word;
+    }
+    .page-practice .qcard .q-actions {
+      grid-column:2;grid-row:2;
+      width:auto;min-width:0;margin:0;padding:0;
+      display:flex;justify-content:flex-start;flex-wrap:wrap;gap:8px;
+    }
+    .page-practice .qcard .q-actions button {flex:0 0 auto;min-height:32px;}
+    .page-practice .qcard .note-toolbar {display:flex;flex-wrap:wrap;gap:7px;}
+    .page-practice .sec-desc {line-height:1.75;}
+  }
+
+
+/* Compact practice actions; legacy sync controls stay hidden. */
+.practice-main-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;width:100%;margin:8px 0 3px}
+.practice-action{border:1px solid #ccd9e7;border-radius:10px;background:#fff;color:#153e65;padding:10px 14px;font:inherit;font-weight:650;font-size:13px;cursor:pointer;min-height:42px}
+.practice-action:hover{background:#eef5fc;border-color:#7cadd7}
+.practice-action.primary{background:#124f86;border-color:#124f86;color:#fff}
+.practice-action.primary:hover{background:#0d3d69}
+.practice-action.subtle{font-weight:500}
+.records-menu{position:relative;margin-left:auto}
+.records-menu-panel{position:absolute;right:0;top:calc(100% + 6px);width:min(310px,calc(100vw - 38px));background:white;border:1px solid #d8e3ee;box-shadow:0 12px 35px rgba(15,45,72,.13);border-radius:12px;padding:12px;z-index:90}
+.records-menu-panel[hidden]{display:none!important}
+.records-menu-panel p{font-size:12px;line-height:1.6;color:#536a7d;margin:0 0 8px}
+.records-menu-panel button{display:block;text-align:left;width:100%;border:0;background:transparent;padding:10px;border-radius:7px;color:#22435e;font:inherit;font-size:13px;cursor:pointer}
+.records-menu-panel button:hover{background:#f0f6fc}
+.records-menu-panel small{display:block;color:#6e7d8d;font-size:11px;line-height:1.5;padding:7px 10px}
+.question-feedback{font-size:12px;color:#466884;margin-top:7px}
+.question-contribute{padding:5px 0 0;text-align:right}
+.question-contribute a{color:#527c9e;font-size:12px;text-decoration:none}
+.question-contribute a:hover{text-decoration:underline}
+.page-practice #saveBtn,.page-practice #exportBtn{display:none!important}
+@media(max-width:640px){.practice-main-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.practice-main-actions>.practice-action{width:100%;padding:9px 8px}.records-menu{margin-left:0}.records-menu>.practice-action{width:100%}.records-menu-panel{right:0}}
+
 </style>
 </head>
 <body class="page-practice">
@@ -695,14 +761,14 @@
 
   <section class="elpa-choices" id="examChoices" aria-label="考试校区和类型">
     <div class="elpa-choice-row"><span class="elpa-choice-label">考试校区</span><div class="elpa-choice-buttons" role="group" aria-label="选择考试校区">
-      <button type="button" data-campus="nansha" aria-pressed="true">南沙校区</button>
-      <button type="button" data-campus="clear-water-bay" aria-pressed="false">清水湾校区</button>
+      <button type="button" data-campus="nansha" aria-pressed="true">GZ</button>
+      <button type="button" data-campus="clear-water-bay" aria-pressed="false">HK</button>
     </div></div>
     <div class="elpa-choice-row"><span class="elpa-choice-label">考试类型</span><div class="elpa-choice-buttons" role="group" aria-label="选择考试类型">
       <button type="button" data-track="regular" aria-pressed="true">常规 ELPA</button>
       <button type="button" data-track="fast-track" aria-pressed="false">ELPA Fast Track</button>
     </div></div>
-    <p class="elpa-choice-note" id="elpaChoiceNote" role="status">南沙校区 · 常规 ELPA</p>
+    <p class="elpa-choice-note" id="elpaChoiceNote" role="status">GZ · 常规 ELPA</p>
   </section>
   <!-- Toolbar -->
   <div class="toolbar">
@@ -734,6 +800,7 @@
     </select>
     <span class="stat-pill">显示 <b id="matchCount">0</b> / <b id="totalCount">0</b> 条</span>
     <span class="stat-pill">已掌握 <b id="doneCount">0</b> 条</span>
+    <div hidden id="legacyDataControls">
     <button class="save-top" id="saveTopBtn" title="手动保存；未关联文件夹时学习记录仍自动保存在本浏览器">💾 保存</button>
     <button class="toolbar-action" id="backupBtn" type="button" title="下载独立的 JSON 备份文件">⬇ 备份</button>
     <button class="toolbar-action" id="restoreBtn" type="button" title="从已有 JSON 文件恢复学习记录">⬆ 恢复</button>
@@ -748,6 +815,22 @@
       <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）" aria-label="打开或关闭练习计时器">⏱️</button>
       <button class="folder-btn" id="folderBtn" title="关联／更换 JSON 数据文件夹（可选）" aria-label="关联或更换 JSON 数据文件夹">📂</button>
     </span>
+    </div>
+    <div class="practice-main-actions">
+      <button type="button" class="practice-action" id="quickDrawBtn">🎲 随机抽题</button>
+      <button type="button" class="practice-action primary" id="mockExamBtn">⏱ 模拟考试</button>
+      <button type="button" class="practice-action subtle" id="practiceTimerBtn">自定义计时</button>
+      <div class="records-menu">
+        <button type="button" class="practice-action subtle" id="recordsMenuBtn" aria-expanded="false" aria-controls="recordsMenu">学习记录 ▾</button>
+        <div class="records-menu-panel" id="recordsMenu" hidden>
+          <p>学习进度和笔记已自动保存在此浏览器。</p>
+          <button type="button" id="recordsBackupBtn">⬇ 备份学习记录</button>
+          <button type="button" id="recordsRestoreBtn">⬆ 恢复学习记录</button>
+          <button type="button" id="recordsExportBtn">📄 导出笔记</button>
+          <small>换设备或切换网站域名前，请先备份；不同浏览器不会自动同步。</small>
+        </div>
+      </div>
+    </div>
     <div class="empty" id="emptyState" role="status">😕 没有找到匹配「<span id="emptyKeyword"></span>」的题目，换个关键词试试？</div>
   </div>
 
@@ -893,10 +976,10 @@ function normalizePayload(data) {
   const cleanStatuses = {};
   const cleanNotes = {};
   for (const [key, value] of Object.entries(data.statuses)) {
-    if ((/^[A-D]-\d+$/.test(key) || key === 'A-附') && ['new', 'doing', 'done'].includes(value)) cleanStatuses[key] = value;
+    if ((/^[A-DFHT]-\d+$/.test(key) || key === 'A-附') && ['new', 'doing', 'done'].includes(value)) cleanStatuses[key] = value;
   }
   for (const [key, value] of Object.entries(data.notes)) {
-    if ((/^(?:qn-)?[A-D]-\d+(?:-\d+)?$/.test(key) || key === 'qn-A-附') && typeof value === 'string' && value.length <= 200000) {
+    if ((/^(?:qn-)?[A-DFHT]-\d+(?:-\d+)?$/.test(key) || key === 'qn-A-附') && typeof value === 'string' && value.length <= 200000) {
       cleanNotes[key] = value;
     }
   }
@@ -1073,28 +1156,11 @@ function markDirty() {
   scheduleFileSync();
 }
 async function initStorage() {
-  const localRecord = restoreBrowser();
-  if (!fsSupported) {
-    setTip('✅ 学习记录自动保存在此浏览器。可使用“备份 / 恢复”跨设备迁移；浏览器清理数据可能删除记录。', 'ok');
-    return;
-  }
-  try { dirHandle = await idbGet(IDB_DIR_KEY); }
-  catch (e) { dirHandle = null; }
-  if (!dirHandle) {
-    setTip('✅ 学习记录自动保存在此浏览器。需要长期留存时请下载 JSON 备份（可选关联文件夹）。', 'ok');
-    return;
-  }
-  try {
-    const exists = await loadFromDir(localRecord);
-    if (!exists) {
-      dirty = Object.keys(statuses).length + Object.keys(notes).length > 0;
-      updateSaveBtn();
-      setTip('ℹ️ 已关联文件夹暂未找到 JSON 文件，浏览器记录已保留；点击“保存”创建文件。', 'ok');
-    }
-  } catch (e) {
-    dirHandle = null;
-    setTip('⚠️ 暂时无法读取关联的 JSON 文件，已恢复浏览器本地记录；可点击 📂 重新选择文件夹。', 'err');
-  }
+  restoreBrowser();
+  // Existing local progress remains authoritative; legacy folder sync is no longer automatic.
+  const notice=document.getElementById('storageTip');
+  notice.className='storage-banner';
+  notice.textContent='';
 }
 
 /* ---- 手动关联文件夹：已有 JSON 时必须先确认是否导入 ---- */
@@ -1224,6 +1290,17 @@ function appearancesFor(id){
   const records=ELPA_APPEARANCES[id];
   return Array.isArray(records)?records:[];
 }
+function feedbackCount(id){
+  const item=questionById(id);
+  const baseline=item&&Number.isInteger(item.records)&&item.records>0?item.records:
+    (item&&item.term?1:0);
+  const reports=appearancesFor(id).filter(x=>x&&Number.isInteger(x.issueNumber)&&x.issueNumber>0);
+  return baseline+new Set(reports.map(x=>x.issueNumber)).size;
+}
+function feedbackRanked(ids){
+  return ids.map((id,i)=>({id,i,count:feedbackCount(id)}))
+    .sort((a,b)=>b.count-a.count||a.i-b.i).map(x=>x.id);
+}
 function sessionBadges(id){
   const unique=new Set();
   return appearancesFor(id).filter(x=>x&&x.term&&x.examStage).map(x=>{
@@ -1274,7 +1351,7 @@ function activeArchivedIds(){
   return activePracticeIds().filter(id=>!current.has(id));
 }
 function renderTOC() {
-  const campus=activeCampus==='nansha'?'南沙校区':'清水湾校区';
+  const campus=activeCampus==='nansha'?'GZ':'HK';
   const type=activeTrack==='regular'?'常规 ELPA':'ELPA Fast Track';
   const count=activePracticeIds().length;
   const term=activeLatestTerm(),current=activeCurrentIds(),past=activeArchivedIds();
@@ -1305,7 +1382,7 @@ function allPracticeIds() {
   return activePracticeIds();
 }
 function renderQuestionIds(ids) {
-  return ids.map((id,index) => {
+  return feedbackRanked(ids).map((id,index) => {
     const key=id.split('-')[0],item=questionById(id);
     return renderBank(key,[item],index);
   }).join('');
@@ -1331,6 +1408,7 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
     const translation=questionTranslation(bankKey,item);
     const sourceNote=questionSourceNote(bankKey,item);
     const badges=sessionBadges(id);
+    const feedback=feedbackCount(id);
     const searchText = (item.en + ' ' + (item.cn||'') + ' ' + (item.subs||[]).map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
     return `
     <div class="qcard status-${st}" id="q-${id}" data-search="${escAttr(searchText)}">
@@ -1339,6 +1417,7 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
         <div class="q-title">
           <div class="en">${esc(item.en)}</div>
           ${item.recallTag ? `<span class="recall-mark">${esc(item.recallTag)}</span>` : ""}
+          ${feedback ? `<div class="question-feedback">↻ 已收录 ${feedback} 条反馈</div>` : ''}
           ${badges ? `<div class="session-badges">${badges}</div>` : ''}
           ${translation ? `<button type="button" class="translation-toggle" aria-expanded="false" aria-controls="cn-${id}" onclick="toggleTranslation('cn-${id}',this)">查看中文</button><div class="cn translation" id="cn-${id}" hidden>${esc(translation)}</div>` : ''}
           ${sourceNote ? `<div class="question-provenance">${esc(sourceNote)}</div>` : ''}
@@ -1348,6 +1427,7 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
           <button class="status-btn ${stMap[st][1]}" onclick="cycleStatus('${id}', this)">${stMap[st][0]}</button>
         </div>
       </div>
+      <div class="question-contribute"><a href="./submit.html?question=${encodeURIComponent(id)}&campus=${encodeURIComponent(activeCampus)}&track=${encodeURIComponent(activeTrack)}">我也考到了 / 补充题目 ↗</a></div>
       ${hasSubs ? `
       <div class="subq" id="subq-${id}">
         <button type="button" class="subq-head" onclick="toggleSub('${id}')" aria-expanded="false" aria-controls="subq-list-${id}">
@@ -2038,7 +2118,7 @@ function clearDrill() {
   document.querySelectorAll('.qcard.drill-active, .qcard.drill-flash').forEach(c =>
     c.classList.remove('drill-active', 'drill-flash'));
 }
-document.getElementById('timerDrill').addEventListener('click', () => {
+function drawPractice(withTimer) {
   const keys = allPracticeIds().filter(id => {
     const card = document.getElementById('q-' + id);
     return card && card.dataset.filterMatch === '1';
@@ -2052,13 +2132,18 @@ document.getElementById('timerDrill').addEventListener('click', () => {
   bankPages[kind]=Math.max(1,Math.floor(index/PAGE_SIZE)+1);
   applyFilters();
   // 演练模式：60 秒准备 → 自动进入 2 分钟陈述（先切模式，其内部会 clearDrill）
-  switchTimerMode('countdown');
-  document.getElementById('timerMin').value = 1;
-  document.getElementById('timerSec').value = 0;
-  timerRemain = 60;
-  setPhase('prep', '📝 准备 1:00');
-  syncDisplay();
-  if (!timerPanel.classList.contains('show')) toggleTimer();
+  if(withTimer){
+    switchTimerMode('countdown');
+    document.getElementById('timerMin').value = 1;
+    document.getElementById('timerSec').value = 0;
+    timerRemain = 60;
+    setPhase('prep', '📝 准备 1:00');
+    syncDisplay();
+    if (!timerPanel.classList.contains('show')) toggleTimer();
+  }else{
+    stopTimer();
+    setPhase('idle', '⏳ 倒计时');
+  }
   // 标记当前题：滚动定位 + 闪烁 5 次后保持常亮
   clearDrill();
   card.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2070,15 +2155,39 @@ document.getElementById('timerDrill').addEventListener('click', () => {
       card.removeEventListener('animationend', h);
     }
   });
-  startTimer();
-  setTip('🎲 随机抽到：' + pick + ' —— 先 60 秒准备，随后自动开始 2 分钟陈述！', 'ok');
+  if(withTimer)startTimer();
+  setTip(withTimer?'🎲 已抽到 '+pick+'：1 分钟准备，随后 2 分钟陈述。':'🎲 已抽到 '+pick+'，可以开始练习。','ok');
+}
+document.getElementById('timerDrill').addEventListener('click',()=>drawPractice(true));
+document.getElementById('quickDrawBtn').addEventListener('click',()=>drawPractice(false));
+document.getElementById('mockExamBtn').addEventListener('click',()=>drawPractice(true));
+document.getElementById('practiceTimerBtn').addEventListener('click',()=>document.getElementById('timerBtn').click());
+
+
+/* Existing backup and export handlers are accessed from a single menu. */
+const recordsButton=document.getElementById('recordsMenuBtn');
+const recordsPanel=document.getElementById('recordsMenu');
+recordsButton.addEventListener('click',()=>{
+  const show=recordsPanel.hidden;
+  recordsPanel.hidden=!show;
+  recordsButton.setAttribute('aria-expanded',String(show));
 });
-
-
+document.getElementById('recordsBackupBtn').addEventListener('click',()=>document.getElementById('backupBtn').click());
+document.getElementById('recordsRestoreBtn').addEventListener('click',()=>document.getElementById('restoreBtn').click());
+document.getElementById('recordsExportBtn').addEventListener('click',()=>document.getElementById('exportBtn').click());
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.records-menu')){
+    recordsPanel.hidden=true;
+    recordsButton.setAttribute('aria-expanded','false');
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){recordsPanel.hidden=true;recordsButton.setAttribute('aria-expanded','false');}
+});
 /* ============ 导出全部笔记（Markdown 下载） ============ */
 document.getElementById('exportBtn').addEventListener('click', () => {
   let md = '# ELPA 备考笔记导出\n\n> 导出时间：' + new Date().toLocaleString('zh-CN') + '\n\n';
-  const category=(activeCampus==='nansha'?'南沙校区':'清水湾校区')+' · '+
+  const category=(activeCampus==='nansha'?'GZ':'HK')+' · '+
     (activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA');
   const sections=[
     {name:category+' · '+(activeLatestTerm()||'暂无学期记录')+' · 最新学期题库',ids:activeCurrentIds()},
