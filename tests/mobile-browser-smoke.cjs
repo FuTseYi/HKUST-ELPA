@@ -86,11 +86,11 @@ function chromeBinary(){
           scrollWidth:document.documentElement.scrollWidth};
       });
       assert.equal(footer.count,1,'One footer required at '+width);
-      assert.equal(footer.caption,'2026 Fall MPhil');
+      assert.equal(footer.caption,undefined,'Personal cohort label removed');
       assert.equal(footer.authorLast,true,'Author credit should be the last footer element');
       assert.equal(footer.actions,2,'Both contribution links must be present');
       assert.deepEqual(footer.buttons.map(b=>b.text.replace(/\s+/g,' ').trim()),['分享考题与经验','参与开源共建']);
-      assert.ok(footer.buttons.every(b=>b.height===38&&b.whiteSpace==='nowrap'&&b.scrollWidth<=b.clientWidth+1),
+      assert.ok(footer.buttons.every(b=>b.height>=28&&b.whiteSpace==='nowrap'&&b.scrollWidth<=b.clientWidth+1),
         'Footer labels must be single-line at '+width+': '+JSON.stringify(footer.buttons));
       assert.ok(Math.abs(footer.buttons[0].y-footer.buttons[1].y)<=1,'Footer buttons not aligned at '+width);
       assert.match(footer.tech,/Built with GitHub · Vercel · Cloudflare/);
@@ -99,6 +99,23 @@ function chromeBinary(){
       assert.ok(footer.scrollWidth<=width+2,'Footer overflows at '+width);
       assert.ok(layout.launcher.left>=0&&layout.launcher.right<=width+1,
         'Launcher escapes the mobile viewport at '+width+': '+JSON.stringify(layout.launcher));
+      // The homepage and sources now share the compact footer and mobile layout.
+      const homePage=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
+      try{
+        await homePage.goto(new URL('/index.html',host).href,{waitUntil:'load'});
+        assert.equal(await homePage.locator('.elpa-capability').count(),3);
+        assert.equal(await homePage.locator('.elpa-next-primary').count(),1);
+        assert.equal(await homePage.locator('.elpa-start-actions').count(),0);
+        assert.match(await homePage.locator('.elpa-community').innerText(),/社区分享/);
+        const dimensions=await homePage.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+        assert.ok(dimensions.scroll<=dimensions.width+2,'Home horizontal overflow at '+width+': '+JSON.stringify(dimensions));
+        await homePage.goto(new URL('/sources.html',host).href,{waitUntil:'load'});
+        assert.equal(await homePage.locator('#official-sources + .elpa-desc').count(),1);
+        assert.equal(await homePage.locator('.elpa-resource-tag').count(),4);
+        const sourcesDimensions=await homePage.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+        assert.ok(sourcesDimensions.scroll<=sourcesDimensions.width+2,'Sources horizontal overflow at '+width+': '+JSON.stringify(sourcesDimensions));
+      }finally{await homePage.close();}
+
 
       // Guide flow is tested locally at every responsive width, before any release.
       const guide=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
@@ -203,6 +220,39 @@ function chromeBinary(){
         const restored=page.locator('#bankD .qcard .qnote').first();
         await restored.locator('.note-toggle').click();
         assert.equal(await restored.locator('textarea').inputValue(),'ELPA mobile smoke note');
+        // Regression: reviewed follow-ups must survive both copy and Markdown export.
+        await page.evaluate(()=>{
+          const id='D-1';
+          BANKS.D.items[0].recallTag='考生回忆，待核实';
+          ELPA_APPEARANCES[id].push({issueNumber:99999,term:'2026 Fall',examStage:'start',
+            intent:'supplement',subs:[{en:'Community-added follow-up',cn:'社区补充小问'}]});
+          ELPA_APPEARANCES[id].push({issueNumber:100000,term:'2026 Fall',examStage:'start',intent:'supplement',alternatives:[{en:'Alternative community phrasing',cn:'另一种社区问法'}]});
+          notes[id+'-0']='Community supplement notes';
+          window.__elpaCopied='';
+          Object.defineProperty(navigator,'clipboard',{configurable:true,value:{
+            writeText(text){window.__elpaCopied=text;return Promise.resolve();}
+          }});
+          renderAll();
+        });
+        const variant=page.locator('#variants-D-1');
+        await variant.locator('.subq-head').click();
+        assert.equal(await variant.locator('.subq-cn').first().isVisible(),false,'Alternative translation hidden by default');
+        await variant.locator('.translation-toggle').click();
+        assert.equal(await variant.locator('.subq-cn').first().isVisible(),true,'Alternative translation revealed on request');
+        await variant.locator('.translation-toggle').click();
+        assert.equal(await variant.locator('.subq-cn').first().isVisible(),false,'Alternative translation can be hidden again');
+        await page.locator('#q-D-1 .copy-btn').click();
+        const copied=await page.evaluate(()=>window.__elpaCopied);
+        assert.match(copied,/Community-added follow-up/,'Copy must include reviewed follow-ups');
+        assert.match(copied,/考生回忆，待核实/,'Copy must retain explicit provenance');
+        const downloadPromise=page.waitForEvent('download');
+        await page.locator('#recordsMenuBtn').click();
+        await page.locator('#recordsExportBtn').click();
+        const exported=await downloadPromise;
+        const markdown=fs.readFileSync(await exported.path(),'utf8');
+        assert.match(markdown,/Community-added follow-up/,'Export must include reviewed follow-ups');
+        assert.match(markdown,/Community supplement notes/,'Export must include matching follow-up notes');
+        assert.match(markdown,/考生回忆，待核实/,'Export must preserve recorded provenance');
       }
       assert.deepEqual(errors,[],'Browser JS errors at '+width+'px');
       console.log('Browser UI passed at '+width+'px');

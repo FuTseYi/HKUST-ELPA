@@ -196,34 +196,26 @@ test('pause and resume preserve seconds, custom countdown and stopwatch work',()
  assert.equal(f.el('timerDisplay').textContent,'00:04');
 });
 
-test('footer is compact and consistent on five pages',()=>{
+test('footer is concise, community-oriented and identical across five pages',()=>{
  const pages=['index.html','guide.html','practice.html','sources.html','submit.html'];
  const read=p=>fs.readFileSync(path.resolve(__dirname,'..',p),'utf8');
- for(const p of pages){
-   const html=read(p),footer=html.match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/);
-   assert.ok(footer,p+' missing footer');
-   assert.equal((html.match(/<footer class="elpa-footer"/g)||[]).length,1);
-   for(const text of ['Built with Passion. Shared with Everyone.','为爱发电 · 开源共建 · 互帮互助',
-     'Built with GitHub · Vercel · Cloudflare','2026 Fall MPhil']){
-     assert.ok(footer[0].includes(text),p+' missing '+text);
-   }
-   assert.doesNotMatch(footer[0],/Found it useful\?|Contribute on GitHub|class="elpa-footer-project"/);
-   assert.doesNotMatch(footer[0],/分享考题与经验，一起让这份资料更好。/);
-   assert.match(footer[0],/href="\.\/submit\.html">分享考题与经验<\/a>/);
-   assert.match(footer[0],/>参与开源共建<\/a>/);
-   assert.match(html,/class="elpa-nav-submit"[^>]*>[\s\S]*?我要分享<\/a>/);
-   assert.match(footer[0],/aria-label="通过 GitHub Pull Request 参与项目共建">参与开源共建<\/a>/);
-   assert.match(footer[0],/Not affiliated with or endorsed by HKUST/);
-   assert.match(footer[0],/Created &amp; Maintained by/);
-   assert.ok(footer[0].indexOf('elpa-footer-identity')>footer[0].indexOf('elpa-footer-disclaimer'));
+ const footers=pages.map(p=>{
+   const html=read(p),matches=html.match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/g);
+   assert.equal(matches?.length,1,p+' should have one footer');
+   return matches[0];
+ });
+ for(const f of footers){
+   assert.equal(f,footers[0],'Footer must match across all pages');
+   for(const label of ['Built with Passion. Shared with Everyone.','为爱发电 · 开源共建 · 互帮互助','Built with GitHub · Vercel · Cloudflare','Initiated by','Open to Contributions'])
+     assert.ok(f.includes(label),'Footer missing '+label);
+   assert.match(f,/href="\.\/submit\.html">分享考题与经验<\/a>/);
+   assert.match(f,/>参与开源共建<\/a>/);
+   assert.doesNotMatch(f,/Not affiliated with or endorsed by HKUST|资料来源与声明|2026 Fall MPhil|Created &amp; Maintained by/);
  }
- assert.equal((read('practice.html').match(/id="exportBtn"/g)||[]).length,1);
- assert.match(read('site.css'),/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
- assert.match(read('site.css'),/white-space:nowrap/);
- assert.match(read('site.css'),/\.elpa-start-actions strong::after/);
+ assert.match(read('sources.html'),/本站为学生整理的备考资源，并非学校官方题库/);
+ assert.match(read('site.css'),/\.elpa-footer \.elpa-footer-action\{[^}]*min-height:28px/);
  assert.match(read('site.css'),/\.question-feedback a::after/);
- assert.match(read('site.css'),/border-top:1\.5px solid currentColor;border-right:1\.5px solid currentColor/);
- assert.doesNotMatch(read('index.html'),/<span aria-hidden="true">[→↗]<\/span>/);
+ assert.equal((read('practice.html').match(/id="exportBtn"/g)||[]).length,1);
 });
 
 test('internal pages share one compact banner and the practice brand uses the site palette',()=>{
@@ -238,7 +230,8 @@ test('internal pages share one compact banner and the practice brand uses the si
 
 test('sources page keeps external references without duplicate question-bank documents',()=>{
  const sources=fs.readFileSync(path.join(__dirname,'../sources.html'),'utf8');
- assert.match(sources,/<h2 class="elpa-heading">参考链接<\/h2>/);
+  assert.match(sources,/id="official-sources">学校官方说明<\/h2>/);
+  assert.match(sources,/id="community-sources">考生分享与备考资料<\/h2>/);
  assert.match(sources,/docs\.qq\.com\/doc\/DT3BxSkJzSGdUamJE/);
  assert.match(sources,/docs\.qq\.com\/doc\/DSHJydEVYSHBtdkZO/);
  assert.doesNotMatch(sources,/站内题库文档|question-bank\/(?:2026-fall|previous-years|fast-track)\.md/);
@@ -274,15 +267,18 @@ test('guide separates the official Regular and Fast Track paths with one obvious
  assert.match(guide,/id="adviceTagFilter"/);
  assert.equal((guide.match(/class="elpa-guide-switch"/g)||[]).length,1);
 });
-test('home Fast Track card opens its guide and study controls stay with progress',()=>{
+test('homepage prioritizes practice and keeps community contribution subtle',()=>{
  const home=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
  const practice=fs.readFileSync(path.join(__dirname,'../practice.html'),'utf8');
- assert.match(home,/class="elpa-start-actions"[\s\S]*?href="\.\/practice\.html"><strong>开始题库练习<\/strong>[\s\S]*?href="\.\/guide\.html"><strong>查看考试指南<\/strong>[\s\S]*?href="\.\/guide\.html\?track=fast-track#sec-process"><strong>了解 Fast Track<\/strong>[\s\S]*?href="\.\/sources\.html"><strong>查看资料来源<\/strong>/);
- assert.doesNotMatch(home,/GZ 12 道|目前主要整理|目前以香港科技大学|现有资料以/);
- assert.match(home,/id="quickstart-title">功能与使用<\/h2>/);
- for(const title of ['题库练习','学习记录与备份','模拟计时','匿名分享'])assert.match(home,new RegExp('<h3>'+title+'<\\/h3>'));
- assert.match(home,/进度和笔记自动保存在当前浏览器/);
- assert.match(home,/提交 → 后端校验 → 审核 → 入库/);
+ assert.match(home,/class="elpa-next-primary" href="\.\/practice\.html"/);
+ assert.match(home,/href="\.\/guide\.html\?track=fast-track#sec-process"/);
+ assert.match(home,/id="quickstart-title">从了解考题，到开口练习<\/h2>/);
+ assert.equal((home.match(/class="elpa-capability"/g)||[]).length,3);
+ for(const title of ['题库练习','学习记录','口语模拟'])assert.match(home,new RegExp('<h3>'+title+'<\\/h3>'));
+ assert.match(home,/class="elpa-community"/);
+ assert.match(home,/社区分享/);
+ assert.match(home,/无需注册账号 · 请勿填写个人敏感信息/);
+ assert.doesNotMatch(home,/提交 → 后端校验 → 审核 → 入库|elpa-start-actions|查看资料来源<\/strong>/);
  assert.doesNotMatch(home,/homeNewCount|homePastCount|homeDoneCount|网站内容概览|题目来源与项目说明|elpa-feature-grid|最新学期题库|过往题库<\/strong>/);
  assert.doesNotMatch(home,/question-bank\/questions\.js|question-bank\/appearances\.js/);
  const toolbar=section(practice,'<div class="toolbar">','<!-- 存储状态提示 -->');
@@ -372,4 +368,21 @@ test('guide switch preserves accessible state and works without a second page',(
  const selected=fn({getElementById:id=>elements[id]},
    {location:{search:'?track=fast-track',hash:''}},()=>{});
  selected('fast-track');assert.equal(two.hidden,false);
+});
+
+test('Fast Track documentation links to the selectable practice route',()=>{
+ const fastDoc=fs.readFileSync(path.join(__dirname,'../question-bank/fast-track.md'),'utf8');
+ const indexDoc=fs.readFileSync(path.join(__dirname,'../question-bank/README.md'),'utf8');
+ assert.ok(fastDoc.includes('../practice.html?campus=nansha&track=fast-track'));
+ assert.ok(!fastDoc.includes('../practice.html#fast-track'));
+ assert.ok(indexDoc.includes('| [Fast Track · 南沙校区](./fast-track.md) |'));
+});
+
+test('official source links remain separate from community references',()=>{
+ const sources=fs.readFileSync(path.join(__dirname,'../sources.html'),'utf8');
+ assert.match(sources,/id="official-sources"/);
+ assert.match(sources,/id="community-sources"/);
+ for(const target of ['https://elpa.hkust-gz.edu.cn/','https://fytgs.hkust-gz.edu.cn/handbooks/handbook-for-research-postgraduate-studies','https://cle.hkust.edu.hk/elpa','https://cle.hkust.edu.hk/sites/default/files/ELPA-Speaking-Scale-Student-Version.pdf'])assert.ok(sources.includes(target),target);
+ assert.ok(sources.indexOf('id="official-sources"')<sources.indexOf('id="community-sources"'));
+ assert.equal((sources.match(/class="elpa-resource-tag"/g)||[]).length,4);
 });

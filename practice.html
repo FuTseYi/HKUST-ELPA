@@ -1021,24 +1021,21 @@
   <div hidden><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></div>
 </div>
 </main>
-<footer class="elpa-footer" aria-label="开源共建与项目署名">
+<footer class="elpa-footer" aria-label="项目与社区">
 <div class="elpa-footer-inner">
-<div class="elpa-footer-intro">
-<p class="elpa-footer-slogan">Built with Passion. Shared with Everyone.</p>
-<p class="elpa-footer-motto">为爱发电 · 开源共建 · 互帮互助</p>
-</div>
-<div class="elpa-footer-actions">
-<a class="elpa-footer-action elpa-footer-action-primary" href="./submit.html">分享考题与经验</a>
-<a class="elpa-footer-action elpa-footer-action-secondary" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">参与开源共建</a>
-</div>
-<div class="elpa-footer-divider" aria-hidden="true"></div>
-<p class="elpa-footer-tech">Built with GitHub · Vercel · Cloudflare</p>
-<p class="elpa-footer-disclaimer">Independent student-led project · Not affiliated with or endorsed by HKUST</p>
-<p class="elpa-footer-source"><a href="./sources.html">资料来源与声明</a></p>
-<div class="elpa-footer-identity">
-<p class="elpa-footer-byline">Created &amp; Maintained by <a href="https://github.com/FuTseYi" target="_blank" rel="noopener noreferrer">Shine</a></p>
-<p class="elpa-footer-cohort">2026 Fall MPhil</p>
-</div>
+  <div class="elpa-footer-intro">
+    <p class="elpa-footer-slogan">Built with Passion. Shared with Everyone.</p>
+    <p class="elpa-footer-motto">为爱发电 · 开源共建 · 互帮互助</p>
+  </div>
+  <nav class="elpa-footer-actions" aria-label="社区参与">
+    <a class="elpa-footer-action" href="./submit.html">分享考题与经验</a>
+    <a class="elpa-footer-action" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">参与开源共建</a>
+  </nav>
+  <div class="elpa-footer-divider" aria-hidden="true"></div>
+  <p class="elpa-footer-tech">Built with GitHub · Vercel · Cloudflare</p>
+  <div class="elpa-footer-identity">
+    <p class="elpa-footer-byline">Initiated by <a href="https://github.com/FuTseYi" target="_blank" rel="noopener noreferrer">Shine</a> · Open to Contributions</p>
+  </div>
 </div>
 </footer>
 
@@ -1394,6 +1391,10 @@ function qId(bank, num) { return bank + '-' + num; }
 function questionTranslation(bankKey,item) {
   return item.cn || '';
 }
+function questionSourceNote(bankKey,item) {
+  // Show only provenance explicitly recorded with a question; never use its translation as a source note.
+  return item && typeof item.recallTag === 'string' ? item.recallTag : '';
+}
 function appearancesFor(id){
   const records=ELPA_APPEARANCES[id];
   return Array.isArray(records)?records:[];
@@ -1442,6 +1443,16 @@ function toggleTranslation(id,button){
   target.hidden=!showing;
   button.setAttribute('aria-expanded',String(showing));
   button.textContent=showing?'隐藏中文':'查看中文';
+}
+function toggleVariantChinese(id,button){
+  const section=document.getElementById('variants-'+id);
+  if(!section||!button)return;
+  const targets=[...section.querySelectorAll('.subq-cn.translation')];
+  if(!targets.length)return;
+  const showing=targets[0].hidden;
+  for(const node of targets)node.hidden=!showing;
+  button.setAttribute('aria-expanded',String(showing));
+  button.textContent=showing?'隐藏相似问法中文':'查看相似问法中文';
 }
 function toggleFollowupChinese(id,button){
   const section=document.getElementById('subq-'+id);
@@ -1579,9 +1590,10 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
         <button type="button" class="subq-head" onclick="toggleVariants('${id}')" aria-expanded="false" aria-controls="variants-list-${id}">
           <span class="arrow">▶</span>查看相似问法（${alternatives.length} 个）
         </button>
-        <div class="subq-list" id="variants-list-${id}"><ol>
-          ${alternatives.map(s=>`<li><span class="subq-en">${esc(s.en)}</span>${s.cn?`<span class="subq-cn">${esc(s.cn)}</span>`:''}</li>`).join('')}
-        </ol></div>
+        <div class="subq-list" id="variants-list-${id}">
+          ${alternatives.some(s=>s.cn) ? `<button type="button" class="translation-toggle translation-toggle-sub" aria-expanded="false" aria-controls="variants-list-${id}" onclick="toggleVariantChinese('${id}',this)">查看相似问法中文</button>` : ''}
+          <ol>${alternatives.map(s=>`<li><span class="subq-en">${esc(s.en)}</span>${s.cn?`<span class="subq-cn translation" hidden>${esc(s.cn)}</span>`:''}</li>`).join('')}</ol>
+        </div>
       </div>` : ''}
       ${hasSubs ? `
       <div class="subq" id="subq-${id}">
@@ -1818,8 +1830,9 @@ function copyQuestion(id) {
   if (copyCn) text += `（${copyCn}）\n`;
   const copyNote=questionSourceNote(bankKey,item);
   if (copyNote) text += `来源说明：${copyNote}\n`;
-  if (item.subs && item.subs.length) {
-    text += '\n提示小问：\n' + item.subs.map(s => '• ' + s.en + (s.cn ? '  (' + s.cn + ')' : '')).join('\n');
+  const followups = questionFollowups(id,item);
+  if (followups.length) {
+    text += '\n提示小问：\n' + followups.map(s => '• ' + s.en + (s.cn ? '  (' + s.cn + ')' : '')).join('\n');
   }
   const doCopy = () => {
     if (navigator.clipboard) {
@@ -2365,9 +2378,10 @@ document.getElementById('exportBtn').addEventListener('click', () => {
       md += '*状态：' + stLabel + '*\n\n';
       const qn = notes['qn-' + id];
       if (qn && qn.trim()) md += '**大问题笔记：**\n\n' + qn.trim() + '\n\n';
-      if (it.subs && it.subs.length) {
+      const followups = questionFollowups(id,it);
+      if (followups.length) {
         md += '**提示小问：**\n\n';
-        it.subs.forEach((s, si) => {
+        followups.forEach((s, si) => {
           const n = notes[id + '-' + si];
           md += '- ' + s.en + (s.cn ? '（' + s.cn + '）' : '');
           if (n && n.trim()) md += '\n  > 笔记：' + n.trim().replace(/\n/g, '\n  > ');

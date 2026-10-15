@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#003e74">
-<meta name="description" content="匿名分享 ELPA 考题或备考经验，关联已有题目更省事，审核后收录。">
+<meta name="description" content="分享 ELPA 考题与备考经验，帮助同学共同完善口语练习资源。">
 <title>社区贡献｜HKUST-ELPA</title>
 <link rel="prefetch" href="./sources.html"><link rel="stylesheet" href="./site.css"><link rel="icon" type="image/svg+xml" href="./assets/elpa-mark.svg">
 <style>
@@ -102,7 +102,7 @@
 <div class="contrib-main">
 <section class="contrib-panel" aria-label="社区贡献表单">
 <form id="submissionForm" class="contrib-form">
-<p class="contrib-notice">无需注册账号，提交后进入公开审核队列，审核通过后收录。请勿填写姓名、学号或联系方式。</p>
+<p class="contrib-notice">无需注册账号。提交内容会公开保存，并在必要核对与整理后收录。请勿填写姓名、学号或联系方式。</p>
 <div class="contrib-tabs" role="group" aria-label="投稿类别">
 <button id="tabQuestion" class="contrib-tab" type="button" aria-pressed="true">贡献考题 · Question</button>
 <button id="tabAdvice" class="contrib-tab" type="button" aria-pressed="false">分享经验 · Advice</button>
@@ -219,30 +219,27 @@
   <a href="./practice.html">返回题库练习</a></div>
 <section id="previewPanel" class="contrib-preview" aria-label="投稿预览" hidden></section>
 <div id="submissionTurnstile" class="contrib-turnstile" aria-label="人机验证"></div>
-<div class="contrib-actions"><button id="submissionButton" class="contrib-button primary" type="submit" disabled>提交待审核</button></div>
+<div class="contrib-actions"><button id="submissionButton" class="contrib-button primary" type="submit" disabled>提交分享</button></div>
 <p id="submissionMessage" class="contrib-message" role="status" aria-live="polite"></p>
 </form>
 </section>
 </div>
 </main>
-<footer class="elpa-footer" aria-label="开源共建与项目署名">
+<footer class="elpa-footer" aria-label="项目与社区">
 <div class="elpa-footer-inner">
-<div class="elpa-footer-intro">
-<p class="elpa-footer-slogan">Built with Passion. Shared with Everyone.</p>
-<p class="elpa-footer-motto">为爱发电 · 开源共建 · 互帮互助</p>
-</div>
-<div class="elpa-footer-actions">
-<a class="elpa-footer-action elpa-footer-action-primary" href="./submit.html">分享考题与经验</a>
-<a class="elpa-footer-action elpa-footer-action-secondary" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">参与开源共建</a>
-</div>
-<div class="elpa-footer-divider" aria-hidden="true"></div>
-<p class="elpa-footer-tech">Built with GitHub · Vercel · Cloudflare</p>
-<p class="elpa-footer-disclaimer">Independent student-led project · Not affiliated with or endorsed by HKUST</p>
-<p class="elpa-footer-source"><a href="./sources.html">资料来源与声明</a></p>
-<div class="elpa-footer-identity">
-<p class="elpa-footer-byline">Created &amp; Maintained by <a href="https://github.com/FuTseYi" target="_blank" rel="noopener noreferrer">Shine</a></p>
-<p class="elpa-footer-cohort">2026 Fall MPhil</p>
-</div>
+  <div class="elpa-footer-intro">
+    <p class="elpa-footer-slogan">Built with Passion. Shared with Everyone.</p>
+    <p class="elpa-footer-motto">为爱发电 · 开源共建 · 互帮互助</p>
+  </div>
+  <nav class="elpa-footer-actions" aria-label="社区参与">
+    <a class="elpa-footer-action" href="./submit.html">分享考题与经验</a>
+    <a class="elpa-footer-action" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">参与开源共建</a>
+  </nav>
+  <div class="elpa-footer-divider" aria-hidden="true"></div>
+  <p class="elpa-footer-tech">Built with GitHub · Vercel · Cloudflare</p>
+  <div class="elpa-footer-identity">
+    <p class="elpa-footer-byline">Initiated by <a href="https://github.com/FuTseYi" target="_blank" rel="noopener noreferrer">Shine</a> · Open to Contributions</p>
+  </div>
 </div>
 </footer>
 <script src="./question-bank/questions.js"></script>
@@ -525,7 +522,7 @@ function showPreview(){
     addText(preview,'strong',data.title);
     addText(preview,'p',data.body);
   }
-  addText(preview,'small','以上内容将作为公开待审核投稿保存。');
+  addText(preview,'small','以上内容将作为公开投稿记录保存。');
   preview.hidden=false;preview.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 get('previewButton').addEventListener('click',showPreview);
@@ -573,7 +570,7 @@ form.addEventListener('submit',async event=>{
     get('submissionSlot').value='';
     get('previewPanel').hidden=true;
     setKind(kind);
-    say('提交成功！已经收到你的分享，审核通过后会收录到题库。','success');
+    say('分享已提交！内容会经过必要核对与整理后收录。','success');
     if(/^https:\/\/github\.com\/FuTseYi\/HKUST-ELPA\/issues\/\d+$/.test(result.issueUrl||'')){
       const a=document.createElement('a');a.href=result.issueUrl;a.target='_blank';
       a.rel='noopener noreferrer';a.textContent='查看投稿记录';message.append(' ',a);
