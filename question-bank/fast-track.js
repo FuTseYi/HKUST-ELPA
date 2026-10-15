@@ -1,7 +1,7 @@
-/* Unofficial student recollections: 14 reports summarized as 12 practice questions.
+/* Unofficial student recollections organized as Fast Track practice questions.
  * Source compiled on 2026-10-14; compilation date is NOT an exam session date.
  * Only questions 5 and 7 include provided English original wording.
- * No term is invented for these historical recollections.
+ * Session classification is maintained separately in appearances.js.
  */
 BANKS.F = {
   name: 'ELPA Fast Track · GZ',
@@ -109,41 +109,3 @@ BANKS.F = {
  */
 BANKS.H = {name:'常规 ELPA · HK',items:[]};
 BANKS.T = {name:'ELPA Fast Track · HK',items:[]};
-const ELPA_FAST_TRACK_INTRO = {
-  en:'Please introduce yourself and your research. Include the following points.',
-  cn:'请介绍你自己及你的研究，并尽可能涵盖以下要点。',
-  subs:[
-  {
-    "en": "Your research program and degree type",
-    "cn": "你的研究项目与学位类型"
-  },
-  {
-    "en": "Your year of study or research stage",
-    "cn": "你的就读年级或当前研究阶段"
-  },
-  {
-    "en": "Your general research field or focus",
-    "cn": "你的总体研究领域或研究重点"
-  },
-  {
-    "en": "Why your research field or focus interests you",
-    "cn": "你为什么对这一领域或研究重点感兴趣"
-  },
-  {
-    "en": "Experiences in your background that contributed to your interests",
-    "cn": "你的背景中与研究兴趣有关的经历"
-  },
-  {
-    "en": "Why you chose to conduct your research at this university",
-    "cn": "你为什么选择在这所大学开展研究"
-  },
-  {
-    "en": "What you do as part of your research most days, and why",
-    "cn": "你通常开展哪些研究工作，以及这样做的原因"
-  },
-  {
-    "en": "What the next major stage of your research might be",
-    "cn": "你研究工作的下一个主要阶段可能是什么"
-  }
-]
-};
