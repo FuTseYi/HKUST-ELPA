@@ -61,6 +61,21 @@ function chromeBinary(){
       assert.ok(layout.rects.every(r=>r.marginTop==='0px'&&r.marginBottom==='0px'&&r.height===40),
         'All card buttons must have identical zero margins and 40px height at '+width+': '+JSON.stringify(layout.rects));
       assert.equal(layout.noteEdit,'none','Note editing controls should be collapsed');
+      const footer=await page.evaluate(()=>{
+        const f=document.querySelector('footer.elpa-footer');
+        const rect=f?.getBoundingClientRect();
+        return {count:document.querySelectorAll('footer.elpa-footer').length,
+          caption:f?.querySelector('.elpa-footer-cohort')?.textContent,
+          actions:f?.querySelectorAll('.elpa-footer-action').length||0,
+          left:rect?.left,right:rect?.right,
+          scrollWidth:document.documentElement.scrollWidth};
+      });
+      assert.equal(footer.count,1,'One footer required at '+width);
+      assert.equal(footer.caption,'2026 Fall MPhil');
+      assert.equal(footer.actions,2,'Both contribution links must be present');
+      assert.ok(footer.left>=-1&&footer.right<=width+1,
+        'Footer escapes mobile viewport at '+width+': '+JSON.stringify(footer));
+      assert.ok(footer.scrollWidth<=width+2,'Footer overflows at '+width);
       assert.ok(layout.launcher.left>=0&&layout.launcher.right<=width+1,
         'Launcher escapes the mobile viewport at '+width+': '+JSON.stringify(layout.launcher));
 
