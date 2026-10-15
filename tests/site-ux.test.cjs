@@ -207,3 +207,44 @@ test('footer is a consistent student-led open community component across all fiv
  assert.match(css,/\.elpa-footer-actions\{/);
  assert.match(css,/@media\(max-width:560px\)/);
 });
+
+test('guide separates the official Regular and Fast Track paths with one obvious switch',()=>{
+ const guide=fs.readFileSync(path.join(__dirname,'../guide.html'),'utf8');
+ assert.match(guide,/id="guideRegularTab"[^>]*aria-pressed="true"/);
+ assert.match(guide,/id="guideFastTab"[^>]*aria-pressed="false"/);
+ assert.match(guide,/id="fastGuide"[^>]*hidden/);
+ assert.match(guide,/Warm-up · 约 5 分钟/);
+ assert.match(guide,/Preparation · 约 3 分钟/);
+ assert.match(guide,/Discussion · 约 16 分钟/);
+ assert.match(guide,/约 2 分钟的个人英语陈述/);
+ assert.match(guide,/按指定话题录制视频/);
+ assert.match(guide,/IELTS 口语 ≥ 7\.0/);
+ assert.match(guide,/新(?:版 )?TOEFL 口语 ≥ 4\.5/);
+ assert.match(guide,/Automatic Exemption/);
+ assert.match(guide,/track=regular#sec-bankD/);
+ assert.match(guide,/track=fast-track#sec-bankD/);
+ assert.doesNotMatch(guide,/报名截止日期|2026 Fall 场次反馈|advicePhaseFilter|adviceTagFilter/);
+ assert.equal((guide.match(/class="elpa-guide-switch"/g)||[]).length,1);
+});
+test('guide switch preserves accessible state and works without a second page',()=>{
+ const html=fs.readFileSync(path.join(__dirname,'../guide.html'),'utf8');
+ const code=section(html,'/* Single choice; no extra filters, accounts or persistent state. */',
+   '/* Display approved community tips only when any exist; never show empty filters. */');
+ const events=new Map();
+ const btn=id=>({id,attributes:{},classList:{toggle(name,val){this[name]=val;}},setAttribute(k,v){this.attributes[k]=v;},
+   addEventListener(name,cb){events.set(id+':'+name,cb);}});
+ const regular=btn('regular'),fast=btn('fast'),one={hidden:false},two={hidden:true};
+ const elements={regularGuide:one,fastGuide:two,guideRegularTab:regular,guideFastTab:fast};
+ const fn=new Function('document','window',code+';return selectGuideTrack;');
+ const select=fn({getElementById:id=>elements[id]},{location:{search:'',hash:''}});
+ assert.equal(one.hidden,false);assert.equal(two.hidden,true);
+ events.get('fast:click')();
+ assert.equal(one.hidden,true);assert.equal(two.hidden,false);
+ assert.equal(regular.attributes['aria-pressed'],'false');assert.equal(fast.attributes['aria-pressed'],'true');
+ events.get('regular:click')();
+ assert.equal(one.hidden,false);assert.equal(two.hidden,true);
+ assert.equal(regular.attributes['aria-pressed'],'true');
+ const selected=fn({getElementById:id=>elements[id]},
+   {location:{search:'?track=fast-track',hash:''}});
+ assert.equal(two.hidden,false);
+});

@@ -82,6 +82,29 @@ function chromeBinary(){
       assert.ok(layout.launcher.left>=0&&layout.launcher.right<=width+1,
         'Launcher escapes the mobile viewport at '+width+': '+JSON.stringify(layout.launcher));
 
+      // Guide flow is tested locally at every responsive width, before any release.
+      const guide=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
+      try{
+        const guideErrors=[];
+        guide.on('pageerror',err=>guideErrors.push(err.message));
+        await guide.goto(new URL('/guide.html',host).href,{waitUntil:'load'});
+        assert.equal(await guide.locator('#regularGuide').isVisible(),true);
+        assert.equal(await guide.locator('#fastGuide').isVisible(),false);
+        await guide.locator('#guideFastTab').click();
+        assert.equal(await guide.locator('#fastGuide').isVisible(),true);
+        assert.equal(await guide.locator('#regularGuide').isVisible(),false);
+        assert.equal(await guide.locator('#guideFastTab').getAttribute('aria-pressed'),'true');
+        assert.match(await guide.locator('#fastGuide .elpa-guide-practice').getAttribute('href'),/track=fast-track/);
+        await guide.locator('.elpa-guide-eligibility summary').click();
+        assert.equal(await guide.locator('.elpa-guide-eligibility').getAttribute('open'),'');
+        const dimensions=await guide.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+        assert.ok(dimensions.scroll<=dimensions.width+2,'Guide horizontal overflow at '+width+': '+JSON.stringify(dimensions));
+        await guide.locator('#guideRegularTab').click();
+        assert.equal(await guide.locator('#regularGuide').isVisible(),true);
+        assert.equal(await guide.locator('#fastGuide').isVisible(),false);
+        assert.deepEqual(guideErrors,[],'Guide browser errors at '+width);
+      }finally{await guide.close();}
+
       if(width===390){
         const feedback=page.locator('#bankD .qcard .question-feedback').first();
         assert.match(await feedback.innerText(),/考过 \d+ 次/);
