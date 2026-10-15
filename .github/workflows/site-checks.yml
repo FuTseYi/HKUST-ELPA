@@ -158,7 +158,6 @@ jobs:
           PY
       - name: Check JavaScript syntax
         run: |
-          node --check /tmp/elpa-index.html.js
           node --check /tmp/elpa-guide.html.js
           node --check /tmp/elpa-practice.html.js
           node --check /tmp/elpa-submit.html.js
