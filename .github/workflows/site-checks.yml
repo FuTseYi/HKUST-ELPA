@@ -182,3 +182,12 @@ jobs:
               assert img.width>=450 and img.height>=240
               print(img.size)
           PY
+
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser driver (test only)
+        run: npm install --no-save --no-package-lock playwright
+      - name: Verify responsive layout and exercise interactions in headless Chrome
+        run: node tests/mobile-browser-smoke.cjs
