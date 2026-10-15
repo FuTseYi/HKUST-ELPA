@@ -26,7 +26,7 @@ test('all current IDs survive JSON backup normalization and recovery',()=>{
  assert.deepEqual(Object.keys(clean({statuses:{'../bad':'done'},notes:{'qn-<script>':'injection'}}).statuses),[]);
 });
 test('feedback count includes reviewed submissions and ties retain original order',()=>{
- const code=section(practice,'function feedbackCount(id){','function sessionBadges(id){');
+ const code=section(practice,'function feedbackCount(id){','function toggleTranslation(id,button){');
  const fixtures={
    'F-1':{num:1,records:1},'F-2':{num:2,records:2},
    'D-1':{num:1,term:'2026 Fall'},'A-1':{num:1},
@@ -34,24 +34,44 @@ test('feedback count includes reviewed submissions and ties retain original orde
  };
  const arrivals={'F-1':[{issueNumber:9},{issueNumber:9},{issueNumber:10}],
    'F-2':[], 'D-1':[{issueNumber:11},{issueNumber:12,intent:'supplement'}],
-   'D-1000301':[{issueNumber:301,intent:'encounter',subs:[{en:'What matters?',cn:''}]}]};
+   'D-1000301':[
+     {issueNumber:301,intent:'encounter',subs:[{en:'What matters?',cn:''}]},
+     {issueNumber:302,intent:'supplement',alternatives:[{en:'Could you explain this project?',cn:'你能解释这个项目吗？'}],subs:[{en:'What changed?',cn:''}]}
+   ]};
  const funcs=new Function('questionById','appearancesFor',code+
-   ';return {feedbackCount,feedbackRanked,questionFollowups}')(
+   ';return {feedbackCount,feedbackRanked,questionFollowups,questionAlternatives}')(
    id=>fixtures[id],id=>arrivals[id]||[]);
  assert.equal(funcs.feedbackCount('F-1'),3);
  assert.equal(funcs.feedbackCount('D-1'),2);
  assert.equal(funcs.feedbackCount('A-1'),1);
  assert.equal(funcs.feedbackCount('D-1000301'),1,'imported issue counted exactly once');
- assert.deepEqual(funcs.questionFollowups('D-1000301',{subs:[]}),[{en:'What matters?',cn:''}]);
+ assert.deepEqual(funcs.questionFollowups('D-1000301',{subs:[{en:'Original prompt?',cn:''}]}),[
+   {en:'Original prompt?',cn:''},{en:'What matters?',cn:''},{en:'What changed?',cn:''}
+ ]);
+ assert.deepEqual(funcs.questionAlternatives('D-1000301',{en:'Original question'}),[
+   {en:'Could you explain this project?',cn:'你能解释这个项目吗？'}
+ ]);
  assert.deepEqual(funcs.feedbackRanked(['F-2','A-1','F-1','D-1']),['F-1','F-2','D-1','A-1']);
 });
 test('practice cards expose reviewed encounter action and uniform alignment',()=>{
- assert.match(practice,/考过 \$\{feedback\} 次/);
+ assert.match(practice,/过往考过 \$\{feedback\} 次/);
  assert.match(practice,/我也考过<\/a>/);
  assert.match(practice,/submit\.html\?question=\$\{encodeURIComponent\(id\)\}/);
+ assert.doesNotMatch(practice,/submit\.html\?question=\$\{encodeURIComponent\(id\)\}[^"`]*campus=/);
  assert.match(practice,/margin:0!important/);
  assert.match(submit,/id="contributionIntent"/);
  assert.match(submit,/linkedQuestionId:linkedId/);
+ assert.match(submit,/id="supplementQuestionFields"[^>]*hidden/);
+ assert.match(submit,/id="supplementEn"/);
+ assert.match(submit,/填写相似问法或至少添加一条新的提示小问/);
+ assert.match(practice,/查看相似问法（\$\{alternatives\.length\} 个）/);
+ assert.match(practice,/function questionAlternatives\(id,item\)/);
+ assert.match(submit,/id="exam-context">01 · 考试校区与类型/);
+ assert.match(submit,/id="submissionCampus" required>[\s\S]*?<option value="" selected disabled>选择考试校区<\/option>/);
+ assert.match(submit,/if\(intent==='encounter'\)requestAnimationFrame\(\(\)=>\{/);
+ assert.match(submit,/get\('exam-context'\)\.scrollIntoView\(\{block:'start',behavior:'instant'\}\)/);
+ assert.match(submit,/get\('submissionCampus'\)\.focus\(\{preventScroll:true\}\)/);
+ assert.match(submit,/get\('submissionCampus'\)\.addEventListener\('change',\(\)=>renderSuggestions\(\)\)/);
  assert.match(submit,/id="mainCn"[^>]*maxlength="1000"/);
  assert.doesNotMatch(submit,/id="mainCn"[^>]*required/);
 });
@@ -189,8 +209,10 @@ test('footer is compact and consistent on five pages',()=>{
    }
    assert.doesNotMatch(footer[0],/Found it useful\?|Contribute on GitHub|class="elpa-footer-project"/);
    assert.doesNotMatch(footer[0],/分享考题与经验，一起让这份资料更好。/);
-   assert.match(footer[0],/href="\.\/submit\.html">分享考题<\/a>/);
-   assert.match(footer[0],/aria-label="通过 GitHub Pull Request 参与项目共建">提交 PR<\/a>/);
+   assert.match(footer[0],/href="\.\/submit\.html">分享考题与经验<\/a>/);
+   assert.match(footer[0],/>参与开源共建<\/a>/);
+   assert.match(html,/class="elpa-nav-submit"[^>]*>[\s\S]*?我要分享<\/a>/);
+   assert.match(footer[0],/aria-label="通过 GitHub Pull Request 参与项目共建">参与开源共建<\/a>/);
    assert.match(footer[0],/Not affiliated with or endorsed by HKUST/);
    assert.match(footer[0],/Created &amp; Maintained by/);
    assert.ok(footer[0].indexOf('elpa-footer-identity')>footer[0].indexOf('elpa-footer-disclaimer'));
@@ -198,6 +220,38 @@ test('footer is compact and consistent on five pages',()=>{
  assert.equal((read('practice.html').match(/id="exportBtn"/g)||[]).length,1);
  assert.match(read('site.css'),/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
  assert.match(read('site.css'),/white-space:nowrap/);
+ assert.match(read('site.css'),/\.elpa-start-actions strong::after/);
+ assert.match(read('site.css'),/\.question-feedback a::after/);
+ assert.match(read('site.css'),/border-top:1\.5px solid currentColor;border-right:1\.5px solid currentColor/);
+ assert.doesNotMatch(read('index.html'),/<span aria-hidden="true">[→↗]<\/span>/);
+});
+
+test('internal pages share one compact banner and the practice brand uses the site palette',()=>{
+ const pages=['guide.html','practice.html','sources.html','submit.html'];
+ for(const page of pages){
+   const html=fs.readFileSync(path.resolve(__dirname,'..',page),'utf8');
+   assert.match(html,/class="[^"]*elpa-subhero/);
+   assert.equal((html.match(/<main(?:\s|>)/g)||[]).length,1,page+' should have one main landmark');
+ }
+ assert.match(practice,/<body class="elpa-body page-practice">/);
+});
+
+test('sources page keeps external references without duplicate question-bank documents',()=>{
+ const sources=fs.readFileSync(path.join(__dirname,'../sources.html'),'utf8');
+ assert.match(sources,/<h2 class="elpa-heading">参考链接<\/h2>/);
+ assert.match(sources,/docs\.qq\.com\/doc\/DT3BxSkJzSGdUamJE/);
+ assert.match(sources,/docs\.qq\.com\/doc\/DSHJydEVYSHBtdkZO/);
+ assert.doesNotMatch(sources,/站内题库文档|question-bank\/(?:2026-fall|previous-years|fast-track)\.md/);
+ assert.doesNotMatch(practice,/tree\/main\/question-bank|question-provenance|sourceNote/);
+ assert.match(practice,/href="\.\/sources\.html">查看参考资料<\/a>/);
+});
+
+test('seed advice uses the same track, phase and topic schema without invented provenance',()=>{
+ const advice=fs.readFileSync(path.join(__dirname,'../question-bank/advice.js'),'utf8');
+ assert.equal((advice.match(/id: 'ADVICE-REGULAR-/g)||[]).length,3);
+ assert.equal((advice.match(/track: 'regular', phase: 'during'/g)||[]).length,3);
+ assert.doesNotMatch(advice,/HIST-|provenance|历史考情整理/);
+ assert.match(submit,/<select id="adviceTrack">[\s\S]*?<option value="regular">常规 ELPA<\/option>[\s\S]*?<option value="fast-track">ELPA Fast Track<\/option>/);
 });
 
 test('guide separates the official Regular and Fast Track paths with one obvious switch',()=>{
@@ -205,20 +259,95 @@ test('guide separates the official Regular and Fast Track paths with one obvious
  assert.match(guide,/id="guideRegularTab"[^>]*aria-pressed="true"/);
  assert.match(guide,/id="guideFastTab"[^>]*aria-pressed="false"/);
  assert.match(guide,/id="fastGuide"[^>]*hidden/);
- assert.match(guide,/Warm-up · 约 5 分钟/);
- assert.match(guide,/Preparation · 约 3 分钟/);
- assert.match(guide,/Discussion · 约 16 分钟/);
- assert.match(guide,/约 2 分钟的个人英语陈述/);
- assert.match(guide,/按指定话题录制视频/);
- assert.match(guide,/IELTS 口语 ≥ 7\.0/);
- assert.match(guide,/新(?:版 )?TOEFL 口语 ≥ 4\.5/);
- assert.match(guide,/Automatic Exemption/);
+ for(const step of ['入场与身份核验','抽题与准备','个人陈述','提问与回答','结束离场']) assert.match(guide,new RegExp(step));
+ assert.match(guide,/学生证或校园卡/);
+ assert.match(guide,/主问题和提示小问/);
+ assert.match(guide,/草稿纸和笔/);
+ assert.match(guide,/考官的计时提示/);
+ assert.match(guide,/个人英语陈述/);
+ assert.match(guide,/按照系统指定的话题准备英语回答/);
+ assert.doesNotMatch(guide,/约 30 分钟|最多 4 名|IELTS 口语|TOEFL 口语|Automatic Exemption/);
  assert.match(guide,/track=regular#sec-bankD/);
  assert.match(guide,/track=fast-track#sec-bankD/);
  assert.doesNotMatch(guide,/报名截止日期|2026 Fall 场次反馈|你可能想知道|elpa-guide-faq/);
  assert.match(guide,/id="advicePhaseFilter"/);
  assert.match(guide,/id="adviceTagFilter"/);
  assert.equal((guide.match(/class="elpa-guide-switch"/g)||[]).length,1);
+});
+test('home Fast Track card opens its guide and study controls stay with progress',()=>{
+ const home=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
+ const practice=fs.readFileSync(path.join(__dirname,'../practice.html'),'utf8');
+ assert.match(home,/class="elpa-start-actions"[\s\S]*?href="\.\/practice\.html"><strong>开始题库练习<\/strong>[\s\S]*?href="\.\/guide\.html"><strong>查看考试指南<\/strong>[\s\S]*?href="\.\/guide\.html\?track=fast-track#sec-process"><strong>了解 Fast Track<\/strong>[\s\S]*?href="\.\/sources\.html"><strong>查看资料来源<\/strong>/);
+ assert.doesNotMatch(home,/GZ 12 道|目前主要整理|目前以香港科技大学|现有资料以/);
+ assert.match(home,/id="quickstart-title">功能与使用<\/h2>/);
+ for(const title of ['题库练习','学习记录与备份','模拟计时','匿名分享'])assert.match(home,new RegExp('<h3>'+title+'<\\/h3>'));
+ assert.match(home,/进度和笔记自动保存在当前浏览器/);
+ assert.match(home,/提交 → 后端校验 → 审核 → 入库/);
+ assert.doesNotMatch(home,/homeNewCount|homePastCount|homeDoneCount|网站内容概览|题目来源与项目说明|elpa-feature-grid|最新学期题库|过往题库<\/strong>/);
+ assert.doesNotMatch(home,/question-bank\/questions\.js|question-bank\/appearances\.js/);
+ const toolbar=section(practice,'<div class="toolbar">','<!-- 存储状态提示 -->');
+ const progress=section(practice,'<!-- Progress -->','<!-- TOC -->');
+ assert.doesNotMatch(toolbar,/id="doneCount"|id="recordsMenuBtn"/);
+ assert.match(progress,/id="doneCount"/);
+ assert.match(progress,/id="recordsMenuBtn"/);
+ assert.doesNotMatch(practice,/id="currentBankDescription"|往届经典题与其他学期的考生反馈统一归档|该分类暂无已收录题目/);
+ assert.doesNotMatch(practice,/current\.length\+' 题 · '|past\.length\+' 题 · '/);
+ assert.match(practice,/feedbackBankCount'\)\.textContent=current\.length\+' 题'/);
+ assert.match(practice,/pastBankCount'\)\.textContent=past\.length\+' 题'/);
+ assert.match(practice,/id="sessionFilter"[\s\S]*?<option value="">全部考试场次<\/option>/);
+ assert.match(practice,/#sessionFilter\{field-sizing:content\}/);
+ assert.match(practice,/\.filter-select \{[^}]*width:auto; max-width:100%/);
+ assert.match(practice,/appearance:none; -webkit-appearance:none; padding:7px 28px 7px 12px/);
+ assert.match(practice,/id="statusFilter"[^>]*>[\s\S]*?<option value="all">备考状态<\/option>/);
+ assert.match(practice,/\.progress-head-actions \.stat-pill,#recordsMenuBtn\{[^}]*height:36px;[^}]*white-space:nowrap/);
+ assert.match(practice,/#recordsMenuBtn\{[^}]*width:auto;[^}]*padding:0 10px;[^}]*border-radius:999px/);
+ assert.match(practice,/entry\.term\+' · '\+stage\.zh/);
+ assert.doesNotMatch(practice,/id="termFilter"|id="examStageFilter"|session-badges|session-chip/);
+ const appearances=fs.readFileSync(path.join(__dirname,'../question-bank/appearances.js'),'utf8');
+ const questions=fs.readFileSync(path.join(__dirname,'../question-bank/questions.js'),'utf8');
+ const sessionData=new Function(questions+'\n'+appearances+'\nreturn {ids:PAST_QUESTION_IDS,data:ELPA_APPEARANCES};')();
+ assert.equal(sessionData.ids.length,25);
+ for(const id of sessionData.ids)assert.deepEqual(sessionData.data[id],[{term:'2025 Fall',examStage:'start'}],id);
+ assert.equal((appearances.match(/"term": "2026 Fall", "examStage": "start"/g)||[]).length,24);
+ const fastTrack=fs.readFileSync(path.join(__dirname,'../question-bank/fast-track.js'),'utf8');
+ const fastSessionData=new Function(questions+'\n'+fastTrack+'\n'+appearances+'\nreturn {ids:BANKS.F.items.map(x=>"F-"+x.num),data:ELPA_APPEARANCES};')();
+ assert.equal(fastSessionData.ids.length,12);
+ for(const id of fastSessionData.ids)assert.deepEqual(fastSessionData.data[id],[{term:'2026 Fall',examStage:'start'}],id);
+ assert.match(fastTrack,/"num": 1,[\s\S]*?"subs": \[\]/);
+ assert.doesNotMatch(fastTrack,/"num": 13/);
+ assert.doesNotMatch(questions,/"F-13"/);
+ assert.doesNotMatch(practice,/fastIntroSection|fastIntroDetails|ELPA_FAST_TRACK_INTRO|补充准备 · 完整自我介绍任务/);
+ assert.match(practice,/titleStatus\.textContent=total\?'第 '\+page\+' \/ '\+pages\+' 页 · 总 '\+total\+' 题':'0 题'/);
+ assert.match(practice,/function activeLatestSessionLabel\(\)[\s\S]*?session\.term\+' · '\+ELPA_TAXONOMY\.examStages\[session\.stage\]\.zh/);
+ assert.match(practice,/currentBankTitle'\)\.textContent=selectedIsCurrent\?selectedLabel:sessionLabel/);
+ assert.doesNotMatch(practice,/currentBankTitle'\)\.textContent=.*最新学期题库/);
+ assert.match(practice,/id="pastBankTitle">过往题库<\/h2>/);
+ assert.match(practice,/pastBankTitle'\)\.textContent=selectedValue&&!selectedIsCurrent\?selectedLabel:'过往题库'/);
+ assert.match(practice,/sec-bankD'\)\.hidden=!!selectedValue&&!selectedIsCurrent/);
+ assert.match(practice,/sec-bankA'\)\.hidden=!!selectedValue&&selectedIsCurrent/);
+ assert.match(practice,/const items=selectedValue\?/);
+ assert.match(practice,/\.page-practice \.to-top\{[\s\S]*?display:inline-grid!important/);
+ assert.match(practice,/\.page-practice \.practice-launcher\{[\s\S]*?bottom:calc\(66px/);
+ assert.doesNotMatch(practice,/筛选后|每页最多|pagination-caption/);
+ assert.match(practice,/\.page-practice \.sec-head \.tag \{[\s\S]*?white-space:nowrap/);
+});
+test('latest bank advances by complete term and stage while older sessions remain filterable',()=>{
+ const code=section(practice,'function activeLatestTerm(){','function renderTOC() {');
+ const ids=['Q-start','Q-mid','Q-old'];
+ const records={
+   'Q-start':[{term:'2026 Fall',examStage:'start'}],
+   'Q-mid':[{term:'2026 Fall',examStage:'mid'}],
+   'Q-old':[{term:'2025 Fall',examStage:'start'}]
+ };
+ const funcs=new Function('activePracticeIds','appearancesFor','elpaLatestTermForIds','elpaReportedTerms','ELPA_TAXONOMY',
+   code+';return {activeLatestSession,activeCurrentIds,activeArchivedIds};')(
+     ()=>ids,id=>records[id]||[],()=> '2026 Fall',id=>(records[id]||[]).map(x=>x.term),
+     {examStages:{start:{zh:'开学阶段'},mid:{zh:'学期中'},end:{zh:'学期末'}}});
+ assert.deepEqual(funcs.activeLatestSession(),{term:'2026 Fall',stage:'mid'});
+ assert.deepEqual(funcs.activeCurrentIds(),['Q-mid']);
+ assert.deepEqual(funcs.activeArchivedIds(),['Q-start','Q-old']);
+ assert.match(practice,/sessions\.set\(entry\.term\+'\|'\+entry\.examStage/);
+ assert.match(practice,/sessionFilter\.append\(new Option\(session\.label,value\)\)/);
 });
 test('guide switch preserves accessible state and works without a second page',()=>{
  const html=fs.readFileSync(path.join(__dirname,'../guide.html'),'utf8');
