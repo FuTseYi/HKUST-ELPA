@@ -13,7 +13,7 @@ HKUST-ELPA 是学生维护的非官方 ELPA 备考资源。目前内容以香港
 - **[Vercel · 主要访问入口](https://hkust-elpa.vercel.app/)**：独立域名入口。
 - **[GitHub Pages · 备用入口](https://futseyi.github.io/HKUST-ELPA/)**：与 Vercel 使用同一 GitHub 仓库。
 - 两个域名都通过独立校验的 Cloudflare Turnstile 向同一个 GitHub Issues 审核队列匿名投稿；只有维护者批准并合并相应更新 PR，题目才进入正式题库。
-- **题库界面**：校区展示统一为 GZ / HK（底层键值和题目 ID 不变），同一区域内按已整理的「考过 N 次」排序；将随机抽题、模拟考试（1 分钟准备 + 2 分钟陈述）、倒计时与正向计时统一到单个悬浮「练习工具」中；打开不自动计时，避免重复操作。
+- **题库界面**：校区展示统一为 GZ / HK（底层键值和题目 ID 不变），同一区域内按已整理的「考过 N 次」排序；将随机抽题、模拟练习计时（默认 1 分钟准备 + 2 分钟陈述，非官方统一时间）、倒计时与正向计时统一到单个悬浮「练习工具」中；打开不自动计时，避免重复操作。
 - **学习记录**：默认在浏览器自动保存；备份、恢复、导出笔记收进同一个「学习记录」菜单，原有 JSON 兼容。历史文件夹关联入口不再占据普通用户的界面。
 - **分享考题**：输入英文题干后本地提示相似题；题卡「我也考过」可直接关联已有题目，补充考试学期和可选小问。中文翻译选填。「仅补充小问」不会增加次数；所有内容仍须审核、合并后更新，无新增数据库或账号。
 - **学习记录不会自动跨域同步**：练习进度与笔记保存在各自域名的浏览器存储中，切换入口前可用「备份／恢复」迁移。
@@ -22,7 +22,7 @@ HKUST-ELPA 是学生维护的非官方 ELPA 备考资源。目前内容以香港
 
 - **[独立题库 · Question Bank](./question-bank/README.md)**：提供**南沙 / 清水湾**校区来源切换及**常规 ELPA / ELPA Fast Track**考试类型切换。常规 ELPA 依最新已收录学期自动分类；Fast Track 独立展示 12 道回忆题及 8 要点自我介绍任务。
 - **[网站首页](https://futseyi.github.io/HKUST-ELPA/)**：网站导航与功能概览。
-- **[考试指南](https://futseyi.github.io/HKUST-ELPA/guide.html)**：常见流程与 FAQ。
+- **[考试指南](https://futseyi.github.io/HKUST-ELPA/guide.html)**：常规线下口试与 Fast Track 线上视频录制的实用流程、必要 FAQ 和直达题库入口。
 - **[题库练习](https://futseyi.github.io/HKUST-ELPA/practice.html)**：两组题库、关键词与状态筛选、每页 8 题、计时与个人笔记。
 - **[资料来源](https://futseyi.github.io/HKUST-ELPA/sources.html)**：资料分享链接与贡献说明。
 - **页面结构**：多页面静态网站（`index.html`、`guide.html`、`practice.html`、`sources.html`），共享蓝黄导航样式见 `site.css`。

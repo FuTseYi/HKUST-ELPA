@@ -261,3 +261,34 @@ body { margin:0; }
   ::view-transition-old(root),::view-transition-new(root){animation:none;}
   .elpa-cta{transition:none;transform:none!important;}
 }
+
+/* Minimal regular / Fast Track guide switch. */
+.elpa-guide-main{max-width:970px}
+.elpa-guide-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:5px;border:1px solid #dce6f1;border-radius:13px;background:#eaf1f8;margin:19px 0 21px}
+.elpa-guide-switch button{appearance:none;border:0;border-radius:9px;background:transparent;color:#476079;min-height:46px;min-width:0;padding:9px 12px;font:inherit;font-size:14px;font-weight:750;cursor:pointer}
+.elpa-guide-switch button.active{color:#083c69;background:#fff;box-shadow:0 2px 10px rgba(20,55,85,.09)}
+.elpa-guide-switch button:focus-visible{outline:3px solid #e5a921;outline-offset:2px}
+.elpa-guide-panel{border:1px solid var(--site-line);background:#fff;padding:26px 28px;border-radius:17px}
+.elpa-guide-panel[hidden],.elpa-advice-section[hidden]{display:none!important}
+.elpa-guide-overview h3{margin:0;color:var(--site-navy);font-size:22px;line-height:1.4}
+.elpa-guide-overview p{margin:4px 0 0;color:#64748b;font-size:13px}
+.elpa-guide-steps{list-style:none;counter-reset:elpa-step;display:grid;gap:0;padding:0;margin:23px 0 11px}
+.elpa-guide-steps li{counter-increment:elpa-step;position:relative;padding:0 0 20px 45px;border-left:2px solid #e2ebf5;margin-left:14px}
+.elpa-guide-steps li:last-child{padding-bottom:4px;border-left-color:transparent}
+.elpa-guide-steps li::before{content:counter(elpa-step);position:absolute;left:-15px;top:0;display:grid;place-items:center;width:28px;height:28px;color:#fff;background:#1763a3;border-radius:9px;font-size:12px;font-weight:800}
+.elpa-guide-steps strong{display:block;font-size:15px;line-height:1.5;color:var(--site-ink)}
+.elpa-guide-steps p{margin:4px 0 0;color:#536579;font-size:13.5px;line-height:1.7}
+.elpa-guide-note{margin:14px 0 0;padding:11px 13px;border-radius:9px;background:#f2f6fb;color:#4d647a;font-size:12.5px}
+.elpa-guide-faq{margin-top:23px}
+.elpa-guide-faq h4{margin:0 0 8px;font-size:14px;color:#274b6c}
+.elpa-guide-faq details{margin:7px 0;padding:13px 14px}
+.elpa-guide-eligibility{border:1px solid #dce6f1;border-radius:10px;padding:14px 16px;margin:11px 0;color:#43556b;font-size:13px}
+.elpa-guide-eligibility summary{font-size:13.5px;font-weight:750;color:#175889;cursor:pointer}
+.elpa-guide-eligibility ul{padding-left:22px;margin:9px 0}
+.elpa-guide-eligibility li{margin:6px 0}
+.elpa-guide-eligibility p{margin:10px 0}
+.elpa-guide-practice{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:10px;margin-top:20px;min-height:44px;padding:10px 18px;background:var(--site-navy);color:#fff!important;text-decoration:none;font-weight:750;font-size:13.5px}
+.elpa-guide-practice:hover{background:#1763a3}
+.elpa-guide-source{font-size:12px;color:#64748b;line-height:1.75;margin:18px 1px 0}
+.elpa-guide-main .elpa-advice-section{margin-top:34px}
+@media(max-width:640px){.elpa-guide-panel{padding:20px 16px}.elpa-guide-switch{margin-top:15px}.elpa-guide-steps li{padding-left:36px}.elpa-guide-overview h3{font-size:20px}.elpa-guide-practice{display:flex;width:100%}}
