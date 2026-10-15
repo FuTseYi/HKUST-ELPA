@@ -276,8 +276,17 @@ test('homepage explains the full learning workflow without a repeated oversized 
  assert.equal((home.match(/class="elpa-home-feature"/g)||[]).length,4);
  for(const id of ['home-guide-title','home-bank-title','home-practice-title','home-record-title','home-more-title'])
    assert.ok(home.includes('id="'+id+'"'),'Missing '+id);
- for(const topic of ['常规 ELPA / Fast Track','考试场次','相似问法','提示小问','随机抽取','正向计时','Markdown','JSON','Vercel / GitHub Pages'])
+ for(const topic of ['常规 ELPA / Fast Track','考试场次','相似问法','提示小问','随机抽题','正向计时','记笔记','未练','练习中','已掌握','备份','恢复','换浏览器'])
    assert.ok(home.includes(topic),'Not explained: '+topic);
+ assert.match(home,/网站负责抽题和计时，你来开口回答/);
+ assert.match(home,/不会自动评价回答/);
+ assert.match(home,/打开「练习」，点击「随机抽题」/);
+ assert.match(home,/换手机或电脑，怎么接着练？/);
+ assert.match(home,/「恢复」会替换当前设备已有的记录/);
+ assert.doesNotMatch(home,/模拟口语|Markdown|JSON|elpa_data\.json/);
+ assert.equal((home.match(/class="elpa-home-instructions"/g)||[]).length,2);
+ assert.equal((home.match(/class="elpa-home-instructions-num"/g)||[]).length,6);
+ assert.equal((home.match(/class="elpa-home-backup-guide"/g)||[]).length,1);
  assert.match(home,/class="elpa-home-demo"/);
  assert.match(home,/class="elpa-home-demo elpa-home-demo-timer"/);
  assert.equal((home.match(/class="elpa-demo-top"/g)||[]).length,4);
