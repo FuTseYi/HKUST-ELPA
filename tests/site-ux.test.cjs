@@ -175,3 +175,27 @@ test('pause and resume preserve seconds, custom countdown and stopwatch work',()
  assert.equal(Math.floor(f.api.read().timerElapsed),4500);
  assert.equal(f.el('timerDisplay').textContent,'00:04');
 });
+
+test('footer is a consistent student-led open community component across all five routes',()=>{
+ const pages=['index.html','guide.html','practice.html','sources.html','submit.html'];
+ const read=file=>fs.readFileSync(path.resolve(__dirname,'..',file),'utf8');
+ for(const page of pages){
+   const html=read(page);
+   assert.equal((html.match(/<footer class="elpa-footer"/g)||[]).length,1,page);
+   assert.match(html,/Built with Passion\. Shared with Everyone\./);
+   assert.match(html,/为爱发电 · 开源共建 · 互帮互助/);
+   assert.match(html,/Created &amp; Maintained by/);
+   assert.match(html,/2026 Fall MPhil/);
+   assert.doesNotMatch(html,/2026 Fall MPhil · HKUST\(GZ\)/);
+   assert.match(html,/https:\/\/github\.com\/FuTseYi\/HKUST-ELPA\/pulls/);
+   assert.match(html,/href="\.\/submit\.html">分享考题<\/a>/);
+   for(const stack of ['GitHub','Vercel','Cloudflare'])assert.ok(html.includes('<span>'+stack+'</span>'),page+' missing '+stack);
+   assert.match(html,/Not affiliated with or endorsed by HKUST/);
+   assert.match(html,/href="\.\/sources\.html">资料来源与声明<\/a>/);
+ }
+ const practice=read('practice.html');
+ assert.equal((practice.match(/id="exportBtn"/g)||[]).length,1,'keep the notebook exporter');
+ const css=read('site.css');
+ assert.match(css,/\.elpa-footer-actions\{/);
+ assert.match(css,/@media\(max-width:560px\)/);
+});
