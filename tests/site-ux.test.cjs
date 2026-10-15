@@ -282,7 +282,7 @@ test('homepage explains the full learning workflow without a repeated oversized 
  assert.match(home,/先有 1 分钟准备，接着进入 2 分钟陈述/);
  assert.match(home,/不同校区和考试类型的收录情况可能不同/);
  assert.match(home,/不会自动评价回答/);
- assert.match(home,/打开「练习」，点击「随机抽题」/);
+ assert.match(home,/点击页面右下角的「练习」，再选「随机抽题」/);
  assert.match(home,/换手机或电脑，怎么接着练？/);
  assert.match(home,/「恢复」会替换当前设备已有的记录/);
  assert.doesNotMatch(home,/模拟口语|Markdown|JSON|elpa_data\.json/);
