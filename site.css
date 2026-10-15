@@ -78,6 +78,12 @@ body { margin:0; }
 .elpa-resource h3 {font-size:16px; margin:0 0 7px; color:var(--site-navy);}
 .elpa-resource p {font-size:13px; color:var(--site-muted);}
 .elpa-resource a {font-size:13px; font-weight:700; text-decoration:none;}
+.elpa-source-section+.elpa-source-section{margin-top:52px;padding-top:38px;border-top:1px solid var(--site-line)}
+.elpa-source-section .elpa-heading{margin-top:7px}
+.elpa-source-section .elpa-resource-grid{align-items:stretch}
+.elpa-resource-tag{display:block;margin-bottom:7px;color:#5f7892;font-size:10.5px;font-weight:800;letter-spacing:.05em}
+.elpa-resource p{line-height:1.7}
+@media(max-width:650px){.elpa-source-section+.elpa-source-section{margin-top:34px;padding-top:28px}.elpa-resource{padding:20px}}
 .elpa-cta::after,
 
 .elpa-guide-practice::after,
