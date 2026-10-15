@@ -203,6 +203,31 @@ function chromeBinary(){
         const restored=page.locator('#bankD .qcard .qnote').first();
         await restored.locator('.note-toggle').click();
         assert.equal(await restored.locator('textarea').inputValue(),'ELPA mobile smoke note');
+        // Regression: reviewed follow-ups must survive both copy and Markdown export.
+        await page.evaluate(()=>{
+          const id='D-1';
+          BANKS.D.items[0].recallTag='考生回忆，待核实';
+          ELPA_APPEARANCES[id].push({issueNumber:99999,term:'2026 Fall',examStage:'start',
+            intent:'supplement',subs:[{en:'Community-added follow-up',cn:'社区补充小问'}]});
+          notes[id+'-0']='Community supplement notes';
+          window.__elpaCopied='';
+          Object.defineProperty(navigator,'clipboard',{configurable:true,value:{
+            writeText(text){window.__elpaCopied=text;return Promise.resolve();}
+          }});
+          renderAll();
+        });
+        await page.locator('#q-D-1 .copy-btn').click();
+        const copied=await page.evaluate(()=>window.__elpaCopied);
+        assert.match(copied,/Community-added follow-up/,'Copy must include reviewed follow-ups');
+        assert.match(copied,/考生回忆，待核实/,'Copy must retain explicit provenance');
+        const downloadPromise=page.waitForEvent('download');
+        await page.locator('#recordsMenuBtn').click();
+        await page.locator('#recordsExportBtn').click();
+        const exported=await downloadPromise;
+        const markdown=fs.readFileSync(await exported.path(),'utf8');
+        assert.match(markdown,/Community-added follow-up/,'Export must include reviewed follow-ups');
+        assert.match(markdown,/Community supplement notes/,'Export must include matching follow-up notes');
+        assert.match(markdown,/考生回忆，待核实/,'Export must preserve recorded provenance');
       }
       assert.deepEqual(errors,[],'Browser JS errors at '+width+'px');
       console.log('Browser UI passed at '+width+'px');
