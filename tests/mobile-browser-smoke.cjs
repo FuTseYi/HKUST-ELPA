@@ -66,12 +66,15 @@ function chromeBinary(){
         const rect=f?.getBoundingClientRect();
         return {count:document.querySelectorAll('footer.elpa-footer').length,
           caption:f?.querySelector('.elpa-footer-cohort')?.textContent,
+          authorLast:f?.lastElementChild?.lastElementChild?.classList.contains('elpa-footer-identity'),
+          flow:[...f?.querySelectorAll('.elpa-footer-inner > *')||[]].map(el=>el.className),
           actions:f?.querySelectorAll('.elpa-footer-action').length||0,
           left:rect?.left,right:rect?.right,
           scrollWidth:document.documentElement.scrollWidth};
       });
       assert.equal(footer.count,1,'One footer required at '+width);
       assert.equal(footer.caption,'2026 Fall MPhil');
+      assert.equal(footer.authorLast,true,'Author credit should be the last footer element');
       assert.equal(footer.actions,2,'Both contribution links must be present');
       assert.ok(footer.left>=-1&&footer.right<=width+1,
         'Footer escapes mobile viewport at '+width+': '+JSON.stringify(footer));
