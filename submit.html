@@ -8,9 +8,6 @@
 <link rel="prefetch" href="./sources.html"><link rel="stylesheet" href="./site.css"><link rel="icon" type="image/svg+xml" href="./assets/elpa-mark.svg">
 <style>
 .contrib-main{max-width:860px;margin:38px auto 76px;padding:0 20px}
-.contrib-intro{margin:0 0 22px}
-.contrib-intro h1{font-size:clamp(1.8rem,4.6vw,2.5rem);line-height:1.2;margin:0 0 8px;color:#12345a}
-.contrib-intro p{font-size:.96rem;color:#52657b;margin:0;line-height:1.7}
 .contrib-panel{background:#fff;border:1px solid #dce5ee;border-radius:18px;padding:clamp(18px,4vw,34px);box-shadow:0 14px 36px rgba(17,52,91,.065)}
 .contrib-form{display:grid;gap:24px}
 .contrib-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f0f4f9;padding:5px;border-radius:12px}
@@ -97,14 +94,12 @@
       <a href="./practice.html">题库练习</a>
       <a href="./sources.html">资料来源</a>
     </div>
-    <div class="elpa-nav-actions"><a class="elpa-nav-github" href="https://github.com/FuTseYi/HKUST-ELPA" target="_blank" rel="noopener noreferrer" aria-label="HKUST-ELPA GitHub 仓库（新窗口打开）" title="GitHub · HKUST-ELPA"><img src="./assets/github-mark.svg" width="20" height="20" alt=""></a><a class="elpa-nav-submit" aria-current="page" href="./submit.html"><span aria-hidden="true">＋</span> 贡献内容</a></div>
+    <div class="elpa-nav-actions"><a class="elpa-nav-github" href="https://github.com/FuTseYi/HKUST-ELPA" target="_blank" rel="noopener noreferrer" aria-label="HKUST-ELPA GitHub 仓库（新窗口打开）" title="GitHub · HKUST-ELPA"><img src="./assets/github-mark.svg" width="20" height="20" alt=""></a><a class="elpa-nav-submit" aria-current="page" href="./submit.html"><span aria-hidden="true">＋</span> 我要分享</a></div>
   </div>
 </nav>
-<main class="contrib-main">
-<header class="contrib-intro">
-<h1>社区贡献 <span lang="en">Contribute</span></h1>
-<p>记得多少就分享多少，不需要专门整理成文档；审核后收录，帮助后来者备考。</p>
-</header>
+<main>
+<div class="elpa-subhero"><div class="elpa-subhero-inner"><span class="elpa-eyebrow">Contribute</span><h1>社区贡献</h1><p>分享考题或备考经验，补充这份由同学共同维护的 ELPA 资料。</p></div></div>
+<div class="contrib-main">
 <section class="contrib-panel" aria-label="社区贡献表单">
 <form id="submissionForm" class="contrib-form">
 <p class="contrib-notice">无需注册账号，提交后进入公开审核队列，审核通过后收录。请勿填写姓名、学号或联系方式。</p>
@@ -113,10 +108,11 @@
 <button id="tabAdvice" class="contrib-tab" type="button" aria-pressed="false">分享经验 · Advice</button>
 </div>
 <div id="questionFields" class="contrib-section">
-  <h2>01 · 考试校区与类型 <span lang="en">Campus &amp; Assessment</span></h2>
+  <h2 id="exam-context">01 · 考试校区与类型 <span lang="en">Campus &amp; Assessment</span></h2>
   <div class="contrib-row">
     <div class="contrib-field"><label for="submissionCampus">考试校区 *</label>
       <select id="submissionCampus" required>
+        <option value="" selected disabled>选择考试校区</option>
         <option value="nansha">GZ</option>
         <option value="clear-water-bay">HK</option>
       </select>
@@ -128,7 +124,7 @@
       </select>
     </div>
   </div>
-  <h2>02 · 考试场次 <span lang="en">Exam Session</span></h2>
+  <h2 id="exam-session" tabindex="-1">02 · 考试场次 <span lang="en">Exam Session</span></h2>
   <div class="contrib-row">
     <div class="contrib-field"><label for="submissionYear">考试年份 *</label>
       <select id="submissionYear" required></select>
@@ -163,6 +159,15 @@
         <label><input type="radio" name="contributionIntent" value="supplement"> 仅补充题目或提示小问</label>
         <small>同一次考试经历如果已有同学提交过，请选「仅补充」，不会重复增加考过次数。</small>
       </fieldset>
+      <div id="supplementQuestionFields" class="contrib-section" hidden>
+        <div class="contrib-field"><label for="supplementEn">补充的英文题目（选填）</label>
+          <textarea id="supplementEn" rows="3" maxlength="1000" placeholder="填写与原题相近的另一种问法"></textarea>
+        </div>
+        <div class="contrib-field"><label for="supplementCn">中文理解（选填）</label>
+          <textarea id="supplementCn" rows="3" maxlength="1000"></textarea>
+        </div>
+        <p class="contrib-caption">相似问法会与原题放在一起；提示小问会按顺序追加在原有小问后面。</p>
+      </div>
     </div>
   </div>
   <hr class="contrib-line">
@@ -180,12 +185,20 @@
 </div>
 <div id="adviceFields" class="contrib-section" hidden>
   <h2>01 · 备考阶段 <span lang="en">Preparation Stage</span></h2>
-  <div class="contrib-field"><label for="advicePhase">经验阶段 *</label>
-    <select id="advicePhase" required>
-      <option value="before">考前准备 · Before the Exam</option>
-      <option value="during">考试现场 · During the Exam</option>
-      <option value="after">考后反馈 · After the Exam</option>
-    </select>
+  <div class="contrib-row">
+    <div class="contrib-field"><label for="adviceTrack">考试方式（选填，默认常规 ELPA）</label>
+      <select id="adviceTrack">
+        <option value="regular">常规 ELPA</option>
+        <option value="fast-track">ELPA Fast Track</option>
+      </select>
+    </div>
+    <div class="contrib-field"><label for="advicePhase">经验阶段 *</label>
+      <select id="advicePhase" required>
+        <option value="before">考前准备 · Before the Exam</option>
+        <option value="during">考试现场 · During the Exam</option>
+        <option value="after">考后反馈 · After the Exam</option>
+      </select>
+    </div>
   </div>
   <hr class="contrib-line">
   <h2>02 · 主题标签 <span lang="en">Topics</span></h2>
@@ -203,24 +216,24 @@
 </div>
 <hr class="contrib-line">
 <div class="contrib-actions"><button type="button" class="contrib-button" id="previewButton">预览投稿</button>
-  <a href="./practice.html">返回题库练习 →</a></div>
+  <a href="./practice.html">返回题库练习</a></div>
 <section id="previewPanel" class="contrib-preview" aria-label="投稿预览" hidden></section>
 <div id="submissionTurnstile" class="contrib-turnstile" aria-label="人机验证"></div>
 <div class="contrib-actions"><button id="submissionButton" class="contrib-button primary" type="submit" disabled>提交待审核</button></div>
 <p id="submissionMessage" class="contrib-message" role="status" aria-live="polite"></p>
 </form>
 </section>
+</div>
 </main>
 <footer class="elpa-footer" aria-label="开源共建与项目署名">
 <div class="elpa-footer-inner">
 <div class="elpa-footer-intro">
 <p class="elpa-footer-slogan">Built with Passion. Shared with Everyone.</p>
 <p class="elpa-footer-motto">为爱发电 · 开源共建 · 互帮互助</p>
-<p class="elpa-footer-help">分享考题与经验，一起让这份资料更好。</p>
 </div>
 <div class="elpa-footer-actions">
-<a class="elpa-footer-action" href="./submit.html">分享考题</a>
-<a class="elpa-footer-action" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">提交 PR</a>
+<a class="elpa-footer-action elpa-footer-action-primary" href="./submit.html">分享考题与经验</a>
+<a class="elpa-footer-action elpa-footer-action-secondary" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">参与开源共建</a>
 </div>
 <div class="elpa-footer-divider" aria-hidden="true"></div>
 <p class="elpa-footer-tech">Built with GitHub · Vercel · Cloudflare</p>
@@ -359,7 +372,13 @@ function availableQuestions(){
     return entry?{id,en:entry.en,cn:entry.cn||''}:null;
   }).filter(Boolean);
 }
-function findQuestion(id){return availableQuestions().find(x=>x.id===id);}
+function findQuestion(id){
+  const track=trimmed('submissionTrack');
+  const allowed=track==='fast-track'?['F','T']:['A','B','C','D','H'];
+  const key=String(id||'').split('-')[0],bank=allowed.includes(key)&&BANKS[key];
+  const entry=bank&&bank.items.find(it=>key+'-'+it.num===id);
+  return entry?{id,en:entry.en,cn:entry.cn||''}:null;
+}
 function clearLink(){
   linkedId=null;
   get('mainEn').readOnly=false;get('mainCn').readOnly=false;
@@ -367,6 +386,8 @@ function clearLink(){
   get('mainCnField').classList.remove('linked-hidden');
   get('linkedQuestion').hidden=true;
   get('mainEn').value='';get('mainCn').value='';
+  get('supplementEn').value='';get('supplementCn').value='';
+  syncContributionIntent();
   renderSuggestions();
 }
 function linkQuestion(entry){
@@ -383,7 +404,16 @@ function linkQuestion(entry){
   get('matchingPanel').hidden=false;
   const selected=get('contributionIntent').querySelector('input[value="encounter"]');
   selected.checked=true;
+  syncContributionIntent();
 }
+function syncContributionIntent(){
+  const supplement=linkedId&&form.querySelector('input[name="contributionIntent"]:checked')?.value==='supplement';
+  get('supplementQuestionFields').hidden=!supplement;
+  get('supplementEn').disabled=!supplement;
+  get('supplementCn').disabled=!supplement;
+}
+for(const radio of form.querySelectorAll('input[name="contributionIntent"]'))
+  radio.addEventListener('change',syncContributionIntent);
 function renderSuggestions(){
   if(kind!=='question'){get('matchingPanel').hidden=true;return;}
   if(linkedId){get('matchingPanel').hidden=false;return;}
@@ -398,26 +428,33 @@ function renderSuggestions(){
     const button=document.createElement('button');button.type='button';button.className='contrib-match';
     const block=document.createElement('span');block.textContent=entry.en;
     const detail=document.createElement('small');detail.textContent=entry.cn;block.append(detail);
-    const action=document.createElement('em');action.textContent='关联这题 →';
+    const action=document.createElement('em');action.textContent='关联这题';
     button.append(block,action);button.addEventListener('click',()=>linkQuestion(entry));out.append(button);
   }
 }
 get('unlinkQuestion').addEventListener('click',clearLink);
 for(const id of ['mainEn','mainCn'])get(id).addEventListener('input',()=>{if(!linkedId)renderSuggestions();});
-for(const id of ['submissionCampus','submissionTrack'])get(id).addEventListener('change',()=>{
-  if(linkedId)clearLink();
-  renderSuggestions();
+get('submissionCampus').addEventListener('change',()=>renderSuggestions());
+get('submissionTrack').addEventListener('change',()=>{
+  if(linkedId)clearLink();else renderSuggestions();
 });
 function loadQuestionLink(){
   const params=new URLSearchParams(location.search);
   const campus=params.get('campus'),track=params.get('track'),id=params.get('question');
+  if(['regular','fast-track'].includes(track))get('adviceTrack').value=track;
   if(['nansha','clear-water-bay'].includes(campus))get('submissionCampus').value=campus;
   if(['regular','fast-track'].includes(track))get('submissionTrack').value=track;
   const q=id&&findQuestion(id);
   if(q){
     linkQuestion(q);
-    if(params.get('intent')==='supplement')
+    const intent=params.get('intent');
+    if(intent==='supplement')
       get('contributionIntent').querySelector('input[value="supplement"]').checked=true;
+    syncContributionIntent();
+    if(intent==='encounter')requestAnimationFrame(()=>{
+      get('exam-context').scrollIntoView({block:'start',behavior:'instant'});
+      get('submissionCampus').focus({preventScroll:true});
+    });
   }else renderSuggestions();
 }
 
@@ -426,7 +463,7 @@ function buildData(){
   if(kind==='advice'){
     const tags=[...list.querySelectorAll('input:checked')].map(x=>x.value);
     if(tags.length<1||tags.length>4)throw new Error('请选择 1–4 个主题标签。');
-    return {version:2,kind:'advice',phase:trimmed('advicePhase'),tags,
+    return {version:2,kind:'advice',track:trimmed('adviceTrack'),phase:trimmed('advicePhase'),tags,
       title:trimmed('adviceTitle'),body:trimmed('adviceBody')};
   }
   const slot=trimmed('submissionSlot');
@@ -439,12 +476,16 @@ function buildData(){
   if(!trimmed('mainEn')||subs.some(x=>!x.en))
     throw new Error('请填写英文主问题；小问只需填写记得的英文内容，中文可留空。');
   const intent=linkedId?form.querySelector('input[name="contributionIntent"]:checked').value:'encounter';
-  if(intent==='supplement'&&!subs.length)
-    throw new Error('仅补充题目内容时，请至少添加一条新的提示小问。');
+  const alternative=intent==='supplement'?{en:trimmed('supplementEn'),cn:trimmed('supplementCn')}:null;
+  if(alternative&&alternative.cn&&!alternative.en)
+    throw new Error('填写中文理解时，也请填写补充的英文题目。');
+  if(intent==='supplement'&&!alternative.en&&!subs.length)
+    throw new Error('仅补充题目内容时，请填写相似问法或至少添加一条新的提示小问。');
   return {version:2,kind:'question',campus:trimmed('submissionCampus'),track:trimmed('submissionTrack'),
     term:trimmed('submissionYear')+' '+semester,
     examStage,main:{en:trimmed('mainEn'),cn:trimmed('mainCn')},
     subs,source:trimmed('submissionSource'),
+    ...(alternative&&alternative.en?{alternatives:[alternative]}:{}),
     ...(linkedId?{linkedQuestionId:linkedId,intent}:{} )};
 }
 function validateForm(){
@@ -462,19 +503,24 @@ function showPreview(){
   addText(preview,'h2','投稿预览 · Review');
   if(data.kind==='question'){
     addText(preview,'small',(data.linkedQuestionId?'已关联 '+data.linkedQuestionId+' · '+
-      (data.intent==='supplement'?'仅补充小问':'我也考过')+' · ':'')+
+      (data.intent==='supplement'?'补充题目内容':'我也考过')+' · ':'')+
       (data.campus==='nansha'?'GZ':'HK')+' · '+
       (data.track==='regular'?'常规 ELPA':'ELPA Fast Track')+' · '+data.term+' · '+taxonomy.examStages[data.examStage].zh+
       ' · '+taxonomy.sourceTypes[data.source].zh);
     addText(preview,'strong',data.main.en);
     addText(preview,'p',data.main.cn);
+    for(const alternative of data.alternatives||[]){
+      addText(preview,'small','相似问法','contrib-preview-line');
+      addText(preview,'p',alternative.en);
+      addText(preview,'p',alternative.cn);
+    }
     for(const [i,s] of data.subs.entries()){
       addText(preview,'small','小问 '+(i+1),'contrib-preview-line');
       addText(preview,'p',s.en);
       addText(preview,'p',s.cn);
     }
   }else{
-    addText(preview,'small',taxonomy.advicePhases[data.phase].zh+' · '+
+    addText(preview,'small',(data.track==='fast-track'?'ELPA Fast Track':'常规 ELPA')+' · '+taxonomy.advicePhases[data.phase].zh+' · '+
       data.tags.map(x=>taxonomy.adviceTags[x].zh).join('、'));
     addText(preview,'strong',data.title);
     addText(preview,'p',data.body);
@@ -520,6 +566,7 @@ form.addEventListener('submit',async event=>{
     if(!response.ok||!result.ok)throw new Error(result.message||'提交失败，请稍后重试。');
     form.reset();followups.replaceChildren();refreshFollowups();
     get('mainEn').readOnly=false;get('mainCn').readOnly=false;linkedId=null;
+    get('supplementEn').value='';get('supplementCn').value='';syncContributionIntent();
     get('mainEnField').classList.remove('linked-hidden');
     get('mainCnField').classList.remove('linked-hidden');
     year.value=String(currentYear);
@@ -529,7 +576,7 @@ form.addEventListener('submit',async event=>{
     say('提交成功！已经收到你的分享，审核通过后会收录到题库。','success');
     if(/^https:\/\/github\.com\/FuTseYi\/HKUST-ELPA\/issues\/\d+$/.test(result.issueUrl||'')){
       const a=document.createElement('a');a.href=result.issueUrl;a.target='_blank';
-      a.rel='noopener noreferrer';a.textContent='查看投稿记录 ↗';message.append(' ',a);
+      a.rel='noopener noreferrer';a.textContent='查看投稿记录';message.append(' ',a);
     }
   }catch(e){say(e.message||'网络异常，请稍后重试。','error');}
   finally{
@@ -537,7 +584,7 @@ form.addEventListener('submit',async event=>{
     if(widgetId!==null&&window.turnstile)window.turnstile.reset(widgetId);
   }
 });
-setKind('question');
+setKind(new URLSearchParams(location.search).get('kind')==='advice'?'advice':'question');
 })();
 </script>
 </body>

@@ -8,6 +8,7 @@
 - Question submissions require the remembered English main question; Chinese translations are optional. Each submitted follow-up requires English, while Chinese is optional. Never manufacture a missing translation.
 - Follow-ups are optional and dynamically added, removed and ordered; if provided, English text is required. Initial count is zero and cap is 20.
 - Preparation advice uses **a single-language required title and body**, regardless of the site's interface language. No compulsory translation.
+- Advice may include `track` (`regular` or `fast-track`); older submissions without it belong to Regular. The guide shows reviewed advice for the selected track and offers a Fast Track sharing link when that track is empty.
 - All categories use fixed codes with bilingual labels in `question-bank/taxonomy.js`. No free-form categories.
 - Placeholders are **short, professional and non-repetitive**; length limits, privacy notes and instructions belong in labels, helper text or errors—not placeholder prose.
 - The new question form requires a year and one of six Spring/Fall × start/mid/end slots. No “unknown stage” option for **new** reports. Historic records without evidence of a stage remain unclassified.
@@ -34,6 +35,7 @@ Advice:
 {
   "version": 2,
   "kind": "advice",
+  "track": "regular",
   "phase": "before",
   "tags": ["speaking-strategy"],
   "title": "我的口语备考建议",

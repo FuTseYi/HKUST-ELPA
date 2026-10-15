@@ -30,14 +30,17 @@ function validate(data){
      data.main && valid(data.main.en,8,1000) && valid(data.main.cn,0,1000) &&
      Array.isArray(data.subs) && data.subs.length<=20 &&
      data.subs.every(s=>s && valid(s.en,1,400)&&valid(s.cn,0,400)) &&
+     (data.alternatives===undefined||(Array.isArray(data.alternatives) && data.alternatives.length<=1 &&
+       data.alternatives.every(s=>s&&valid(s.en,8,1000)&&valid(s.cn,0,1000)))) &&
      ['firsthand','secondhand'].includes(data.source) &&
      (data.linkedQuestionId===undefined||
        (/^[A-DFHT]-[0-9]+$/.test(data.linkedQuestionId)&&
         ['encounter','supplement'].includes(data.intent))) &&
      (data.intent===undefined||data.linkedQuestionId!==undefined) &&
-     (data.intent!=='supplement'||data.subs.length>0);
+     (data.intent!=='supplement'||data.subs.length>0||(data.alternatives&&data.alternatives.length>0));
  if(data.kind==='advice')
-   return ['before','during','after'].includes(data.phase) &&
+   return (data.track===undefined||['regular','fast-track'].includes(data.track)) &&
+     ['before','during','after'].includes(data.phase) &&
      Array.isArray(data.tags) && data.tags.length>=1 && data.tags.length<=4 &&
      new Set(data.tags).size===data.tags.length && data.tags.every(t=>tags.includes(t)) &&
      valid(data.title,4,120) && valid(data.body,20,6000);
@@ -66,11 +69,11 @@ module.exports=function importV2(event){
    if(!Array.isArray(existing))throw Error('Advice database invalid');
    const id='ADV-'+number;
    if(existing.some(x=>x.id===id)){output('duplicate');return;}
-   existing.push({id,issueNumber:number,phase:data.phase,tags:data.tags,
+   existing.push({id,issueNumber:number,track:data.track||'regular',phase:data.phase,tags:data.tags,
      title:text(data.title),body:text(data.body)});
    saveJS(adviceFile,'ELPA_ADVICE',existing);
    appendDoc(adviceDoc,'# 社区备考经验 · Reviewed Preparation Advice\n\n> 考生分享，不代表学校官方建议。\n',
-     '\n## '+id+' · '+quote(text(data.title))+'\n\n阶段：'+data.phase+
+     '\n## '+id+' · '+quote(text(data.title))+'\n\n考试方式：'+(data.track||'regular')+' ｜ 阶段：'+data.phase+
      ' ｜ 标签：'+data.tags.join(', ')+' ｜ [原始投稿](https://github.com/FuTseYi/HKUST-ELPA/issues/'+number+')'+
      '\n\n'+quote(text(data.body))+'\n');
    output('added');return;
@@ -109,6 +112,7 @@ module.exports=function importV2(event){
  if(appearances.some(x=>x.issueNumber===number)){output('duplicate');return;}
  const occurrence={issueNumber:number,term:data.term,examStage:data.examStage,
    source:data.source,campus,track,intent:data.intent||'encounter',
+   ...(data.alternatives?.length?{alternatives:data.alternatives.map(x=>({en:text(x.en),cn:text(x.cn)}))}:{}),
    ...(data.subs.length?{subs:data.subs.map(x=>({en:text(x.en),cn:text(x.cn)}))}:{} )};
  app[id]=[...appearances,occurrence];
  if(!matched){
@@ -146,11 +150,13 @@ module.exports=function importV2(event){
    '\n## '+data.term+' · '+campusLabel+' · '+trackLabel+' · Issue #'+number+
    '\n\n考试阶段：'+data.examStage+
    ' ｜ 来源：'+(data.source==='firsthand'?'本人亲历':'同学转述')+
-   ' ｜ 类型：'+(data.intent==='supplement'?'仅补充小问':'新增考试经历')+
+   ' ｜ 类型：'+(data.intent==='supplement'?'补充题目内容':'新增考试经历')+
    ' ｜ 关联题目：'+id+
    ' ｜ [投稿记录](https://github.com/FuTseYi/HKUST-ELPA/issues/'+number+')'+
    '\n\n**English**\n\n'+quote(text(data.main.en))+
    '\n\n**中文**\n\n'+quote(text(data.main.cn))+
+   '\n\n**相似问法**\n\n'+(data.alternatives?.length?data.alternatives.map(s=>
+      quote(text(s.en))+'\n'+quote(text(s.cn))).join('\n\n'):'> 无')+
    '\n\n**提示小问**\n\n'+(data.subs.length?data.subs.map((s,i)=>
       '\n'+(i+1)+'. '+quote(text(s.en))+'\n'+quote(text(s.cn))).join('\n'):'> 无')+'\n');
  output(matched?'linked':'added');

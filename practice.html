@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>题库练习｜HKUST-ELPA</title><link rel="prefetch" href="./sources.html"><link rel="stylesheet" href="./site.css"><link rel="icon" type="image/svg+xml" href="./assets/elpa-mark.svg">
-<link rel="preload" as="image" href="./assets/Administration-Building-14-1536x864.jpg">
-<meta name="description" content="HKUST-ELPA 非官方口语题库练习，现有资料以香港科技大学（广州）的考生回忆为主，提供检索、模拟计时和学习笔记。">
+<meta name="description" content="HKUST-ELPA 非官方口语题库练习，提供题目检索、模拟计时、学习状态和本地笔记。">
 <meta name="theme-color" content="#1e3a8a">
 <style>
   :root {
@@ -92,9 +91,14 @@
   /* ===== Progress ===== */
   .progress-card {
     background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
-    padding: 16px 20px; margin-bottom: 22px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 16px 20px; margin-bottom: 22px;
   }
   .progress-card .label { font-size: 13.5px; color: var(--ink-soft); }
+  .progress-head { display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap; }
+  .progress-head > .label { color:var(--ink);font-weight:700; }
+  .progress-head-actions { display:flex;align-items:center;gap:10px;flex-wrap:wrap; }
+  .progress-main { display:flex;align-items:center;gap:12px;margin:16px 0 7px; }
+  #progressDetail { display:block; }
   .progress-bar { flex: 1; min-width: 160px; height: 8px; background: #eef0f4; border-radius: 99px; overflow: hidden; }
   .progress-bar > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--brand), var(--accent)); border-radius: 99px; transition: width .35s; }
   .progress-card .pct { font-size: 15px; font-weight: 700; color: var(--brand); min-width: 52px; text-align: right; }
@@ -125,6 +129,7 @@
     font-size: 12px; background: var(--brand-soft); color: var(--brand);
     padding: 3px 10px; border-radius: 999px; font-weight: 600;
   }
+  .sec-head .sec-meta {display:flex;align-items:center;gap:7px;margin-left:auto;}
   .sec-desc { color: var(--ink-soft); font-size: 13.5px; margin: -8px 0 16px; }
 
   /* ===== Process timeline ===== */
@@ -510,8 +515,10 @@
   .source-notice { padding:13px 17px; border:1px solid #dbeafe; border-radius:12px; margin-bottom:18px;
     background:#eff6ff; color:#334155; font-size:13px; line-height:1.7; }
   .source-notice a { color:#1d4ed8; }
-  .filter-select { border:1px solid var(--line); background:#fff; border-radius:999px; padding:8px 12px;
-    color:var(--ink); font-size:13px; min-height:36px; max-width:140px; }
+  .filter-select { border:1px solid var(--line); border-radius:999px;
+    background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.25 6 6.25 11 1.25' fill='none' stroke='%23334a62' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center/12px 8px;
+    appearance:none; -webkit-appearance:none; padding:7px 28px 7px 12px;
+    color:var(--ink); font-size:13px; min-height:36px; width:auto; max-width:100%; }
   .toolbar-action { border:1px solid var(--line); background:#fff; color:var(--ink);
     border-radius:999px; padding:8px 12px; cursor:pointer; font-size:12.5px; white-space:nowrap; }
   .toolbar-action:hover { border-color:var(--brand); color:var(--brand); }
@@ -526,7 +533,7 @@
     .toolbar { gap:8px; position:relative; }
     .toolbar-icons { gap:8px; margin-left:0; }
     .search-box { min-width:100%; }
-    .filter-select { flex:1; max-width:none; }
+    .filter-select { flex:0 1 auto; max-width:100%; }
     .stat-pill { padding:7px 10px; }
     .qcard { padding:14px 13px; }
     .q-title .en { font-size:15px; overflow-wrap:anywhere; }
@@ -661,35 +668,26 @@
   .elpa-choice-buttons button[aria-pressed="true"]{background:#003e74;color:#fff;box-shadow:0 2px 8px rgba(0,48,91,.14)}
   .elpa-choice-buttons button:focus-visible{outline:3px solid #e3b34b;outline-offset:2px}
   .elpa-choice-note{font-size:12px;color:#60758b;line-height:1.7;margin:12px 0 0}
-  .page-practice section[hidden],.page-practice .elpa-fast-intro[hidden]{display:none!important}
-  .elpa-fast-intro{background:#fff;border:1px solid #dbe5f0;border-radius:14px;padding:22px;margin:20px 0 28px}
-  .elpa-fast-intro h2{font-size:18px;color:#003e74;margin:0 0 7px}
-  .elpa-fast-intro p{font-size:13px;color:#5d6b7c;margin:0 0 12px}
-  .elpa-fast-intro ol{margin:0;padding-left:22px}
-  .elpa-fast-intro li{margin:8px 0;color:#233c57;font-size:14px}
-  .elpa-fast-intro li span{display:block;color:#64748b;font-size:12px}
+  .page-practice section[hidden]{display:none!important}
   @media(max-width:640px){.elpa-choices{padding:14px}.elpa-choice-row{gap:7px;flex-direction:column;align-items:stretch}.elpa-choice-row+.elpa-choice-row{margin-top:14px}.elpa-choice-buttons{width:100%}.elpa-choice-buttons button{flex:1 1 0;min-width:0;padding:8px 6px;font-size:12px}}
 
 
-  /* Mobile practice layout: keep title and count on separate aligned rows. */
+  /* Mobile practice layout: keep each section title and its data together. */
   @media (max-width: 760px) {
     .page-practice .sec-head {
-      display: grid;
-      grid-template-columns: 28px minmax(0, 1fr);
-      align-items: start;
-      column-gap: 9px;
-      row-gap: 8px;
+      display:flex;align-items:center;gap:8px;flex-wrap:nowrap;
     }
-    .page-practice .sec-head .emoji {grid-column:1;grid-row:1;line-height:1.35;font-size:22px;}
+    .page-practice .sec-head .emoji {line-height:1.2;font-size:20px;flex:0 0 auto;}
     .page-practice .sec-head h2 {
-      grid-column:2;grid-row:1;min-width:0;margin:0;
-      font-size:clamp(20px,4.9vw,24px);line-height:1.4;
-      overflow-wrap:break-word;
+      min-width:0;margin:0;font-size:clamp(18px,4.8vw,22px);line-height:1.35;
+      white-space:nowrap;
+    }
+    .page-practice .sec-head .sec-meta {
+      display:grid;gap:4px;justify-items:end;margin-left:auto;flex:0 0 auto;
     }
     .page-practice .sec-head .tag {
-      grid-column:2;grid-row:2;justify-self:start;
-      max-width:100%;min-width:0;padding:5px 11px;
-      line-height:1.45;white-space:normal;overflow-wrap:break-word;
+      flex:0 0 auto;padding:3px 7px;font-size:10.5px;
+      line-height:1.4;white-space:nowrap;
     }
   }
   @media (max-width: 640px) {
@@ -716,13 +714,17 @@
 
 
 /* Compact practice actions; legacy sync controls stay hidden. */
-.practice-main-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;width:100%;margin:8px 0 3px}
 .practice-action{border:1px solid #ccd9e7;border-radius:10px;background:#fff;color:#153e65;padding:10px 14px;font:inherit;font-weight:650;font-size:13px;cursor:pointer;min-height:42px}
 .practice-action:hover{background:#eef5fc;border-color:#7cadd7}
 .practice-action.primary{background:#124f86;border-color:#124f86;color:#fff}
 .practice-action.primary:hover{background:#0d3d69}
 .practice-action.subtle{font-weight:500}
 .records-menu{position:relative;margin-left:auto}
+#sessionFilter{field-sizing:content}
+#sessionFilter:focus-visible,#recordsMenuBtn:focus-visible{outline-width:2px;outline-offset:2px}
+.progress-head-actions .stat-pill,#recordsMenuBtn{box-sizing:border-box;height:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+.progress-head-actions .stat-pill{padding:0 12px}
+#recordsMenuBtn{width:auto;padding:0 10px;border-radius:999px;font-size:13px;line-height:1.2}
 .records-menu-panel{position:absolute;right:0;top:calc(100% + 6px);width:min(310px,calc(100vw - 38px));background:white;border:1px solid #d8e3ee;box-shadow:0 12px 35px rgba(15,45,72,.13);border-radius:12px;padding:12px;z-index:90}
 .records-menu-panel[hidden]{display:none!important}
 .records-menu-panel p{font-size:12px;line-height:1.6;color:#536a7d;margin:0 0 8px}
@@ -734,15 +736,19 @@
 .question-contribute a{color:#527c9e;font-size:12px;text-decoration:none}
 .question-contribute a:hover{text-decoration:underline}
 .page-practice #saveBtn,.page-practice #exportBtn{display:none!important}
-@media(max-width:640px){.practice-main-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.practice-main-actions>.practice-action{width:100%;padding:9px 8px}.records-menu{margin-left:0}.records-menu>.practice-action{width:100%}.records-menu-panel{right:0}}
+@media(max-width:640px){.progress-head-actions{width:100%;justify-content:space-between}.records-menu{margin-left:0}.records-menu-panel{right:0}}
 
 
   /* One compact exercise dock; the sheet stays above iOS Safari's usable viewport. */
-  .page-practice .to-top {display:none!important}
-  .page-practice .practice-main-actions{display:flex;justify-content:flex-end;align-items:center;gap:0;margin:4px 0 0}
-  .page-practice .practice-main-actions .records-menu{margin-left:auto}
+  .page-practice .to-top{
+    display:inline-grid!important;place-items:center;right:16px;
+    bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:112;
+    width:38px;height:38px;border:1px solid #cbd9e7;border-radius:999px;
+    color:#003e74;background:#fff;box-shadow:0 7px 20px rgba(0,40,85,.16);
+    font-size:17px;font-weight:700
+  }
   .page-practice .practice-launcher{
-    position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));
+    position:fixed;right:16px;bottom:calc(66px + env(safe-area-inset-bottom,0px));
     z-index:112;display:inline-flex;align-items:center;justify-content:center;gap:7px;
     border:0;border-radius:999px;padding:0 16px;min-height:46px;
     color:white;background:#003e74;box-shadow:0 8px 25px rgba(0,40,85,.22);
@@ -751,7 +757,7 @@
   }
   .page-practice .practice-launcher:focus-visible{outline:3px solid #e4b73e;outline-offset:3px}
   .page-practice .timer-panel{
-    top:auto;left:auto;right:12px;bottom:calc(74px + env(safe-area-inset-bottom,0px));
+    top:auto;left:auto;right:12px;bottom:calc(120px + env(safe-area-inset-bottom,0px));
     z-index:111;width:min(320px,calc(100vw - 24px));max-width:none;
     max-height:min(410px,calc(100dvh - 100px));overflow-y:auto;
     padding:13px;border:1px solid #dbe5f0;border-radius:16px;
@@ -799,8 +805,9 @@
     }
     .page-practice .qcard .q-actions.no-translation{grid-template-columns:repeat(2,minmax(0,1fr))}
     .page-practice .qcard .q-actions button{width:100%;min-width:0;padding:7px 3px;min-height:40px}
-    .page-practice .timer-panel{right:12px;left:12px;bottom:calc(77px + env(safe-area-inset-bottom,0px));width:auto;max-width:none;margin:0}
-    .page-practice .practice-launcher{right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+    .page-practice .timer-panel{right:12px;left:12px;bottom:calc(118px + env(safe-area-inset-bottom,0px));width:auto;max-width:none;margin:0}
+    .page-practice .practice-launcher{right:14px;bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+    .page-practice .to-top{right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px))}
   }
   @media(prefers-reduced-motion:reduce){
     .page-practice .qcard.drill-flash{animation:none!important}
@@ -834,7 +841,7 @@
 
 </style>
 </head>
-<body class="page-practice">
+<body class="elpa-body page-practice">
 <nav class="elpa-nav" aria-label="主导航">
   <div class="elpa-nav-inner">
     <a class="elpa-brand" href="./index.html" aria-label="HKUST-ELPA 首页"><span class="elpa-brand-icon"><img src="./assets/elpa-mark.svg" alt="" width="38" height="38"></span><span class="elpa-brand-name">HKUST-<strong>ELPA</strong><small>Speaking Preparation</small></span></a>
@@ -844,15 +851,16 @@
       <a href="./practice.html" class="active" aria-current="page">题库练习</a>
       <a href="./sources.html">资料来源</a>
     </div>
-    <div class="elpa-nav-actions"><a class="elpa-nav-github" href="https://github.com/FuTseYi/HKUST-ELPA" target="_blank" rel="noopener noreferrer" aria-label="HKUST-ELPA GitHub 仓库（新窗口打开）" title="GitHub · HKUST-ELPA"><img src="./assets/github-mark.svg" width="20" height="20" alt=""></a><a class="elpa-nav-submit" href="./submit.html"><span aria-hidden="true">＋</span> 贡献内容</a></div>
+    <div class="elpa-nav-actions"><a class="elpa-nav-github" href="https://github.com/FuTseYi/HKUST-ELPA" target="_blank" rel="noopener noreferrer" aria-label="HKUST-ELPA GitHub 仓库（新窗口打开）" title="GitHub · HKUST-ELPA"><img src="./assets/github-mark.svg" width="20" height="20" alt=""></a><a class="elpa-nav-submit" href="./submit.html"><span aria-hidden="true">＋</span> 我要分享</a></div>
   </div>
 </nav>
 
-<header class="campus-hero"><div class="hero-inner"><span class="hero-eyebrow">ELPA · Speaking Practice</span><h1>题库练习 <span class="hero-highlight">Practice</span></h1><p class="hero-lead">最新学期新题 · 过往题库 · 搜索 · 分页 · 模拟计时</p><p class="hero-description">笔记与练习状态自动保存在当前浏览器，支持导出与恢复。</p><nav class="elpa-actions" aria-label="题库快速跳转"><a class="elpa-cta elpa-cta-primary" href="#sec-bankD">最新学期新题 <span aria-hidden="true">↓</span></a><a class="elpa-cta elpa-cta-secondary" href="#sec-bankA">过往题库 <span aria-hidden="true">↓</span></a></nav></div></header>
+<main>
+<header class="campus-hero elpa-subhero"><div class="hero-inner elpa-subhero-inner"><span class="hero-eyebrow elpa-eyebrow">Speaking Practice</span><h1>题库练习</h1><p class="hero-description">搜索和筛选已收录题目，使用模拟计时、学习状态和本地笔记持续练习。</p></div></header>
 
 <div class="wrap">
   <aside class="source-notice" role="note">
-    本站为学生维护的<strong>非官方备考资料</strong>。题库可以直接用于模拟练习；少数回忆不完整的题目会单独标注。「考过次数」根据已整理的历史回忆及审核反馈统计，并非官方完整抽题数据。考试信息以学校当期通知为准。<a href="https://github.com/FuTseYi/HKUST-ELPA/tree/main/question-bank">查看题目来源与分类说明</a>。
+    本站为学生维护的<strong>非官方备考资料</strong>。题库可以直接用于模拟练习；少数回忆不完整的题目会单独标注。「过往考过次数」根据已收录的考生反馈统计，并非官方完整抽题数据。考试信息以学校当期通知为准。<a href="./sources.html">查看参考资料</a>。
   </aside>
 
   <section class="elpa-choices" id="examChoices" aria-label="考试校区和类型">
@@ -875,27 +883,19 @@
         <input type="search" id="searchInput" name="query" aria-label="搜索题目或关键词" placeholder="搜索题目或关键词" enterkeyhint="search" autocomplete="off">
         <button type="button" class="search-clear" id="searchClear" title="清空搜索" aria-label="清空搜索">×</button>
       </div>
-      <button type="submit" class="search-submit" id="searchSubmit">搜索 <span aria-hidden="true">↗</span></button>
+      <button type="submit" class="search-submit" id="searchSubmit">搜索</button>
     </form>
     <p id="searchFeedback" class="search-feedback" role="status" aria-live="polite" hidden></p>
-    <label class="sr-only" for="termFilter">按考试学期筛选</label>
-    <select id="termFilter" class="filter-select" aria-label="按考试学期筛选">
-      <option value="">全部考试学期</option>
-    </select>
-    <label class="sr-only" for="examStageFilter">按考试场次筛选</label>
-    <select id="examStageFilter" class="filter-select" aria-label="按考试场次筛选">
+    <label class="sr-only" for="sessionFilter">按考试场次筛选</label>
+    <select id="sessionFilter" class="filter-select" aria-label="按考试场次筛选">
       <option value="">全部考试场次</option>
-      <option value="start">开学阶段</option>
-      <option value="mid">学期中</option>
-      <option value="end">学期末</option>
     </select>
     <label for="statusFilter" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">练习状态筛选</label>
     <select id="statusFilter" class="filter-select" aria-label="练习状态筛选">
-      <option value="all">全部状态</option><option value="new">未练</option>
+      <option value="all">备考状态</option><option value="new">未练</option>
       <option value="doing">练习中</option><option value="done">已掌握</option>
     </select>
     <span class="stat-pill">显示 <b id="matchCount">0</b> / <b id="totalCount">0</b> 条</span>
-    <span class="stat-pill">已掌握 <b id="doneCount">0</b> 条</span>
     <div hidden id="legacyDataControls">
     <button class="save-top" id="saveTopBtn" title="手动保存；未关联文件夹时学习记录仍自动保存在本浏览器">💾 保存</button>
     <button class="toolbar-action" id="backupBtn" type="button" title="下载独立的 JSON 备份文件">⬇ 备份</button>
@@ -911,18 +911,6 @@
       <button class="folder-btn" id="timerBtn" title="计时器（倒计时 / 正向计时）" aria-label="打开或关闭练习计时器">⏱️</button>
       <button class="folder-btn" id="folderBtn" title="关联／更换 JSON 数据文件夹（可选）" aria-label="关联或更换 JSON 数据文件夹">📂</button>
     </span>
-    </div>
-    <div class="practice-main-actions">
-      <div class="records-menu">
-        <button type="button" class="practice-action subtle" id="recordsMenuBtn" aria-expanded="false" aria-controls="recordsMenu">学习记录 ▾</button>
-        <div class="records-menu-panel" id="recordsMenu" hidden>
-          <p>学习进度和笔记已自动保存在此浏览器。</p>
-          <button type="button" id="recordsBackupBtn">⬇ 备份学习记录</button>
-          <button type="button" id="recordsRestoreBtn">⬆ 恢复学习记录</button>
-          <button type="button" id="recordsExportBtn">📄 导出笔记</button>
-          <small>换设备或切换网站域名前，请先备份；不同浏览器不会自动同步。</small>
-        </div>
-      </div>
     </div>
     <div class="empty" id="emptyState" role="status">😕 没有找到匹配「<span id="emptyKeyword"></span>」的题目，换个关键词试试？</div>
   </div>
@@ -995,9 +983,23 @@
 
   <!-- Progress -->
   <div class="progress-card">
-    <span class="label">📈 备考进度</span>
-    <div class="progress-bar" role="progressbar" id="progressBar" aria-label="已掌握题目比例" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressFill"></div></div>
-    <span class="pct" id="progressPct">0%</span>
+    <div class="progress-head">
+      <span class="label">备考进度</span>
+      <div class="progress-head-actions">
+        <span class="stat-pill">已掌握 <b id="doneCount">0</b> 条</span>
+        <div class="records-menu">
+          <button type="button" class="practice-action subtle" id="recordsMenuBtn" aria-expanded="false" aria-controls="recordsMenu">学习记录 ▾</button>
+          <div class="records-menu-panel" id="recordsMenu" hidden>
+            <p>学习进度和笔记已自动保存在此浏览器。</p>
+            <button type="button" id="recordsBackupBtn">⬇ 备份学习记录</button>
+            <button type="button" id="recordsRestoreBtn">⬆ 恢复学习记录</button>
+            <button type="button" id="recordsExportBtn">📄 导出笔记</button>
+            <small>换设备或切换网站域名前，请先备份；不同浏览器不会自动同步。</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="progress-main"><div class="progress-bar" role="progressbar" id="progressBar" aria-label="已掌握题目比例" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressFill"></div></div><span class="pct" id="progressPct">0%</span></div>
     <span class="label" id="progressDetail"></span>
   </div>
 
@@ -1005,37 +1007,29 @@
   <nav class="toc" id="toc"></nav>
 
   <section id="sec-bankD">
-    <div class="sec-head"><span class="emoji">🎓</span><h2 id="currentBankTitle">最新学期题库</h2><span class="tag" id="feedbackBankCount">最新已收录学期 · 持续更新</span></div>
-    <p class="sec-desc" id="currentBankDescription">优先展示已收录的最新考试学期题目；新学期考题审核入库后自动切换，原有场次归入下方过往题库。</p>
+    <div class="sec-head"><span class="emoji">🎓</span><h2 id="currentBankTitle">当前场次题库</h2><span class="sec-meta"><span class="tag" id="feedbackBankCount" aria-live="polite">— 题</span></span></div>
     <div id="bankD"></div>
-    <nav class="bank-pagination" id="pagerFall" aria-label="最新学期题库分页"></nav>
+    <nav class="bank-pagination" id="pagerFall" aria-label="当前场次题库分页"></nav>
   </section>
 
   <section id="sec-bankA">
-    <div class="sec-head"><span class="emoji">📚</span><h2>过往题库</h2><span class="tag" id="pastBankCount">历年题目 · 持续归档</span></div>
-    <p class="sec-desc">往届经典题与其他学期的考生反馈统一归档，题目保留原有编号与学习进度，随时可以继续练习。</p>
+    <div class="sec-head"><span class="emoji">📚</span><h2 id="pastBankTitle">过往题库</h2><span class="sec-meta"><span class="tag" id="pastBankCount" aria-live="polite">— 题</span></span></div>
     <div id="bankPast"></div>
     <nav class="bank-pagination" id="pagerPast" aria-label="过往题库分页"></nav>
   </section>
 
-  <section class="elpa-fast-intro" id="fastIntroSection" hidden aria-labelledby="fastIntroTitle">
-    <h2 id="fastIntroTitle">补充准备 · 完整自我介绍任务</h2>
-    <p>另行收集的独立任务，包含 8 个准备要点，不计入 12 道题目。</p>
-    <div id="fastIntroDetails"></div>
-  </section>
-
   <div hidden><button class="export-link" id="exportBtn" title="将全部题目与笔记导出为 Markdown 下载">📤 导出全部笔记（.md）</button></div>
 </div>
+</main>
 <footer class="elpa-footer" aria-label="开源共建与项目署名">
 <div class="elpa-footer-inner">
 <div class="elpa-footer-intro">
 <p class="elpa-footer-slogan">Built with Passion. Shared with Everyone.</p>
 <p class="elpa-footer-motto">为爱发电 · 开源共建 · 互帮互助</p>
-<p class="elpa-footer-help">分享考题与经验，一起让这份资料更好。</p>
 </div>
 <div class="elpa-footer-actions">
-<a class="elpa-footer-action" href="./submit.html">分享考题</a>
-<a class="elpa-footer-action" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">提交 PR</a>
+<a class="elpa-footer-action elpa-footer-action-primary" href="./submit.html">分享考题与经验</a>
+<a class="elpa-footer-action elpa-footer-action-secondary" href="https://github.com/FuTseYi/HKUST-ELPA/pulls" target="_blank" rel="noopener noreferrer" aria-label="通过 GitHub Pull Request 参与项目共建">参与开源共建</a>
 </div>
 <div class="elpa-footer-divider" aria-hidden="true"></div>
 <p class="elpa-footer-tech">Built with GitHub · Vercel · Cloudflare</p>
@@ -1397,15 +1391,8 @@ restoreInput.addEventListener('change', async () => {
 });
 
 function qId(bank, num) { return bank + '-' + num; }
-function legacyCommunityNote(bankKey,item) {
-  // Optional provenance remains separate from the readable Chinese translation.
-  return bankKey === 'D' && typeof item.sourceNote === 'string' ? item.sourceNote : '';
-}
 function questionTranslation(bankKey,item) {
   return item.cn || '';
-}
-function questionSourceNote(bankKey,item) {
-  return legacyCommunityNote(bankKey,item);
 }
 function appearancesFor(id){
   const records=ELPA_APPEARANCES[id];
@@ -1433,20 +1420,20 @@ function questionFollowups(id,item){
   }
   return result;
 }
+function questionAlternatives(id,item){
+  const normalize=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[\p{P}\p{S}\s]/gu,'');
+  const result=[],seen=new Set([normalize(item.en)]);
+  for(const alternative of appearancesFor(id).flatMap(x=>Array.isArray(x.alternatives)?x.alternatives:[])){
+    if(!alternative||!alternative.en)continue;
+    const key=normalize(alternative.en);
+    if(seen.has(key))continue;
+    seen.add(key);result.push(alternative);
+  }
+  return result;
+}
 function feedbackRanked(ids){
   return ids.map((id,i)=>({id,i,count:feedbackCount(id)}))
     .sort((a,b)=>b.count-a.count||a.i-b.i).map(x=>x.id);
-}
-function sessionBadges(id){
-  const unique=new Set();
-  return appearancesFor(id).filter(x=>x&&x.term&&x.examStage).map(x=>{
-    const stage=ELPA_TAXONOMY.examStages[x.examStage];
-    if(!stage)return '';
-    const key=x.term+' / '+x.examStage;
-    if(unique.has(key))return '';
-    unique.add(key);
-    return '<span class="session-chip">'+esc(x.term)+' · '+esc(stage.zh)+'</span>';
-  }).join('');
 }
 function toggleTranslation(id,button){
   const target=document.getElementById(id);
@@ -1478,7 +1465,27 @@ function escAttr(s) {
 function activeLatestTerm(){
   return elpaLatestTermForIds(activePracticeIds());
 }
+function activeLatestSession(){
+  const stageOrder={start:0,mid:1,end:2};
+  const sessions=new Map();
+  for(const id of activePracticeIds())for(const entry of appearancesFor(id)){
+    if(!entry||!/^20\d{2} (Spring|Fall)$/.test(entry.term)||!ELPA_TAXONOMY.examStages[entry.examStage])continue;
+    sessions.set(entry.term+'|'+entry.examStage,{term:entry.term,stage:entry.examStage});
+  }
+  return [...sessions.values()].sort((a,b)=>{
+    const [yearA,seasonA]=a.term.split(' '),[yearB,seasonB]=b.term.split(' ');
+    return Number(yearB)-Number(yearA)||(seasonB==='Fall'?1:0)-(seasonA==='Fall'?1:0)||stageOrder[b.stage]-stageOrder[a.stage];
+  })[0]||null;
+}
+function activeLatestSessionLabel(){
+  const session=activeLatestSession();
+  if(session)return session.term+' · '+ELPA_TAXONOMY.examStages[session.stage].zh;
+  return activeLatestTerm()||'当前场次题库';
+}
 function activeCurrentIds(){
+  const session=activeLatestSession();
+  if(session)return activePracticeIds().filter(id=>appearancesFor(id).some(entry=>
+    entry&&entry.term===session.term&&entry.examStage===session.stage));
   const term=activeLatestTerm();
   return term?activePracticeIds().filter(id=>elpaReportedTerms(id).includes(term)):[];
 }
@@ -1490,20 +1497,25 @@ function renderTOC() {
   const campus=activeCampus==='nansha'?'GZ':'HK';
   const type=activeTrack==='regular'?'常规 ELPA':'ELPA Fast Track';
   const count=activePracticeIds().length;
-  const term=activeLatestTerm(),current=activeCurrentIds(),past=activeArchivedIds();
-  document.getElementById('sec-bankA').hidden=false;
-  document.getElementById('fastIntroSection').hidden=!(activeCampus==='nansha'&&activeTrack==='fast-track');
-  document.getElementById('currentBankTitle').textContent=(term?term+' · ':'')+'最新学期题库';
-  document.getElementById('feedbackBankCount').textContent=current.length+' 题 · '+(term||'暂无学期记录');
-  document.getElementById('pastBankCount').textContent=past.length+' 题 · 历年归档';
-  document.getElementById('currentBankDescription').textContent=term
-    ?'优先展示该分类已收录的最新考试学期 '+term+'；新学期题目审核入库后自动切换，旧场次归入过往题库。'
-    :'该分类暂未收录明确标注考试学期的新题；未注明学期的考生回忆保留在下方过往题库。';
+  const sessionLabel=activeLatestSessionLabel(),current=activeCurrentIds(),past=activeArchivedIds();
+  const selectedValue=sessionFilter.value;
+  const [selectedTerm='',selectedStage='']=selectedValue.split('|');
+  const selectedOption=sessionFilter.options[sessionFilter.selectedIndex];
+  const selectedLabel=selectedOption&&selectedValue?selectedOption.text:sessionLabel;
+  const latest=activeLatestSession();
+  const selectedIsCurrent=!!(selectedValue&&latest&&latest.term===selectedTerm&&latest.stage===selectedStage);
+  document.getElementById('sec-bankD').hidden=!!selectedValue&&!selectedIsCurrent;
+  document.getElementById('sec-bankA').hidden=!!selectedValue&&selectedIsCurrent;
+  document.getElementById('currentBankTitle').textContent=selectedIsCurrent?selectedLabel:sessionLabel;
+  document.getElementById('pastBankTitle').textContent=selectedValue&&!selectedIsCurrent?selectedLabel:'过往题库';
+  document.getElementById('pagerFall').setAttribute('aria-label',(selectedIsCurrent?selectedLabel:sessionLabel)+'分页');
+  document.getElementById('pagerPast').setAttribute('aria-label',(selectedValue&&!selectedIsCurrent?selectedLabel:'过往题库')+'分页');
+  document.getElementById('feedbackBankCount').textContent=current.length+' 题';
+  document.getElementById('pastBankCount').textContent=past.length+' 题';
   examChoiceNote.textContent=campus+' · '+type+' · '+count+' 道题；按考试学期自动归类。';
-  const items = [
-    ['sec-bankD','🎓',(term?term+' · ':'')+'最新学期题库'],
-    ['sec-bankA','📚','过往题库']
-  ];
+  const items=selectedValue?
+    [[selectedIsCurrent?'sec-bankD':'sec-bankA',selectedIsCurrent?'🎓':'📚',selectedLabel]]:
+    [['sec-bankD','🎓',sessionLabel],['sec-bankA','📚','过往题库']];
   document.getElementById('toc').innerHTML =
     '<h2>📑 题库导航</h2><div class="toc-grid">' +
     items.map(i => `<a href="#${i[0]}"><span class="num">${i[1]}</span>${esc(i[2])}</a>`).join('') +
@@ -1539,14 +1551,13 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
     const st = statuses[id] || 'new';
     const stMap = { new: ['未练', 'active-new'], doing: ['练习中', 'active-doing'], done: ['已掌握', 'active-done'] };
     const subs=questionFollowups(id,item);
+    const alternatives=questionAlternatives(id,item);
     const hasSubs=subs.length>0;
     const qnoteKey = 'qn-' + id;
     const qnoteSaved = notes[qnoteKey] || '';
     const translation=questionTranslation(bankKey,item);
-    const sourceNote=questionSourceNote(bankKey,item);
-    const badges=sessionBadges(id);
     const feedback=feedbackCount(id);
-    const searchText = (item.en + ' ' + (item.cn||'') + ' ' + subs.map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
+    const searchText = (item.en + ' ' + (item.cn||'') + ' ' + alternatives.map(s=>s.en+' '+(s.cn||'')).join(' ') + ' ' + subs.map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
     return `
     <div class="qcard status-${st}" id="q-${id}" data-search="${escAttr(searchText)}">
       <div class="q-top">
@@ -1554,10 +1565,8 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
         <div class="q-title">
           <div class="en">${esc(item.en)}</div>
           ${item.recallTag ? `<span class="recall-mark">${esc(item.recallTag)}</span>` : ""}
-          ${feedback ? `<div class="question-feedback"><span>↻ 考过 ${feedback} 次</span><a href="./submit.html?question=${encodeURIComponent(id)}&campus=${encodeURIComponent(activeCampus)}&track=${encodeURIComponent(activeTrack)}&intent=encounter" aria-label="我也考过这道题，提交考试反馈">我也考过 ↗</a></div>` : ''}
-          ${badges ? `<div class="session-badges">${badges}</div>` : ''}
+          ${feedback ? `<div class="question-feedback"><span>↻ 过往考过 ${feedback} 次</span><a href="./submit.html?question=${encodeURIComponent(id)}&track=${encodeURIComponent(activeTrack)}&intent=encounter" aria-label="我也考过这道题，提交考试反馈">我也考过</a></div>` : ''}
           ${translation ? `<div class="cn translation" id="cn-${id}" hidden>${esc(translation)}</div>` : ''}
-          ${sourceNote ? `<div class="question-provenance">${esc(sourceNote)}</div>` : ''}
         </div>
         <div class="q-actions ${translation ? "has-translation" : "no-translation"}">
           ${translation ? `<button type="button" class="translation-toggle" aria-expanded="false" aria-controls="cn-${id}" onclick="toggleTranslation('cn-${id}',this)">查看中文</button>` : ""}
@@ -1565,6 +1574,15 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
           <button class="status-btn ${stMap[st][1]}" onclick="cycleStatus('${id}', this)">${stMap[st][0]}</button>
         </div>
       </div>
+      ${alternatives.length ? `
+      <div class="subq" id="variants-${id}">
+        <button type="button" class="subq-head" onclick="toggleVariants('${id}')" aria-expanded="false" aria-controls="variants-list-${id}">
+          <span class="arrow">▶</span>查看相似问法（${alternatives.length} 个）
+        </button>
+        <div class="subq-list" id="variants-list-${id}"><ol>
+          ${alternatives.map(s=>`<li><span class="subq-en">${esc(s.en)}</span>${s.cn?`<span class="subq-cn">${esc(s.cn)}</span>`:''}</li>`).join('')}
+        </ol></div>
+      </div>` : ''}
       ${hasSubs ? `
       <div class="subq" id="subq-${id}">
         <button type="button" class="subq-head" onclick="toggleSub('${id}')" aria-expanded="false" aria-controls="subq-list-${id}">
@@ -1610,6 +1628,13 @@ function toggleSub(id) {
   if (el) {
     const expanded = el.classList.toggle('open');
     el.querySelector('.subq-head').setAttribute('aria-expanded', String(expanded));
+  }
+}
+function toggleVariants(id) {
+  const el=document.getElementById('variants-'+id);
+  if(el){
+    const expanded=el.classList.toggle('open');
+    el.querySelector('.subq-head').setAttribute('aria-expanded',String(expanded));
   }
 }
 
@@ -1786,7 +1811,7 @@ function copyQuestion(id) {
   const currentIds=activeCurrentIds();
   const inCurrent=currentIds.includes(id);
   const category=activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA';
-  const section=category+' · '+(inCurrent?(activeLatestTerm()+' 最新学期题库'):'过往题库');
+  const section=category+' · '+(inCurrent?activeLatestSessionLabel():'过往题库');
   const number=(inCurrent?currentIds:activeArchivedIds()).indexOf(id)+1;
   let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
   const copyCn=questionTranslation(id.split('-')[0],item);
@@ -1838,29 +1863,32 @@ function updateProgress() {
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('progressBar').setAttribute('aria-valuenow', String(pct));
   document.getElementById('progressPct').textContent = pct + '%';
-  document.getElementById('progressDetail').textContent = '未练 ' + fresh + ' · 练习中 ' + doing + ' · 已掌握 ' + done;
+  document.getElementById('progressDetail').textContent = '未练 ' + fresh + ' · 练习中 ' + doing;
 }
 
 /* ============ 组合筛选（关键词 + 练习状态） ============ */
 const searchInput = document.getElementById('searchInput');
 const statusFilter = document.getElementById('statusFilter');
-const termFilter=document.getElementById('termFilter');
-const examStageFilter=document.getElementById('examStageFilter');
+const sessionFilter=document.getElementById('sessionFilter');
 function populateExamFilters(){
-  const terms=[...new Set(allPracticeIds().flatMap(id=>elpaReportedTerms(id)))].sort().reverse();
-  termFilter.replaceChildren(new Option('全部考试学期',''));
-  for(const term of terms){
-    const opt=document.createElement('option');
-    opt.value=term;opt.textContent=term;termFilter.append(opt);
+  const activeIds=activePracticeIds();
+  const sessions=new Map();
+  for(const id of activeIds)for(const entry of appearancesFor(id)){
+    const stage=entry&&ELPA_TAXONOMY.examStages[entry.examStage];
+    if(!entry||!entry.term||!stage)continue;
+    sessions.set(entry.term+'|'+entry.examStage,{term:entry.term,stage:entry.examStage,label:entry.term+' · '+stage.zh});
   }
-  const hasStages=allPracticeIds().some(id=>{
-    const records=ELPA_APPEARANCES[id];
-    return Array.isArray(records)&&records.some(entry=>entry&&entry.examStage);
+  const stageOrder={start:0,mid:1,end:2};
+  const options=[...sessions.entries()].sort((a,b)=>{
+    const [yearA,seasonA]=a[1].term.split(' '),[yearB,seasonB]=b[1].term.split(' ');
+    return Number(yearB)-Number(yearA)||(seasonB==='Fall'?1:0)-(seasonA==='Fall'?1:0)||stageOrder[b[1].stage]-stageOrder[a[1].stage];
   });
-  termFilter.disabled=terms.length===0;
-  examStageFilter.disabled=!hasStages;
-  termFilter.title=terms.length?'按已知反馈学期筛选':'尚无标注学期的反馈';
-  examStageFilter.title=hasStages?'按已确认考试阶段筛选':'暂无已确认考试阶段的投稿';
+  sessionFilter.replaceChildren(new Option('全部考试场次',''));
+  for(const [value,session] of options)sessionFilter.append(new Option(session.label,value));
+  const hasSessions=options.length>0;
+  sessionFilter.disabled=!hasSessions;sessionFilter.hidden=!hasSessions;
+  document.querySelector('label[for="sessionFilter"]').hidden=!hasSessions;
+  sessionFilter.title=hasSessions?'按已收录考试场次筛选':'暂无已确认考试场次的投稿';
 }
 populateExamFilters();
 
@@ -1875,19 +1903,22 @@ function changeBankPage(kind,page){
 }
 function renderPager(kind,total,pages){
   const el=document.getElementById(kind==='past'?'pagerPast':'pagerFall');
-  const page=bankPages[kind];el.hidden=total===0;
+  const page=bankPages[kind];
+  const titleStatus=document.getElementById(kind==='past'?'pastBankCount':'feedbackBankCount');
+  el.hidden=total===0;
+  titleStatus.textContent=total?'第 '+page+' / '+pages+' 页 · 总 '+total+' 题':'0 题';
   if(!total){el.innerHTML='';return;}
   const buttons=[{label:'上一页',page:page-1,disabled:page===1}];
   for(let n=1;n<=pages;n++)buttons.push({label:String(n),page:n,current:n===page});
   buttons.push({label:'下一页',page:page+1,disabled:page===pages});
-  el.innerHTML=buttons.map(b=>'<button type="button" data-page="'+b.page+'"'+(b.current?' aria-current="page"':'')+(b.disabled?' disabled':'')+'>'+b.label+'</button>').join('')+
-    '<span class="pagination-caption">第 '+page+' / '+pages+' 页 · 筛选后 '+total+' 题 · 每页最多 '+PAGE_SIZE+' 题</span>';
+  el.innerHTML=buttons.map(b=>'<button type="button" data-page="'+b.page+'"'+(b.current?' aria-current="page"':'')+(b.disabled?' disabled':'')+'>'+b.label+'</button>').join('');
   el.querySelectorAll('[data-page]').forEach(button=>button.addEventListener('click',()=>changeBankPage(kind,Number(button.dataset.page))));
 }
 function applyFilters(reset=false){
   if(reset){bankPages.past=1;bankPages.fall=1;}
   const kw=searchInput.value.trim().toLowerCase(),filter=statusFilter.value;
-  const selectedTerm=termFilter.value,selectedStage=examStageFilter.value;
+  const [selectedTerm='',selectedStage='']=sessionFilter.value.split('|');
+  renderTOC();
   document.getElementById('searchClear').classList.toggle('show',!!searchInput.value);
   let total=0;
   for(const kind of ['past','fall']){
@@ -1915,8 +1946,7 @@ function applyFilters(reset=false){
 }
 searchInput.addEventListener('input',()=>applyFilters(true));
 statusFilter.addEventListener('change',()=>applyFilters(true));
-termFilter.addEventListener('change',()=>applyFilters(true));
-examStageFilter.addEventListener('change',()=>applyFilters(true));
+sessionFilter.addEventListener('change',()=>applyFilters(true));
 
 /* Live filtering remains unchanged; an explicit search moves to results. */
 const searchForm=document.getElementById('searchForm');
@@ -2318,7 +2348,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
   const category=(activeCampus==='nansha'?'GZ':'HK')+' · '+
     (activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA');
   const sections=[
-    {name:category+' · '+(activeLatestTerm()||'暂无学期记录')+' · 最新学期题库',ids:activeCurrentIds()},
+    {name:category+' · '+activeLatestSessionLabel(),ids:activeCurrentIds()},
     {name:category+' · 过往题库',ids:activeArchivedIds()}
   ];
   for (const section of sections) {
@@ -2376,19 +2406,8 @@ toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoot
 function renderAll() {
   if (migrateLegacyPractice()) markDirty();
   const currentIds=activeCurrentIds(),archivedIds=activeArchivedIds();
-  document.getElementById('bankD').innerHTML=currentIds.length?renderQuestionIds(currentIds):
-    '<p class="sec-desc">该分类暂无已收录题目。可通过「贡献内容」分享考试回忆。</p>';
+  document.getElementById('bankD').innerHTML=currentIds.length?renderQuestionIds(currentIds):'';
   document.getElementById('bankPast').innerHTML=renderQuestionIds(archivedIds);
-  const intro=document.getElementById('fastIntroDetails');
-  if(!intro.hasChildNodes()){
-    const summary=document.createElement('p');summary.textContent=ELPA_FAST_TRACK_INTRO.en;
-    const list=document.createElement('ol');
-    for(const task of ELPA_FAST_TRACK_INTRO.subs){
-      const li=document.createElement('li');li.textContent=task.en;
-      const zh=document.createElement('span');zh.textContent=task.cn;li.append(zh);list.append(li);
-    }
-    intro.append(summary,list);
-  }
   renderTOC();updateProgress();applyFilters();
 }
 function setExamChoice(axis,value){
@@ -2396,7 +2415,7 @@ function setExamChoice(axis,value){
   else activeTrack=value;
   document.querySelectorAll('[data-campus]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.campus===activeCampus)));
   document.querySelectorAll('[data-track]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.track===activeTrack)));
-  termFilter.value='';examStageFilter.value='';statusFilter.value='all';searchInput.value='';
+  sessionFilter.value='';statusFilter.value='all';searchInput.value='';
   bankPages.past=1;bankPages.fall=1;searchFeedback.hidden=true;
   renderAll();populateExamFilters();
   const params=new URLSearchParams(location.search);

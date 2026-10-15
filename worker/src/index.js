@@ -77,14 +77,17 @@ function validV2(body) {
       validText(body.main.en,8,1000) && validText(body.main.cn,0,1000) &&
       Array.isArray(body.subs) && body.subs.length<=20 &&
       body.subs.every(s=>s&&validText(s.en,1,400)&&validText(s.cn,0,400)) &&
+      (body.alternatives===undefined||(Array.isArray(body.alternatives) && body.alternatives.length<=1 &&
+        body.alternatives.every(s=>s&&validText(s.en,8,1000)&&validText(s.cn,0,1000)))) &&
       ['firsthand','secondhand'].includes(body.source) &&
       (body.linkedQuestionId===undefined||
         (/^[A-DFHT]-[0-9]+$/.test(body.linkedQuestionId)&&
          ['encounter','supplement'].includes(body.intent))) &&
       (body.intent===undefined||body.linkedQuestionId!==undefined) &&
-      (body.intent!=='supplement'||body.subs.length>0);
+      (body.intent!=='supplement'||body.subs.length>0||(body.alternatives&&body.alternatives.length>0));
   if(body.kind==='advice')
-    return ADVICE_PHASES.has(body.phase) &&
+    return (body.track===undefined||ELPA_TRACKS.has(body.track)) &&
+      ADVICE_PHASES.has(body.phase) &&
       Array.isArray(body.tags) && body.tags.length>=1 && body.tags.length<=4 &&
       new Set(body.tags).size===body.tags.length && body.tags.every(tag=>ADVICE_TAGS.has(tag)) &&
       validText(body.title,4,120) && validText(body.body,20,6000);
@@ -96,10 +99,11 @@ function cleanV2(body){
     campus:body.campus||'nansha',track:body.track||'regular',
     main:{en:body.main.en.trim(),cn:body.main.cn.trim()},
     subs:body.subs.map(s=>({en:s.en.trim(),cn:s.cn.trim()})),source:body.source,
+    ...(body.alternatives?.length?{alternatives:body.alternatives.map(s=>({en:s.en.trim(),cn:s.cn.trim()}))}:{}),
     ...(body.linkedQuestionId?{linkedQuestionId:body.linkedQuestionId,
       intent:body.intent}:{} )
   };
-  return {version:2,kind:'advice',phase:body.phase,tags:[...body.tags],
+  return {version:2,kind:'advice',track:body.track||'regular',phase:body.phase,tags:[...body.tags],
     title:body.title.trim(),body:body.body.trim()};
 }
 const mdQuote=t=>String(t).split('\n').map(s=>'> '+s.replace(/</g,'&lt;')).join('\n');
@@ -109,7 +113,8 @@ function formatV2(record){
       title:'[ELPA 投稿] [备考经验] '+record.title.replace(/\s+/g,' ').slice(0,65),
       body:['## ELPA 备考经验投稿（待审核）','',
         '> 公开匿名投稿；内容为个人经验，尚未经核实。',
-        '', '**阶段：** '+record.phase,
+        '', '**考试方式：** '+(record.track==='fast-track'?'ELPA Fast Track':'常规 ELPA'),
+        '**阶段：** '+record.phase,
         '**主题标签：** '+record.tags.join(', '),
         '', '### 标题',mdQuote(record.title),'',
         '### 正文',mdQuote(record.body),'',
@@ -126,12 +131,16 @@ function formatV2(record){
     '**来源：** '+(record.source==='firsthand'?'本人亲历':'同学转述'),
     ...(record.linkedQuestionId?[
       '**已关联题目：** '+record.linkedQuestionId,
-      '**反馈类型：** '+(record.intent==='supplement'?'仅补充小问（不计次数）':'新增考试经历')
+      '**反馈类型：** '+(record.intent==='supplement'?'补充题目内容（不计次数）':'新增考试经历')
     ]:[]),
     '', '### 主问题 / English',mdQuote(record.main.en),
     '', '### 主问题 / 中文',mdQuote(record.main.cn),'',
     '### 提示小问（'+record.subs.length+'）'
   ];
+  if(record.alternatives?.length){
+    lines.splice(lines.length-1,0,'### 相似问法（'+record.alternatives.length+'）');
+    for(const alternative of record.alternatives)lines.splice(lines.length-1,0,'',mdQuote(alternative.en),mdQuote(alternative.cn));
+  }
   for(const [i,sub] of record.subs.entries())lines.push('','**小问 '+(i+1)+' / English**',mdQuote(sub.en),
     '**小问 '+(i+1)+' / 中文**',mdQuote(sub.cn));
   if(!record.subs.length)lines.push('> 未记录');

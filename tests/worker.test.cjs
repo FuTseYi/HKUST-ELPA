@@ -255,6 +255,26 @@ test('v2 advice accepts one original-language title and article',async()=>{
   assert.match(issue.body,/elpa-submission-v2:/);
   assert.ok(!issue.body.includes('mock-valid-token'));
 });
+test('Fast Track advice keeps its track through the review Issue',async()=>{
+  const x=makeWorker();
+  const response=await x.handler.fetch(x.request({...v2Advice,track:'fast-track'}),x.env);
+  assert.equal(response.status,201,await response.text());
+  const issue=JSON.parse(x.calls[1].init.body);
+  assert.match(issue.body,/ELPA Fast Track/);
+  const marker=issue.body.match(/elpa-submission-v2:([A-Za-z0-9_-]+)/);
+  const embedded=JSON.parse(Buffer.from(marker[1],'base64url').toString('utf8'));
+  assert.equal(embedded.track,'fast-track');
+  assert.equal(Object.hasOwn(embedded,'turnstileToken'),false);
+});
+test('older advice submissions default to Regular',async()=>{
+  const x=makeWorker();
+  const response=await x.handler.fetch(x.request(v2Advice),x.env);
+  assert.equal(response.status,201,await response.text());
+  const issue=JSON.parse(x.calls[1].init.body);
+  const marker=issue.body.match(/elpa-submission-v2:([A-Za-z0-9_-]+)/);
+  const embedded=JSON.parse(Buffer.from(marker[1],'base64url').toString('utf8'));
+  assert.equal(embedded.track,'regular');
+});
 test('v2 rejects missing English and noncanonical categories before siteverify',async()=>{
   const bads=[
     {...v2Question,main:{...v2Question.main,en:''}},
@@ -264,6 +284,7 @@ test('v2 rejects missing English and noncanonical categories before siteverify',
     {...v2Question,track:'untrusted-track'},
     {...v2Question,subs:Array.from({length:21},()=>({en:'Why?',cn:'为什么？'}))},
     {...v2Advice,tags:['arbitrary-tag']},
+    {...v2Advice,track:'untrusted-track'},
     {...v2Advice,tags:['speaking-strategy','speaking-strategy']},
     {...v2Advice,body:'too short'}
   ];
@@ -314,7 +335,7 @@ test('v2 linked encounter and optional translations reach review queue unchanged
  assert.match(bodyText,/新增考试经历/);
  assert.match(bodyText,/What tools did you use\?/);
 });
-test('v2 supplement must have an existing ID and at least one followup',async()=>{
+test('v2 supplement must have an existing ID and either a similar wording or followup',async()=>{
  const base={version:2,kind:'question',campus:'nansha',track:'regular',
    term:'2026 Fall',examStage:'start',
    main:{en:'Explain one of your projects.',cn:''},
@@ -332,5 +353,13 @@ test('v2 supplement must have an existing ID and at least one followup',async()=
    ...base,subs:[{en:'What did you learn?',cn:''}]
  }),okay.env);
  assert.equal(response.status,201,await response.text());
- assert.match(JSON.parse(okay.calls[1].init.body).body,/仅补充小问/);
+ assert.match(JSON.parse(okay.calls[1].init.body).body,/补充题目内容/);
+ const wording=makeWorker();
+ const wordingResponse=await wording.handler.fetch(wording.request({
+   ...base,alternatives:[{en:'Could you explain one of the projects you completed?',cn:'请介绍一个你完成的项目。'}]
+ }),wording.env);
+ assert.equal(wordingResponse.status,201,await wordingResponse.text());
+ const wordingBody=JSON.parse(wording.calls[1].init.body).body;
+ assert.match(wordingBody,/相似问法（1）/);
+ assert.match(wordingBody,/Could you explain one of the projects you completed\?/);
 });

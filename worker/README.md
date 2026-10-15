@@ -53,6 +53,7 @@ It does **not** edit website files or publish a question. Maintainer review rema
   and `turnstileToken`.
 - **Preparation advice:** `version: 2`, `kind: "advice"`, `phase`
   (`before` / `during` / `after`), `tags` (1–4 predefined taxonomy tags),
+  optional `track` (`regular` / `fast-track`, defaults to `regular`),
   `title`, `body`, and `turnstileToken`.
 - **Legacy v1 compatibility:** `term`, `question`, `subquestions`, `source`,
   and `turnstileToken`. The time-bounded `test` mode accepts only its exact

@@ -51,6 +51,14 @@ function chromeBinary(){
       });
       assert.ok(layout.full<=layout.view+2,
         'Unexpected horizontal page overflow at '+width+'px: '+JSON.stringify(layout));
+      if(width===1280){
+        const progress=await page.evaluate(()=>({
+          records:document.getElementById('recordsMenuBtn').closest('.progress-card')!==null,
+          done:document.getElementById('doneCount').closest('.progress-card')!==null,
+          filters:document.getElementById('sessionFilter').closest('.toolbar')!==null
+        }));
+        assert.deepEqual(progress,{records:true,done:true,filters:true},'Study progress and search filters should be separate groups');
+      }
       assert.ok(layout.rects.length>=2,'Question controls missing at '+width);
       assert.ok(layout.rects.every(r=>r.width>=60&&r.height>=32),
         'Card controls undersized at '+width+': '+JSON.stringify(layout.rects));
@@ -81,11 +89,10 @@ function chromeBinary(){
       assert.equal(footer.caption,'2026 Fall MPhil');
       assert.equal(footer.authorLast,true,'Author credit should be the last footer element');
       assert.equal(footer.actions,2,'Both contribution links must be present');
-      assert.deepEqual(footer.buttons.map(b=>b.text),['分享考题','提交 PR']);
-      assert.ok(footer.buttons.every(b=>b.height===42&&b.whiteSpace==='nowrap'&&b.scrollWidth<=b.clientWidth+1),
+      assert.deepEqual(footer.buttons.map(b=>b.text.replace(/\s+/g,' ').trim()),['分享考题与经验','参与开源共建']);
+      assert.ok(footer.buttons.every(b=>b.height===38&&b.whiteSpace==='nowrap'&&b.scrollWidth<=b.clientWidth+1),
         'Footer labels must be single-line at '+width+': '+JSON.stringify(footer.buttons));
-      assert.ok(Math.abs(footer.buttons[0].width-footer.buttons[1].width)<=1&&
-        Math.abs(footer.buttons[0].y-footer.buttons[1].y)<=1,'Footer buttons not aligned at '+width);
+      assert.ok(Math.abs(footer.buttons[0].y-footer.buttons[1].y)<=1,'Footer buttons not aligned at '+width);
       assert.match(footer.tech,/Built with GitHub · Vercel · Cloudflare/);
       assert.ok(footer.left>=-1&&footer.right<=width+1,
         'Footer escapes mobile viewport at '+width+': '+JSON.stringify(footer));
@@ -101,13 +108,37 @@ function chromeBinary(){
         await guide.goto(new URL('/guide.html',host).href,{waitUntil:'load'});
         assert.equal(await guide.locator('#regularGuide').isVisible(),true);
         assert.equal(await guide.locator('#fastGuide').isVisible(),false);
+        assert.equal(await guide.locator('#guideAdviceList article').count(),3);
+        assert.equal(await guide.locator('#guideAdviceFilters').isVisible(),true);
+        await guide.locator('#adviceTagFilter').selectOption('speaking-strategy');
+        assert.equal(await guide.locator('#guideAdviceList article').count(),2);
+        await guide.locator('#adviceTagFilter').selectOption('');
         await guide.locator('#guideFastTab').click();
         assert.equal(await guide.locator('#fastGuide').isVisible(),true);
         assert.equal(await guide.locator('#regularGuide').isVisible(),false);
         assert.equal(await guide.locator('#guideFastTab').getAttribute('aria-pressed'),'true');
         assert.match(await guide.locator('#fastGuide .elpa-guide-practice').getAttribute('href'),/track=fast-track/);
-        await guide.locator('.elpa-guide-eligibility summary').click();
-        assert.equal(await guide.locator('.elpa-guide-eligibility').getAttribute('open'),'');
+        assert.equal(await guide.locator('#guideAdviceList article').count(),0);
+        assert.equal(await guide.locator('#guideAdviceFilters').isVisible(),false);
+        assert.equal(await guide.locator('#guideAdviceEmpty').isVisible(),true);
+        assert.match(await guide.locator('#guideAdviceShare').getAttribute('href'),/kind=advice&track=fast-track/);
+        if(width===390){
+          await guide.evaluate(()=>{
+            reviewedAdvice.push({id:'ADV-999',issueNumber:999,track:'fast-track',phase:'before',
+              tags:['exam-process'],title:'Browser fixture',body:'Browser-only reviewed advice'});
+            selectGuideTrack('fast-track');
+          });
+          assert.equal(await guide.locator('#guideAdviceList article').count(),1);
+          assert.equal(await guide.locator('#guideAdviceFilters').isVisible(),true);
+          assert.match(await guide.locator('#guideAdviceList article a').getAttribute('href'),/issues\/999$/);
+          const share=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+          try{
+            await share.goto(new URL(await guide.locator('#guideAdviceShare').getAttribute('href'),host).href,{waitUntil:'load'});
+            assert.equal(await share.locator('#tabAdvice').getAttribute('aria-pressed'),'true');
+            assert.equal(await share.locator('#adviceTrack').inputValue(),'fast-track');
+            assert.equal(await share.locator('#adviceTrack').isVisible(),true);
+          }finally{await share.close();}
+        }
         const dimensions=await guide.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
         assert.ok(dimensions.scroll<=dimensions.width+2,'Guide horizontal overflow at '+width+': '+JSON.stringify(dimensions));
         await guide.locator('#guideRegularTab').click();
@@ -118,7 +149,7 @@ function chromeBinary(){
 
       if(width===390){
         const feedback=page.locator('#bankD .qcard .question-feedback').first();
-        assert.match(await feedback.innerText(),/考过 \d+ 次/);
+        assert.match(await feedback.innerText(),/过往考过 \d+ 次/);
         const link=feedback.locator('a');
         assert.match(await link.innerText(),/我也考过/);
         const contributionHref=await link.getAttribute('href');
@@ -127,12 +158,19 @@ function chromeBinary(){
           await contrib.goto(new URL(contributionHref,host).href,{waitUntil:'load'});
           assert.equal(await contrib.locator('#linkedQuestion').isVisible(),true);
           assert.equal(await contrib.locator('input[value="encounter"][name="contributionIntent"]').isChecked(),true);
+          assert.equal(await contrib.evaluate(()=>document.activeElement&&document.activeElement.id),'submissionCampus');
+          assert.equal(await contrib.locator('#submissionCampus').inputValue(),'');
+          assert.ok(await contrib.locator('#exam-context').evaluate(el=>el.getBoundingClientRect().top>=0&&el.getBoundingClientRect().top<180));
+          assert.doesNotMatch(contributionHref,/campus=/);
           assert.equal(await contrib.locator('#mainEnField').isVisible(),false);
           assert.equal(await contrib.locator('#mainCnField').isVisible(),false);
           await contrib.locator('input[value="supplement"][name="contributionIntent"]').check();
           assert.equal(await contrib.locator('input[value="supplement"][name="contributionIntent"]').isChecked(),true);
+          assert.equal(await contrib.locator('#supplementQuestionFields').isVisible(),true);
+          assert.equal(await contrib.locator('#supplementEn').isEnabled(),true);
           await contrib.locator('#unlinkQuestion').click();
           assert.equal(await contrib.locator('#mainEnField').isVisible(),true);
+          assert.equal(await contrib.locator('#supplementQuestionFields').isVisible(),false);
           assert.equal(await contrib.locator('#mainCn').getAttribute('required'),null);
         }finally{await contrib.close();}
         await page.click('#practiceLauncher');
