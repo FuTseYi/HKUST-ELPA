@@ -1394,6 +1394,10 @@ function qId(bank, num) { return bank + '-' + num; }
 function questionTranslation(bankKey,item) {
   return item.cn || '';
 }
+function questionSourceNote(bankKey,item) {
+  // Show only provenance explicitly recorded with a question; never use its translation as a source note.
+  return item && typeof item.recallTag === 'string' ? item.recallTag : '';
+}
 function appearancesFor(id){
   const records=ELPA_APPEARANCES[id];
   return Array.isArray(records)?records:[];
@@ -1818,8 +1822,9 @@ function copyQuestion(id) {
   if (copyCn) text += `（${copyCn}）\n`;
   const copyNote=questionSourceNote(bankKey,item);
   if (copyNote) text += `来源说明：${copyNote}\n`;
-  if (item.subs && item.subs.length) {
-    text += '\n提示小问：\n' + item.subs.map(s => '• ' + s.en + (s.cn ? '  (' + s.cn + ')' : '')).join('\n');
+  const followups = questionFollowups(id,item);
+  if (followups.length) {
+    text += '\n提示小问：\n' + followups.map(s => '• ' + s.en + (s.cn ? '  (' + s.cn + ')' : '')).join('\n');
   }
   const doCopy = () => {
     if (navigator.clipboard) {
@@ -2365,9 +2370,10 @@ document.getElementById('exportBtn').addEventListener('click', () => {
       md += '*状态：' + stLabel + '*\n\n';
       const qn = notes['qn-' + id];
       if (qn && qn.trim()) md += '**大问题笔记：**\n\n' + qn.trim() + '\n\n';
-      if (it.subs && it.subs.length) {
+      const followups = questionFollowups(id,it);
+      if (followups.length) {
         md += '**提示小问：**\n\n';
-        it.subs.forEach((s, si) => {
+        followups.forEach((s, si) => {
           const n = notes[id + '-' + si];
           md += '- ' + s.en + (s.cn ? '（' + s.cn + '）' : '');
           if (n && n.trim()) md += '\n  > 笔记：' + n.trim().replace(/\n/g, '\n  > ');
