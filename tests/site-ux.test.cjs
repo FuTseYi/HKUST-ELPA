@@ -279,6 +279,8 @@ test('homepage explains the full learning workflow without a repeated oversized 
  for(const topic of ['常规 ELPA / Fast Track','考试场次','相似问法','提示小问','随机抽题','正向计时','记笔记','未练','练习中','已掌握','备份','恢复','换浏览器'])
    assert.ok(home.includes(topic),'Not explained: '+topic);
  assert.match(home,/网站负责抽题和计时，你来开口回答/);
+ assert.match(home,/先有 1 分钟准备，接着进入 2 分钟陈述/);
+ assert.match(home,/不同校区和考试类型的收录情况可能不同/);
  assert.match(home,/不会自动评价回答/);
  assert.match(home,/打开「练习」，点击「随机抽题」/);
  assert.match(home,/换手机或电脑，怎么接着练？/);
