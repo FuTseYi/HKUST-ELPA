@@ -28,7 +28,7 @@ function chromeBinary(){
   const browser=await chromium.launch({headless:true,executablePath:chromeBinary(),
     args:['--no-sandbox','--disable-dev-shm-usage']});
   try{
-    for(const width of [320,375,390,430,1280]){
+    for(const width of [320,375,390,430,700,768,1024,1280]){
       const mobile=width<600;
       const page=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
       const errors=[];
