@@ -176,36 +176,27 @@ test('pause and resume preserve seconds, custom countdown and stopwatch work',()
  assert.equal(f.el('timerDisplay').textContent,'00:04');
 });
 
-test('footer is a consistent student-led open community component across all five routes',()=>{
+test('footer is compact and consistent on five pages',()=>{
  const pages=['index.html','guide.html','practice.html','sources.html','submit.html'];
- const read=file=>fs.readFileSync(path.resolve(__dirname,'..',file),'utf8');
- for(const page of pages){
-   const html=read(page);
-   assert.equal((html.match(/<footer class="elpa-footer"/g)||[]).length,1,page);
-   assert.match(html,/Built with Passion\. Shared with Everyone\./);
-   assert.match(html,/为爱发电 · 开源共建 · 互帮互助/);
-   assert.match(html,/Created &amp; Maintained by/);
-   assert.match(html,/2026 Fall MPhil/);
-   assert.doesNotMatch(html,/2026 Fall MPhil · HKUST\(GZ\)/);
-   assert.match(html,/https:\/\/github\.com\/FuTseYi\/HKUST-ELPA\/pulls/);
-   assert.match(html,/href="\.\/submit\.html">分享考题<\/a>/);
-   for(const stack of ['GitHub','Vercel','Cloudflare'])assert.ok(html.includes('<span>'+stack+'</span>'),page+' missing '+stack);
-   assert.match(html,/Not affiliated with or endorsed by HKUST/);
-   // Intentional hierarchy: collective purpose and contribution first; author in the final lines.
-   const expectedOrder=['elpa-footer-intro','elpa-footer-contribute','elpa-footer-tech',
-     'elpa-footer-disclaimer','elpa-footer-source','elpa-footer-identity'];
-   const positions=expectedOrder.map(name=>html.indexOf('class="'+name+'"'));
-   assert.ok(positions.every(pos=>pos>=0),page+' missing an expected footer section');
-   assert.ok(positions.every((pos,i)=>i===0||pos>positions[i-1]),
-     page+' creator credit must be the final footer section');
-   assert.equal((html.match(/class="elpa-footer-identity"/g)||[]).length,1,page+' should show author once');
-   assert.match(html,/href="\.\/sources\.html">资料来源与声明<\/a>/);
+ const read=p=>fs.readFileSync(path.resolve(__dirname,'..',p),'utf8');
+ for(const p of pages){
+   const html=read(p),footer=html.match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/);
+   assert.ok(footer,p+' missing footer');
+   assert.equal((html.match(/<footer class="elpa-footer"/g)||[]).length,1);
+   for(const text of ['Built with Passion. Shared with Everyone.','为爱发电 · 开源共建 · 互帮互助',
+     '分享考题与经验，一起让这份资料更好。','Built with GitHub · Vercel · Cloudflare','2026 Fall MPhil']){
+     assert.ok(footer[0].includes(text),p+' missing '+text);
+   }
+   assert.doesNotMatch(footer[0],/Found it useful\?|Contribute on GitHub|class="elpa-footer-project"/);
+   assert.match(footer[0],/href="\.\/submit\.html">分享考题<\/a>/);
+   assert.match(footer[0],/aria-label="通过 GitHub Pull Request 参与项目共建">提交 PR<\/a>/);
+   assert.match(footer[0],/Not affiliated with or endorsed by HKUST/);
+   assert.match(footer[0],/Created &amp; Maintained by/);
+   assert.ok(footer[0].indexOf('elpa-footer-identity')>footer[0].indexOf('elpa-footer-disclaimer'));
  }
- const practice=read('practice.html');
- assert.equal((practice.match(/id="exportBtn"/g)||[]).length,1,'keep the notebook exporter');
- const css=read('site.css');
- assert.match(css,/\.elpa-footer-actions\{/);
- assert.match(css,/@media\(max-width:560px\)/);
+ assert.equal((read('practice.html').match(/id="exportBtn"/g)||[]).length,1);
+ assert.match(read('site.css'),/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+ assert.match(read('site.css'),/white-space:nowrap/);
 });
 
 test('guide separates the official Regular and Fast Track paths with one obvious switch',()=>{

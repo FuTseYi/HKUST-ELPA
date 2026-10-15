@@ -69,6 +69,11 @@ function chromeBinary(){
           authorLast:f?.lastElementChild?.lastElementChild?.classList.contains('elpa-footer-identity'),
           flow:[...f?.querySelectorAll('.elpa-footer-inner > *')||[]].map(el=>el.className),
           actions:f?.querySelectorAll('.elpa-footer-action').length||0,
+          buttons:[...f.querySelectorAll('.elpa-footer-action')].map(el=>{
+            const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+            return {text:el.innerText,width:r.width,height:r.height,y:r.y,whiteSpace:style.whiteSpace,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth};
+          }),
+          tech:f.querySelector('.elpa-footer-tech')?.textContent,
           left:rect?.left,right:rect?.right,
           scrollWidth:document.documentElement.scrollWidth};
       });
@@ -76,6 +81,12 @@ function chromeBinary(){
       assert.equal(footer.caption,'2026 Fall MPhil');
       assert.equal(footer.authorLast,true,'Author credit should be the last footer element');
       assert.equal(footer.actions,2,'Both contribution links must be present');
+      assert.deepEqual(footer.buttons.map(b=>b.text),['分享考题','提交 PR']);
+      assert.ok(footer.buttons.every(b=>b.height===42&&b.whiteSpace==='nowrap'&&b.scrollWidth<=b.clientWidth+1),
+        'Footer labels must be single-line at '+width+': '+JSON.stringify(footer.buttons));
+      assert.ok(Math.abs(footer.buttons[0].width-footer.buttons[1].width)<=1&&
+        Math.abs(footer.buttons[0].y-footer.buttons[1].y)<=1,'Footer buttons not aligned at '+width);
+      assert.match(footer.tech,/Built with GitHub · Vercel · Cloudflare/);
       assert.ok(footer.left>=-1&&footer.right<=width+1,
         'Footer escapes mobile viewport at '+width+': '+JSON.stringify(footer));
       assert.ok(footer.scrollWidth<=width+2,'Footer overflows at '+width);
