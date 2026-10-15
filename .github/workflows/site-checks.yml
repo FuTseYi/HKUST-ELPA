@@ -73,7 +73,8 @@ jobs:
               inspector.feed(content)
               assert len(inspector.ids)==len(set(inspector.ids)), f"Duplicate DOM ID in {filename}"
               scripts=re.findall(r"<script>([\s\S]*?)</script>",content)
-              assert len(scripts)==1 if filename!="sources.html" else len(scripts)==0, f"Unexpected inline scripts in {filename}"
+              expected_scripts=1 if filename in ("guide.html","practice.html","submit.html") else 0
+              assert len(scripts)==expected_scripts, f"Unexpected inline scripts in {filename}"
               if scripts:
                   Path("/tmp/elpa-"+filename+".js").write_text(scripts[0],encoding="utf-8")
 
@@ -88,10 +89,10 @@ jobs:
           assert "searchForm.addEventListener('submit'" in practice, "Search button and Enter key must invoke result navigation"
           assert "first.scrollIntoView(" in practice, "Explicit search should navigate to the first match"
 
-          assert 'id="termFilter"' in practice and 'id="examStageFilter"' in practice, "Session filters missing"
+          assert 'id="sessionFilter"' in practice, "Session filter missing"
           assert 'function toggleTranslation(' in practice and 'function toggleFollowupChinese(' in practice, "Chinese-on-click controls missing"
           assert 'src="./question-bank/appearances.js"' in practice and 'src="./question-bank/taxonomy.js"' in practice, "Session metadata scripts missing"
-          assert 'function legacyCommunityNote(' in practice, "Historical provenance guard missing"
+          assert 'function activeLatestSession(' in practice, "Latest session grouping missing"
 
           inspector=Inspector()
           inspector.feed(practice)
@@ -116,7 +117,7 @@ jobs:
           assert 'id="guideRegularTab"' in guide and 'id="guideFastTab"' in guide, "Both exam type controls missing"
           assert 'id="regularGuide"' in guide and 'id="fastGuide"' in guide, "Both exam flow panels missing"
           assert "selectGuideTrack(" in guide and 'aria-pressed="true"' in guide, "Accessible guide switch missing"
-          assert 'Warm-up · 约 5 分钟' in guide and 'Preparation · 约 3 分钟' in guide, "Official regular flow missing"
+          assert '入场与身份核验' in guide and '抽题与准备' in guide and '提问与回答' in guide, "Regular flow missing"
           assert '线上申请与视频录制' in guide and '按指定话题录制视频' in guide, "Fast Track flow missing"
           assert 'track=fast-track' in guide and 'track=regular' in guide, "Direct practice paths missing"
           assert 'id="advicePhaseFilter"' in guide and 'id="adviceTagFilter"' in guide, "Experience filters missing"
@@ -128,7 +129,7 @@ jobs:
           assert Path("submission-config.js").is_file(), "Public config file missing"
 
           home=pages["index.html"]
-          assert 'practice.html#sec-bankA' in home and 'practice.html#sec-bankD' in home, "Home topic shortcuts missing"
+          assert 'class="elpa-start-actions"' in home and 'href="./practice.html"><strong>开始题库练习</strong>' in home, "Home practice entry missing"
           sources=pages["sources.html"]
           for url in ("docs.qq.com/doc/DT3BxSkJzSGdUamJE","docs.qq.com/doc/DSHJydEVYSHBtdkZO","share.note.youdao.com"):
               assert url in sources, f"Original source link missing: {url}"
