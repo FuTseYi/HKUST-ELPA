@@ -209,6 +209,7 @@ function chromeBinary(){
           BANKS.D.items[0].recallTag='考生回忆，待核实';
           ELPA_APPEARANCES[id].push({issueNumber:99999,term:'2026 Fall',examStage:'start',
             intent:'supplement',subs:[{en:'Community-added follow-up',cn:'社区补充小问'}]});
+          ELPA_APPEARANCES[id].push({issueNumber:100000,term:'2026 Fall',examStage:'start',intent:'supplement',alternatives:[{en:'Alternative community phrasing',cn:'另一种社区问法'}]});
           notes[id+'-0']='Community supplement notes';
           window.__elpaCopied='';
           Object.defineProperty(navigator,'clipboard',{configurable:true,value:{
@@ -216,6 +217,13 @@ function chromeBinary(){
           }});
           renderAll();
         });
+        const variant=page.locator('#variants-D-1');
+        await variant.locator('.subq-head').click();
+        assert.equal(await variant.locator('.subq-cn').first().isVisible(),false,'Alternative translation hidden by default');
+        await variant.locator('.translation-toggle').click();
+        assert.equal(await variant.locator('.subq-cn').first().isVisible(),true,'Alternative translation revealed on request');
+        await variant.locator('.translation-toggle').click();
+        assert.equal(await variant.locator('.subq-cn').first().isVisible(),false,'Alternative translation can be hidden again');
         await page.locator('#q-D-1 .copy-btn').click();
         const copied=await page.evaluate(()=>window.__elpaCopied);
         assert.match(copied,/Community-added follow-up/,'Copy must include reviewed follow-ups');
