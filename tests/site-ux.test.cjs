@@ -267,20 +267,30 @@ test('guide separates the official Regular and Fast Track paths with one obvious
  assert.match(guide,/id="adviceTagFilter"/);
  assert.equal((guide.match(/class="elpa-guide-switch"/g)||[]).length,1);
 });
-test('homepage prioritizes practice and keeps community contribution subtle',()=>{
+test('homepage explains the full learning workflow without a repeated oversized practice CTA',()=>{
  const home=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
  const practice=fs.readFileSync(path.join(__dirname,'../practice.html'),'utf8');
- assert.match(home,/class="elpa-next-primary" href="\.\/practice\.html"/);
- assert.match(home,/href="\.\/guide\.html\?track=fast-track#sec-process"/);
- assert.match(home,/id="quickstart-title">从了解考题，到开口练习<\/h2>/);
- assert.equal((home.match(/class="elpa-capability"/g)||[]).length,3);
- for(const title of ['题库练习','学习记录','口语模拟'])assert.match(home,new RegExp('<h3>'+title+'<\\/h3>'));
- assert.match(home,/class="elpa-community"/);
- assert.match(home,/社区分享/);
- assert.match(home,/无需注册账号 · 请勿填写个人敏感信息/);
- assert.doesNotMatch(home,/提交 → 后端校验 → 审核 → 入库|elpa-start-actions|查看资料来源<\/strong>/);
- assert.doesNotMatch(home,/homeNewCount|homePastCount|homeDoneCount|网站内容概览|题目来源与项目说明|elpa-feature-grid|最新学期题库|过往题库<\/strong>/);
- assert.doesNotMatch(home,/question-bank\/questions\.js|question-bank\/appearances\.js/);
+ assert.match(home,/id="home-overview-title">一站了解考试、整理考题、练习口语<\/h2>/);
+ assert.match(home,/id="home-features-title">你可以在这里做什么？<\/h2>/);
+ assert.equal((home.match(/class="elpa-home-journey"/g)||[]).length,1);
+ assert.equal((home.match(/class="elpa-home-feature"/g)||[]).length,4);
+ for(const id of ['home-guide-title','home-bank-title','home-practice-title','home-record-title','home-more-title'])
+   assert.ok(home.includes('id="'+id+'"'),'Missing '+id);
+ for(const topic of ['常规 ELPA / Fast Track','考试场次','相似问法','提示小问','随机抽取','正向计时','Markdown','JSON','Vercel / GitHub Pages'])
+   assert.ok(home.includes(topic),'Not explained: '+topic);
+ assert.match(home,/class="elpa-home-demo"/);
+ assert.match(home,/class="elpa-home-demo elpa-home-demo-timer"/);
+ assert.equal((home.match(/class="elpa-demo-top"/g)||[]).length,4);
+ assert.ok(home.includes('href="./guide.html"')&&home.includes('href="./practice.html"'));
+ assert.ok(home.includes('href="./sources.html"')&&home.includes('href="./submit.html"'));
+ assert.match(home,/无需注册账号/);
+ assert.match(home,/公开记录保存/);
+ assert.doesNotMatch(home,/elpa-next-primary|elpa-home-next|elpa-start-actions|elpa-capability|提交 → 后端校验 → 审核 → 入库/);
+ assert.match(home,/class="elpa-cta elpa-cta-primary" href="\.\/practice\.html"/);
+ const css=fs.readFileSync(path.join(__dirname,'../site.css'),'utf8');
+ assert.match(css,/\.elpa-home-feature\{display:grid/);
+ assert.match(css,/@media\(max-width:700px\)/);
+ assert.doesNotMatch(css,/\.elpa-next-primary|\.elpa-quickstart|\.elpa-capability/);
  const toolbar=section(practice,'<div class="toolbar">','<!-- 存储状态提示 -->');
  const progress=section(practice,'<!-- Progress -->','<!-- TOC -->');
  assert.doesNotMatch(toolbar,/id="doneCount"|id="recordsMenuBtn"/);
