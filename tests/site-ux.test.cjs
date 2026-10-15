@@ -49,11 +49,113 @@ test('Chinese and English matching runs locally, does not require network',()=>{
  assert.equal(score(item,'interdisciplinary robotics curriculum'),0);
  assert.match(submit,/slice\(0,3\)/);
 });
-test('random draw stays equal probability, timed practice reuses countdown',()=>{
- assert.match(practice,/const pick = keys\[Math\.floor\(Math\.random\(\) \* keys\.length\)\]/);
- assert.match(practice,/function drawPractice\(withTimer\)/);
- assert.match(practice,/if\(withTimer\)startTimer\(\)/);
- assert.match(practice,/timerRemain = 60/);
- assert.match(practice,/timerRemain = 120/);
- assert.match(practice,/id="recordsMenuBtn"/);
+test('one exercise entry and predictable compact question card',()=>{
+ assert.match(practice,/id="practiceLauncher"/);
+ assert.match(practice,/id="timerPanel"[^>]*aria-hidden="true"/);
+ assert.match(practice,/id="tabMock"/);
+ assert.match(practice,/id="timerDrill"/);
+ assert.doesNotMatch(practice,/id="mockExamBtn"|id="quickDrawBtn"|id="practiceTimerBtn"/);
+ assert.doesNotMatch(practice,/class="question-contribute"/);
+ assert.match(practice,/class="q-actions \$\{translation \? "has-translation"/);
+ assert.match(practice,/\.q-actions\.no-translation/);
+ assert.match(practice,/\.note-wrap:not\(\.open\) \.md-tab/);
+ assert.match(practice,/env\(safe-area-inset-bottom,0px\)/);
+});
+function newTimerFixture(){
+ const code=section(practice,
+   '/* ============ Unified practice dock: random draw + one stable timer ============ */',
+   '/* Existing backup and export handlers are accessed from a single menu. */');
+ const elements=new Map(),listeners=new Map();
+ const cls=()=>{const store=new Set();return {
+   add:(...names)=>names.forEach(name=>store.add(name)),
+   remove:(...names)=>names.forEach(name=>store.delete(name)),
+   contains:name=>store.has(name),
+   toggle:(name,force)=>{const target=force===undefined?!store.has(name):force;
+     target?store.add(name):store.delete(name);return target;}
+ }};
+ const card={dataset:{filterMatch:'1'},classList:cls(),scrolled:0,
+   scrollIntoView(){this.scrolled++;}};
+ const el=id=>{
+   if(id==='q-A-1')return card;
+   if(!elements.has(id))elements.set(id,{
+     classList:cls(),textContent:'',value:id==='timerMin'?'2':'0',hidden:false,
+     disabled:false,attributes:{},setAttribute(k,v){this.attributes[k]=v;},
+     addEventListener(name,fn){listeners.set(id+':'+name,fn);},
+     focus(){this.focused=true;},contains(){return true;}
+   });
+   return elements.get(id);
+ };
+ const document={getElementById:el,querySelectorAll:()=>[],addEventListener:(name,fn)=>listeners.set('document:'+name,fn),hidden:false};
+ const window={confirm:()=>true,matchMedia:()=>({matches:true})};
+ let clock=100000,notice='';
+ const fakeDate={now:()=>clock};
+ const timerFactory=new Function('document','window','Date','setInterval',
+    'clearInterval','setTimeout','allPracticeIds','bankPages','matchingCards',
+    'applyFilters','setTip','PAGE_SIZE',code+
+    ';return {tickTimer,drawPractice,read:()=>({timerRunning,timerMode,timerRemain,timerPhase,timerElapsed}),openTimerPanel};');
+ const api=timerFactory(document,window,fakeDate,()=>7,()=>{},()=>{},
+    ()=>['A-1'],{fall:1,past:1},()=>[card],()=>{},txt=>{notice=txt;},8);
+ const click=id=>{const fn=listeners.get(id+':click');assert.ok(fn,'missing click '+id);fn();};
+ return {api,el,click,card,advance:ms=>{clock+=ms;},notice:()=>notice};
+}
+test('opening exercise panel does not draw or start timer; random drawing is independent',()=>{
+ const f=newTimerFixture();
+ assert.equal(f.api.read().timerRunning,false);
+ assert.equal(f.el('timerPanel').classList.contains('show'),false);
+ f.click('practiceLauncher');
+ assert.equal(f.el('timerPanel').classList.contains('show'),true);
+ assert.equal(f.api.read().timerRunning,false);
+ assert.equal(f.card.scrolled,0);
+ f.click('timerDrill');
+ assert.equal(f.card.scrolled,1);
+ assert.equal(f.el('timerPanel').classList.contains('show'),false);
+ assert.equal(f.api.read().timerRunning,false);
+ assert.match(f.notice(),/已抽到/);
+});
+test('mock timer keeps time after panel closes and transitions at original deadlines',()=>{
+ const f=newTimerFixture();
+ f.click('practiceLauncher');
+ f.click('timerStartPause');
+ assert.equal(f.api.read().timerRunning,true);
+ assert.equal(f.api.read().timerPhase,'prep');
+ assert.equal(f.el('timerPanel').classList.contains('show'),false);
+ f.advance(60000);
+ f.api.tickTimer();
+ assert.equal(f.api.read().timerPhase,'speak');
+ assert.equal(Math.round(f.api.read().timerRemain),120);
+ f.advance(120000);
+ f.api.tickTimer();
+ assert.equal(f.api.read().timerPhase,'done');
+ assert.equal(f.api.read().timerRunning,false);
+ f.click('timerReset');
+ assert.equal(f.api.read().timerPhase,'idle');
+ assert.equal(f.api.read().timerRemain,60);
+});
+test('pause and resume preserve seconds, custom countdown and stopwatch work',()=>{
+ const f=newTimerFixture();
+ f.click('timerStartPause');
+ f.advance(10000);
+ f.api.tickTimer();
+ f.click('timerStartPause');
+ assert.equal(f.api.read().timerRunning,false);
+ assert.equal(Math.round(f.api.read().timerRemain),50);
+ f.advance(25000);
+ f.click('timerStartPause');
+ assert.equal(f.api.read().timerRunning,true);
+ f.advance(50000);
+ f.api.tickTimer();
+ assert.equal(f.api.read().timerPhase,'speak');
+ f.click('timerReset');
+ f.click('tabCountdown');
+ assert.equal(f.api.read().timerMode,'countdown');
+ assert.equal(f.el('timerSet').hidden,false);
+ f.el('timerMin').value='0';f.el('timerSec').value='12';
+ const onInput=f.el('timerSec'); // timer set is read only through the existing input handler.
+ f.click('tabStopwatch');
+ assert.equal(f.api.read().timerMode,'stopwatch');
+ f.click('timerStartPause');
+ f.advance(4500);
+ f.api.tickTimer();
+ assert.equal(Math.floor(f.api.read().timerElapsed),4500);
+ assert.equal(f.el('timerDisplay').textContent,'00:04');
 });

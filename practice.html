@@ -736,6 +736,81 @@
 .page-practice #saveBtn,.page-practice #exportBtn{display:none!important}
 @media(max-width:640px){.practice-main-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.practice-main-actions>.practice-action{width:100%;padding:9px 8px}.records-menu{margin-left:0}.records-menu>.practice-action{width:100%}.records-menu-panel{right:0}}
 
+
+  /* One compact exercise dock; the sheet stays above iOS Safari's usable viewport. */
+  .page-practice .to-top {display:none!important}
+  .page-practice .practice-main-actions{display:flex;justify-content:flex-end;align-items:center;gap:0;margin:4px 0 0}
+  .page-practice .practice-main-actions .records-menu{margin-left:auto}
+  .page-practice .practice-launcher{
+    position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));
+    z-index:112;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    border:0;border-radius:999px;padding:0 16px;min-height:46px;
+    color:white;background:#003e74;box-shadow:0 8px 25px rgba(0,40,85,.22);
+    font:inherit;font-size:13px;font-weight:700;cursor:pointer;
+    font-variant-numeric:tabular-nums;touch-action:manipulation
+  }
+  .page-practice .practice-launcher:focus-visible{outline:3px solid #e4b73e;outline-offset:3px}
+  .page-practice .timer-panel{
+    top:auto;left:auto;right:12px;bottom:calc(74px + env(safe-area-inset-bottom,0px));
+    z-index:111;width:min(320px,calc(100vw - 24px));max-width:none;
+    max-height:min(410px,calc(100dvh - 100px));overflow-y:auto;
+    padding:13px;border:1px solid #dbe5f0;border-radius:16px;
+    box-shadow:0 13px 42px rgba(10,35,65,.18);overscroll-behavior:contain
+  }
+  .page-practice .timer-panel:not(.show){display:none!important}
+  .page-practice .timer-head{margin:0 0 10px}
+  .page-practice .timer-head strong{font-size:14px;color:#1c3754}
+  .page-practice .timer-close{width:30px;height:30px;font-size:18px;line-height:1}
+  .page-practice .timer-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .page-practice .timer-tab{padding:8px 3px;font-size:12px;white-space:nowrap;min-height:38px}
+  .page-practice .timer-set{margin:8px 0 0}
+  .page-practice .timer-set[hidden]{display:none!important}
+  .page-practice .timer-input{width:58px;height:37px;min-height:37px}
+  .page-practice .timer-phase{font-size:12px;letter-spacing:0;margin:10px auto 3px;padding:0;border:0;background:none}
+  .page-practice .timer-display{font-size:38px;letter-spacing:0;line-height:1.1;margin:3px 0 8px}
+  .page-practice .timer-status{height:auto;min-height:0;font-size:11px;line-height:1.45;margin:0 0 5px}
+  .page-practice .timer-status:empty{display:none}
+  .page-practice .timer-actions{gap:8px}
+  .page-practice .timer-btn{font-size:13px;min-height:40px;padding:8px;border-radius:9px}
+  .page-practice .timer-draw{display:block;width:100%;margin-top:8px}
+  /* Clear predictable card geometry at every width; no second contribution toolbar. */
+  .page-practice .qcard .q-top{display:grid;grid-template-columns:36px minmax(0,1fr);column-gap:11px;row-gap:9px}
+  .page-practice .qcard .q-num{grid-column:1;grid-row:1}
+  .page-practice .qcard .q-title{grid-column:2;grid-row:1;min-width:0}
+  .page-practice .qcard .q-actions{
+    grid-column:2;grid-row:2;display:flex;flex-wrap:nowrap;gap:8px;
+    width:auto;min-width:0;padding:0;margin:0;justify-content:flex-start
+  }
+  .page-practice .qcard .q-actions button{
+    flex:0 0 auto;min-height:36px;min-width:74px;max-width:100%;
+    padding:6px 10px;font-size:12px;border-radius:9px;white-space:nowrap
+  }
+  .page-practice .qcard .note-wrap:not(.open) .md-tab{display:none!important}
+  .page-practice .qcard .note-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .page-practice .qcard .note-toggle{min-height:34px;padding:6px 10px}
+  .page-practice .qcard .qnote{margin-top:12px;padding-top:10px}
+  .page-practice .question-feedback{margin-top:4px}
+  @media(max-width:640px){
+    .page-practice .wrap{padding-bottom:110px}
+    .page-practice .qcard .q-actions{
+      grid-column:1/-1;grid-row:2;
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;width:100%;
+    }
+    .page-practice .qcard .q-actions.no-translation{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .page-practice .qcard .q-actions button{width:100%;min-width:0;padding:7px 3px;min-height:40px}
+    .page-practice .timer-panel{right:12px;left:12px;bottom:calc(77px + env(safe-area-inset-bottom,0px));width:auto;max-width:none;margin:0}
+    .page-practice .practice-launcher{right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .page-practice .qcard.drill-flash{animation:none!important}
+    .page-practice .timer-display.warn{animation:none!important}
+  }
+
+
+  .page-practice .qcard.drill-active{
+    border-left-color:#23649f;box-shadow:0 0 0 2px rgba(30,102,164,.25),0 8px 30px rgba(10,47,82,.08)
+  }
 </style>
 </head>
 <body class="page-practice">
@@ -817,9 +892,6 @@
     </span>
     </div>
     <div class="practice-main-actions">
-      <button type="button" class="practice-action" id="quickDrawBtn">🎲 随机抽题</button>
-      <button type="button" class="practice-action primary" id="mockExamBtn">⏱ 模拟考试</button>
-      <button type="button" class="practice-action subtle" id="practiceTimerBtn">自定义计时</button>
       <div class="records-menu">
         <button type="button" class="practice-action subtle" id="recordsMenuBtn" aria-expanded="false" aria-controls="recordsMenu">学习记录 ▾</button>
         <div class="records-menu-panel" id="recordsMenu" hidden>
@@ -868,30 +940,37 @@
     </div>
   </div>
 
-  <!-- 计时器面板 -->
-  <div class="timer-panel" id="timerPanel">
+  <!-- 统一练习工具：打开只展示控件，不触发抽题或计时 -->
+  <section class="timer-panel" id="timerPanel" role="dialog" aria-label="练习工具" aria-modal="false" aria-hidden="true">
     <div class="timer-head">
-      <div class="timer-tabs">
-        <button class="timer-tab active" id="tabCountdown">⏳ 倒计时</button>
-        <button class="timer-tab" id="tabStopwatch">⏱️ 正向计时</button>
-      </div>
-      <button class="timer-close" onclick="toggleTimer()" title="关闭">✕</button>
+      <strong>练习工具</strong>
+      <button class="timer-close" id="timerClose" type="button" aria-label="收起练习工具">×</button>
     </div>
-    <div class="timer-set" id="timerSet">
-      <input type="number" id="timerMin" class="timer-input" min="0" max="180" value="2" title="分钟">
+    <div class="timer-tabs" role="group" aria-label="计时模式">
+      <button class="timer-tab active" id="tabMock" type="button" aria-pressed="true">模拟考试</button>
+      <button class="timer-tab" id="tabCountdown" type="button" aria-pressed="false">倒计时</button>
+      <button class="timer-tab" id="tabStopwatch" type="button" aria-pressed="false">正向计时</button>
+    </div>
+    <div class="timer-set" id="timerSet" hidden>
+      <label for="timerMin" class="sr-only">倒计时分钟</label>
+      <input type="number" id="timerMin" class="timer-input" min="0" max="180" value="2" inputmode="numeric">
       <span>分</span>
-      <input type="number" id="timerSec" class="timer-input" min="0" max="59" value="0" title="秒">
+      <label for="timerSec" class="sr-only">倒计时秒数</label>
+      <input type="number" id="timerSec" class="timer-input" min="0" max="59" value="0" inputmode="numeric">
       <span>秒</span>
     </div>
-    <div class="timer-phase" id="timerPhase">⏳ 倒计时</div>
-    <div class="timer-display" id="timerDisplay">02:00</div>
-    <div class="timer-status" id="timerStatus"></div>
+    <div class="timer-phase" id="timerPhase">准备 1 分钟 · 陈述 2 分钟</div>
+    <div class="timer-display" id="timerDisplay" role="timer" aria-live="off">01:00</div>
+    <div class="timer-status" id="timerStatus" role="status" aria-live="polite"></div>
     <div class="timer-actions">
-      <button class="timer-btn primary" id="timerStartPause">▶ 开始</button>
-      <button class="timer-btn" id="timerReset">↺ 重置</button>
+      <button class="timer-btn primary" id="timerStartPause" type="button">▶ 开始</button>
+      <button class="timer-btn" id="timerReset" type="button">↺ 重置</button>
     </div>
-    <button class="timer-btn" id="timerDrill" style="margin-top:8px" title="随机抽一道题并滚动定位，同时开始 2 分钟陈述倒计时">🎲 随机抽题 · 2 分钟</button>
-  </div>
+    <button class="timer-btn timer-draw" id="timerDrill" type="button">🎲 随机抽题</button>
+  </section>
+  <button id="practiceLauncher" class="practice-launcher" type="button" aria-controls="timerPanel" aria-expanded="false" aria-label="打开练习工具">
+    <span aria-hidden="true">⏱</span> <span id="practiceLauncherText">练习</span>
+  </button>
 
   <!-- Progress -->
   <div class="progress-card">
@@ -1419,15 +1498,15 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
           ${item.recallTag ? `<span class="recall-mark">${esc(item.recallTag)}</span>` : ""}
           ${feedback ? `<div class="question-feedback">↻ 已收录 ${feedback} 条反馈</div>` : ''}
           ${badges ? `<div class="session-badges">${badges}</div>` : ''}
-          ${translation ? `<button type="button" class="translation-toggle" aria-expanded="false" aria-controls="cn-${id}" onclick="toggleTranslation('cn-${id}',this)">查看中文</button><div class="cn translation" id="cn-${id}" hidden>${esc(translation)}</div>` : ''}
+          ${translation ? `<div class="cn translation" id="cn-${id}" hidden>${esc(translation)}</div>` : ''}
           ${sourceNote ? `<div class="question-provenance">${esc(sourceNote)}</div>` : ''}
         </div>
-        <div class="q-actions">
-          <button class="copy-btn" onclick="copyQuestion('${id}')" title="复制题目">📋 复制</button>
+        <div class="q-actions ${translation ? "has-translation" : "no-translation"}">
+          ${translation ? `<button type="button" class="translation-toggle" aria-expanded="false" aria-controls="cn-${id}" onclick="toggleTranslation('cn-${id}',this)">查看中文</button>` : ""}
+          <button class="copy-btn" onclick="copyQuestion('${id}')" title="复制题目">复制</button>
           <button class="status-btn ${stMap[st][1]}" onclick="cycleStatus('${id}', this)">${stMap[st][0]}</button>
         </div>
       </div>
-      <div class="question-contribute"><a href="./submit.html?question=${encodeURIComponent(id)}&campus=${encodeURIComponent(activeCampus)}&track=${encodeURIComponent(activeTrack)}">我也考到了 / 补充题目 ↗</a></div>
       ${hasSubs ? `
       <div class="subq" id="subq-${id}">
         <button type="button" class="subq-head" onclick="toggleSub('${id}')" aria-expanded="false" aria-controls="subq-list-${id}">
@@ -1456,7 +1535,7 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
       <div class="qnote">
         <div class="note-wrap" id="nw-${qnoteKey}">
           <div class="note-toolbar">
-            <button class="note-toggle" onclick="toggleNote('${qnoteKey}')" title="记录本题的整体思路/答题要点（保存到 elpa_data.json）">📝 大问题笔记</button>
+            <button class="note-toggle" onclick="toggleNote('${qnoteKey}')" title="记录本题的整体思路/答题要点（保存到 elpa_data.json）">📝 我的笔记</button>
             <button class="md-tab" id="mdt-edit-${qnoteKey}" onclick="switchNoteMode('${qnoteKey}','edit')">✏️ 编辑</button>
             <button class="md-tab" id="mdt-prev-${qnoteKey}" onclick="switchNoteMode('${qnoteKey}','preview')">👁 预览</button>
           </div>
@@ -1946,223 +2025,214 @@ document.addEventListener('keydown', e => {
   if (e.altKey && !mod && e.key === 'ArrowDown') { e.preventDefault(); moveLine(e.target, 1); return; }
 });
 
-/* ============ 计时器（倒计时 / 正向计时） ============ */
-const timerPanel = document.getElementById('timerPanel');
-let timerMode = 'countdown';      // countdown | stopwatch
-let timerRunning = false;
-let timerRemain = 120;            // 倒计时剩余秒数
-let timerEndAt = 0;               // 倒计时结束时间戳
-let timerElapsed = 0;             // 正向计时累计毫秒（暂停保留）
-let timerStartStamp = 0;          // 正向计时开始时间戳
-let timerInterval = null;
-let timerPhase = 'idle';          // idle | prep(准备) | speak(陈述) | done
+/* ============ Unified practice dock: random draw + one stable timer ============ */
+const timerPanel=document.getElementById('timerPanel');
+const practiceLauncher=document.getElementById('practiceLauncher');
+const launcherText=document.getElementById('practiceLauncherText');
+const timerDisplay=document.getElementById('timerDisplay');
+const timerStatus=document.getElementById('timerStatus');
+const timerStartPause=document.getElementById('timerStartPause');
+const timerSet=document.getElementById('timerSet');
+let timerMode='mock';                 // mock | countdown | stopwatch
+let timerRunning=false;
+let timerRemain=60;                   // seconds, including paused countdown
+let timerEndAt=0;                    // phase deadline on the wall clock
+let timerElapsed=0;                  // milliseconds, including paused stopwatch
+let timerStartStamp=0;
+let timerInterval=null;
+let timerPhase='idle';               // idle | prep | speak | done
+let activeDrawId=null;
 
-/* ---- 阶段徽章与配色 ---- */
-function setPhase(phase, label) {
-  timerPhase = phase;
-  timerPanel.classList.toggle('prep', phase === 'prep');
-  timerPanel.classList.toggle('speak', phase === 'speak');
-  timerPanel.classList.toggle('finished', phase === 'done');
-  const badge = document.getElementById('timerPhase');
-  if (badge && label !== undefined) badge.textContent = label;
+function fmtTime(totalSec){
+  const sec=Math.max(0,Math.floor(totalSec));
+  const hour=Math.floor(sec/3600),minute=Math.floor((sec%3600)/60),second=sec%60;
+  const part=String(minute).padStart(2,'0')+':'+String(second).padStart(2,'0');
+  return hour?hour+':'+part:part;
 }
-
-function toggleTimer() {
-  timerPanel.classList.toggle('show');
-  if (timerPanel.classList.contains('show')) {
-    document.getElementById('timerStatus').textContent = '';
-    timerPanel.classList.remove('finished');
-  }
+function readInput(){
+  const min=Math.min(180,Math.max(0,Number.parseInt(document.getElementById('timerMin').value,10)||0));
+  const sec=Math.min(59,Math.max(0,Number.parseInt(document.getElementById('timerSec').value,10)||0));
+  return Math.max(1,min*60+sec);
 }
-document.getElementById('timerBtn').addEventListener('click', toggleTimer);
-
-function fmtTime(totalSec) {
-  const s = Math.max(0, Math.floor(totalSec));
-  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-  const mm = String(m).padStart(2, '0'), ss = String(sec).padStart(2, '0');
-  return h > 0 ? h + ':' + mm + ':' + ss : mm + ':' + ss;
+function setPhase(next){
+  timerPhase=next;
+  timerPanel.classList.toggle('prep',next==='prep');
+  timerPanel.classList.toggle('speak',next==='speak');
+  timerPanel.classList.toggle('finished',next==='done');
 }
-function syncDisplay() {
-  const d = document.getElementById('timerDisplay');
-  if (timerMode === 'countdown') {
-    d.textContent = fmtTime(timerRemain);
-  } else {
-    d.textContent = fmtTime(timerElapsed / 1000);
-  }
+function renderTimer(){
+  const value=timerMode==='stopwatch'?timerElapsed/1000:timerRemain;
+  timerDisplay.textContent=fmtTime(value);
+  timerDisplay.classList.toggle('warn',timerMode!=='stopwatch'&&timerRunning&&timerRemain<=10);
+  timerStartPause.textContent=timerRunning?'⏸ 暂停':'▶ '+(timerPhase==='done'?'重新开始':'开始');
+  const labels={
+    mock:{idle:'准备 1 分钟 · 陈述 2 分钟',prep:'准备阶段',speak:'陈述阶段',done:'模拟结束'},
+    countdown:{idle:'自定义倒计时',prep:'倒计时中',speak:'倒计时中',done:'计时结束'},
+    stopwatch:{idle:'正向计时',prep:'正向计时中',speak:'正向计时中',done:'计时结束'}
+  };
+  document.getElementById('timerPhase').textContent=labels[timerMode][timerPhase];
+  document.getElementById('timerMin').disabled=timerRunning;
+  document.getElementById('timerSec').disabled=timerRunning;
+  launcherText.textContent=timerRunning?fmtTime(value):
+    (timerPhase!=='idle'&&timerPhase!=='done'?'⏸ '+fmtTime(value):'练习');
+  practiceLauncher.setAttribute('aria-label',
+    timerRunning?'练习计时中，剩余或已用 '+fmtTime(value)+'，打开练习工具':'打开练习工具');
 }
-function readInput() {
-  const min = parseInt(document.getElementById('timerMin').value, 10) || 0;
-  const sec = parseInt(document.getElementById('timerSec').value, 10) || 0;
-  return min * 60 + sec;
+function openTimerPanel(open,focusControl=false){
+  timerPanel.classList.toggle('show',open);
+  timerPanel.setAttribute('aria-hidden',String(!open));
+  practiceLauncher.setAttribute('aria-expanded',String(open));
+  if(focusControl)(open?document.getElementById('timerClose'):practiceLauncher).focus();
 }
-function beep(times) {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    let n = 0;
-    const tick = () => {
-      if (n >= times) { ctx.close(); return; }
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = 880;
-      g.gain.setValueAtTime(0.25, ctx.currentTime);
-      o.start(); o.stop(ctx.currentTime + 0.25);
-      n++;
-      setTimeout(tick, 350);
-    };
-    tick();
-  } catch (e) {}
-}
-function stopTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-  timerRunning = false;
-  document.getElementById('timerStartPause').textContent = '▶ 开始';
-  document.getElementById('timerMin').disabled = false;
-  document.getElementById('timerSec').disabled = false;
-  timerPanel.classList.remove('finished');
-}
-function startTimer() {
-  if (timerMode === 'countdown') {
-    if (timerRemain <= 0) timerRemain = Math.max(1, readInput());
-    timerEndAt = Date.now() + timerRemain * 1000;
-  } else {
-    timerStartStamp = Date.now() - timerElapsed;
-  }
-  timerRunning = true;
-  document.getElementById('timerStartPause').textContent = '⏸ 暂停';
-  document.getElementById('timerMin').disabled = true;
-  document.getElementById('timerSec').disabled = true;
-  timerInterval = setInterval(() => {
-    if (timerMode === 'countdown') {
-      timerRemain = (timerEndAt - Date.now()) / 1000;
-      const d = document.getElementById('timerDisplay');
-      if (timerRemain <= 0) {
-        if (timerPhase === 'prep') {
-          // 准备阶段结束 → 自动进入 2 分钟陈述
-          beep(2);
-          timerRemain = 120;
-          timerEndAt = Date.now() + 120000;
-          document.getElementById('timerMin').value = 2;
-          document.getElementById('timerSec').value = 0;
-          setPhase('speak', '🎤 陈述 2:00');
-          d.classList.remove('warn');
-          document.getElementById('timerStatus').textContent = '✍️ 准备结束，开始 2 分钟陈述！';
-          return;
-        }
-        timerRemain = 0;
-        d.textContent = '00:00';
-        stopTimer();
-        clearDrill();
-        setPhase('done', '⏰ 时间到');
-        document.getElementById('timerStatus').textContent = '⏰ 时间到！';
-        beep(3);
-        return;
-      }
-      d.textContent = fmtTime(timerRemain);
-      d.classList.toggle('warn', timerRemain <= 10);
-    } else {
-      timerElapsed = Date.now() - timerStartStamp;
-      document.getElementById('timerDisplay').textContent = fmtTime(timerElapsed / 1000);
+practiceLauncher.addEventListener('click',()=>openTimerPanel(!timerPanel.classList.contains('show'),true));
+document.getElementById('timerClose').addEventListener('click',()=>openTimerPanel(false,true));
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'&&timerPanel.classList.contains('show'))openTimerPanel(false,true);
+});
+function beep(times){
+  try{
+    const context=new (window.AudioContext||window.webkitAudioContext)();
+    for(let i=0;i<times;i++){
+      const oscillator=context.createOscillator(),gain=context.createGain();
+      oscillator.connect(gain);gain.connect(context.destination);
+      oscillator.frequency.value=880;
+      gain.gain.setValueAtTime(.15,context.currentTime+i*.26);
+      oscillator.start(context.currentTime+i*.26);
+      oscillator.stop(context.currentTime+i*.26+.15);
     }
-  }, 250);
+    setTimeout(()=>context.close().catch(()=>{}),times*260+300);
+  }catch(e){}
 }
-document.getElementById('timerStartPause').addEventListener('click', () => {
-  if (timerRunning) {
-    if (timerMode === 'countdown') timerRemain = (timerEndAt - Date.now()) / 1000;
+function stopTimer(){
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=null;
+  timerRunning=false;
+  renderTimer();
+}
+function resetTimer(clearSelection=false){
+  stopTimer();
+  setPhase('idle');
+  timerRemain=timerMode==='mock'?60:readInput();
+  timerElapsed=0;
+  timerStatus.textContent='';
+  if(clearSelection)clearDrill();
+  renderTimer();
+}
+function tickTimer(){
+  if(!timerRunning)return;
+  const now=Date.now();
+  if(timerMode==='stopwatch'){
+    timerElapsed=Math.max(0,now-timerStartStamp);
+    renderTimer();
+    return;
+  }
+  if(timerMode==='mock'&&timerPhase==='prep'&&now>=timerEndAt){
+    // Preserve the original deadline so a backgrounded tab cannot extend the exam.
+    timerEndAt+=120000;
+    setPhase('speak');
+    timerStatus.textContent='准备结束，开始 2 分钟陈述';
+    beep(2);
+  }
+  timerRemain=Math.max(0,(timerEndAt-now)/1000);
+  if(timerRemain<=0){
     stopTimer();
-  } else {
+    setPhase('done');
+    timerStatus.textContent='时间到，本轮练习结束';
+    beep(3);
+  }
+  renderTimer();
+}
+function startTimer(){
+  if(timerRunning)return;
+  if(timerPhase==='done')resetTimer();
+  if(timerMode==='mock'&&timerPhase==='idle'){
+    timerRemain=60;
+    setPhase('prep');
+  }else if(timerMode!=='mock'&&timerPhase==='idle'){
+    setPhase('prep');
+  }
+  timerStatus.textContent='';
+  const now=Date.now();
+  if(timerMode==='stopwatch')timerStartStamp=now-timerElapsed;
+  else timerEndAt=now+Math.max(1,timerRemain)*1000;
+  timerRunning=true;
+  tickTimer();
+  timerInterval=setInterval(tickTimer,200);
+}
+timerStartPause.addEventListener('click',()=>{
+  if(timerRunning){
+    tickTimer();
+    if(!timerRunning)return;
+    if(timerMode==='stopwatch')timerElapsed=Math.max(0,Date.now()-timerStartStamp);
+    else timerRemain=Math.max(0,(timerEndAt-Date.now())/1000);
+    stopTimer();
+  }else{
     startTimer();
+    openTimerPanel(false);
   }
 });
-document.getElementById('timerReset').addEventListener('click', () => {
-  stopTimer();
-  clearDrill();
-  setPhase('idle', '⏳ 倒计时');
-  document.getElementById('timerDisplay').classList.remove('warn');
-  document.getElementById('timerStatus').textContent = '';
-  if (timerMode === 'countdown') {
-    timerRemain = Math.max(1, readInput());
-  } else {
-    timerElapsed = 0;
-  }
-  syncDisplay();
-});
-document.getElementById('timerMin').addEventListener('input', () => {
-  if (!timerRunning) { timerRemain = readInput(); syncDisplay(); }
-});
-document.getElementById('timerSec').addEventListener('input', () => {
-  if (!timerRunning) { timerRemain = readInput(); syncDisplay(); }
-});
-function switchTimerMode(mode) {
-  stopTimer();
-  clearDrill();
-  setPhase('idle', '⏳ 倒计时');
-  timerMode = mode;
-  document.getElementById('tabCountdown').classList.toggle('active', mode === 'countdown');
-  document.getElementById('tabStopwatch').classList.toggle('active', mode === 'stopwatch');
-  document.getElementById('timerSet').style.display = mode === 'countdown' ? '' : 'none';
-  document.getElementById('timerDisplay').classList.remove('warn');
-  document.getElementById('timerStatus').textContent = '';
-  if (mode === 'countdown') {
-    timerRemain = Math.max(1, readInput());
-  } else {
-    timerElapsed = 0;
-  }
-  syncDisplay();
-}
-document.getElementById('tabCountdown').addEventListener('click', () => switchTimerMode('countdown'));
-document.getElementById('tabStopwatch').addEventListener('click', () => switchTimerMode('stopwatch'));
-
-/* ---- 随机抽题 · 模拟考试（60s 准备 → 2 分钟陈述，题目蓝框常驻闪烁） ---- */
-function clearDrill() {
-  document.querySelectorAll('.qcard.drill-active, .qcard.drill-flash').forEach(c =>
-    c.classList.remove('drill-active', 'drill-flash'));
-}
-function drawPractice(withTimer) {
-  const keys = allPracticeIds().filter(id => {
-    const card = document.getElementById('q-' + id);
-    return card && card.dataset.filterMatch === '1';
+document.getElementById('timerReset').addEventListener('click',()=>resetTimer());
+for(const id of ['timerMin','timerSec']){
+  document.getElementById(id).addEventListener('input',()=>{
+    if(timerMode==='countdown'&&!timerRunning&&timerPhase==='idle'){
+      timerRemain=readInput();renderTimer();
+    }
   });
-  if (!keys.length) { setTip('当前筛选条件下没有可抽取的题目，请调整关键词或状态。', 'err'); return; }
-  const pick = keys[Math.floor(Math.random() * keys.length)];
-  const card = document.getElementById('q-' + pick);
-  if (!card) return;
+}
+function switchTimerMode(mode){
+  if(mode===timerMode)return;
+  if((timerRunning||timerPhase==='prep'||timerPhase==='speak')&&
+    !window.confirm('切换计时模式将结束本轮计时，是否继续？'))return;
+  stopTimer();
+  timerMode=mode;
+  for(const [id,value] of [['tabMock','mock'],['tabCountdown','countdown'],['tabStopwatch','stopwatch']]){
+    const button=document.getElementById(id),active=mode===value;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  }
+  timerSet.hidden=mode!=='countdown';
+  resetTimer();
+}
+for(const [id,mode] of [['tabMock','mock'],['tabCountdown','countdown'],['tabStopwatch','stopwatch']]){
+  document.getElementById(id).addEventListener('click',()=>switchTimerMode(mode));
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden)tickTimer();
+});
+function clearDrill(){
+  document.querySelectorAll('.qcard.drill-active,.qcard.drill-flash').forEach(card=>{
+    card.classList.remove('drill-active','drill-flash');
+  });
+  activeDrawId=null;
+}
+function drawPractice(){
+  const keys=allPracticeIds().filter(id=>{
+    const card=document.getElementById('q-'+id);
+    return card&&card.dataset.filterMatch==='1';
+  });
+  if(!keys.length){
+    setTip('当前筛选条件下没有可抽取的题目，请调整筛选条件。','err');
+    return;
+  }
+  if((timerRunning||timerPhase==='prep'||timerPhase==='speak')&&
+    !window.confirm('重新抽题将结束本轮计时，是否继续？'))return;
+  resetTimer();
+  const pick=keys[Math.floor(Math.random()*keys.length)];
+  const card=document.getElementById('q-'+pick);
+  if(!card)return;
   const kind=document.getElementById('bankD').contains(card)?'fall':'past';
   const index=matchingCards(kind).indexOf(card);
   bankPages[kind]=Math.max(1,Math.floor(index/PAGE_SIZE)+1);
   applyFilters();
-  // 演练模式：60 秒准备 → 自动进入 2 分钟陈述（先切模式，其内部会 clearDrill）
-  if(withTimer){
-    switchTimerMode('countdown');
-    document.getElementById('timerMin').value = 1;
-    document.getElementById('timerSec').value = 0;
-    timerRemain = 60;
-    setPhase('prep', '📝 准备 1:00');
-    syncDisplay();
-    if (!timerPanel.classList.contains('show')) toggleTimer();
-  }else{
-    stopTimer();
-    setPhase('idle', '⏳ 倒计时');
-  }
-  // 标记当前题：滚动定位 + 闪烁 5 次后保持常亮
   clearDrill();
-  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  card.classList.add('drill-active');          // 静态高亮（闪烁结束后保持）
-  card.classList.add('drill-flash');           // 边框闪烁 5 次
-  card.addEventListener('animationend', function h(e) {
-    if (e.animationName === 'drillBlink') {
-      card.classList.remove('drill-flash');    // 动画结束移除闪烁类，保留常亮
-      card.removeEventListener('animationend', h);
-    }
-  });
-  if(withTimer)startTimer();
-  setTip(withTimer?'🎲 已抽到 '+pick+'：1 分钟准备，随后 2 分钟陈述。':'🎲 已抽到 '+pick+'，可以开始练习。','ok');
+  activeDrawId=pick;
+  card.classList.add('drill-active');
+  openTimerPanel(false);
+  card.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+  setTip('🎲 已抽到第 '+(index+1)+' 题；需要计时可点右下角「练习」。','ok');
 }
-document.getElementById('timerDrill').addEventListener('click',()=>drawPractice(true));
-document.getElementById('quickDrawBtn').addEventListener('click',()=>drawPractice(false));
-document.getElementById('mockExamBtn').addEventListener('click',()=>drawPractice(true));
-document.getElementById('practiceTimerBtn').addEventListener('click',()=>document.getElementById('timerBtn').click());
-
+document.getElementById('timerDrill').addEventListener('click',drawPractice);
+renderTimer();
 
 /* Existing backup and export handlers are accessed from a single menu. */
 const recordsButton=document.getElementById('recordsMenuBtn');
