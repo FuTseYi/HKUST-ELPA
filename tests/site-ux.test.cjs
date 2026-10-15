@@ -230,7 +230,8 @@ test('internal pages share one compact banner and the practice brand uses the si
 
 test('sources page keeps external references without duplicate question-bank documents',()=>{
  const sources=fs.readFileSync(path.join(__dirname,'../sources.html'),'utf8');
- assert.match(sources,/<h2 class="elpa-heading">参考链接<\/h2>/);
+  assert.match(sources,/id="official-sources">学校官方说明<\/h2>/);
+  assert.match(sources,/id="community-sources">考生分享与备考资料<\/h2>/);
  assert.match(sources,/docs\.qq\.com\/doc\/DT3BxSkJzSGdUamJE/);
  assert.match(sources,/docs\.qq\.com\/doc\/DSHJydEVYSHBtdkZO/);
  assert.doesNotMatch(sources,/站内题库文档|question-bank\/(?:2026-fall|previous-years|fast-track)\.md/);
