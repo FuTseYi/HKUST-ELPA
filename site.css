@@ -56,6 +56,16 @@ body { margin:0; }
 .elpa-home-feature-details{display:grid;gap:9px;margin-top:18px}
 .elpa-home-feature-details p{margin:0;padding-left:13px;border-left:2px solid #cbdeed;color:#5c6f80;font-size:13px;line-height:1.75}
 .elpa-home-feature-details strong{color:#284e71}
+.elpa-home-instructions{display:grid;gap:13px;margin:19px 0 0;padding:0;list-style:none;counter-reset:none}
+.elpa-home-instructions li{display:flex;align-items:flex-start;gap:12px}
+.elpa-home-instructions-num{display:grid;place-items:center;flex:0 0 24px;height:24px;margin-top:2px;border:1px solid #cbdbe9;border-radius:7px;background:#f5f9fc;color:#235980;font-size:11px;font-weight:800}
+.elpa-home-instructions li>div{min-width:0}
+.elpa-home-instructions strong{display:block;color:#274b6b;font-size:13px;line-height:1.6}
+.elpa-home-instructions p{margin:3px 0 0;color:#5b6f82;font-size:12.5px;line-height:1.75}
+.elpa-home-backup-guide{margin-top:21px;padding:17px 18px;border:1px solid #dce7f0;border-radius:11px;background:#f8fafc}
+.elpa-home-backup-guide h4{margin:0 0 7px;color:var(--site-navy);font-size:14px;line-height:1.5}
+.elpa-home-backup-guide p{margin:0;color:#4f6476;font-size:12.5px;line-height:1.8}
+.elpa-home-backup-guide small{display:block;margin-top:10px;color:#718294;font-size:11.5px;line-height:1.65}
 .elpa-home-feature-note{margin:17px 0 0;padding:11px 13px;border-radius:8px;background:#eef4fa;color:#546e85;font-size:12px;line-height:1.75}
 .elpa-home-feature-link,.elpa-home-more-card>a{display:inline-flex;gap:7px;align-items:center;margin-top:19px;color:var(--site-blue)!important;font-size:13px;font-weight:800;text-decoration:none;text-underline-offset:4px}
 .elpa-home-feature-link:hover,.elpa-home-more-card>a:hover{text-decoration:underline}
@@ -111,6 +121,10 @@ body { margin:0; }
  .elpa-home-feature{grid-template-columns:1fr;gap:23px;padding:32px 0}
  .elpa-home-feature-copy h3{font-size:21px}
  .elpa-home-feature-copy>p:not(.elpa-home-feature-note){font-size:13px}
+ .elpa-home-instructions{gap:12px}
+ .elpa-home-instructions p{font-size:12px}
+ .elpa-home-backup-guide{padding:16px 15px;margin-top:18px}
+ .elpa-home-backup-guide p{font-size:12px}
  .elpa-home-demo{max-width:560px;width:100%;margin:0 auto;padding:20px}
  .elpa-home-more{padding-top:36px}
  .elpa-home-more-grid{grid-template-columns:1fr;gap:10px;margin-top:18px}
