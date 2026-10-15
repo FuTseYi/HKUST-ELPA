@@ -110,7 +110,8 @@ function chromeBinary(){
         assert.equal(await homePage.locator('.elpa-home-instructions li').count(),6);
         assert.equal(await homePage.locator('.elpa-home-backup-guide').count(),1);
         assert.match(await homePage.locator('#home-practice-title').innerText(),/网站负责抽题和计时/);
-        assert.match(await homePage.locator('.elpa-home-backup-guide').innerText(),/备份[\\s\\S]*恢复/);
+        const backupGuide=await homePage.locator('.elpa-home-backup-guide').innerText();
+        assert.ok(backupGuide.includes('「备份」')&&backupGuide.includes('「恢复」'),'Explain both backup and restore in plain language');
         const plainHome=await homePage.locator('main').innerText();
         assert.doesNotMatch(plainHome,/模拟口语|JSON|Markdown/,'Instructions must stay jargon-free');
         assert.equal(await homePage.locator('.elpa-home-more-card').count(),2);
