@@ -105,31 +105,23 @@ body { margin:0; }
 .contrib-actions a:hover::after,
 .question-feedback a:hover::after {transform:translateX(3px) rotate(45deg);}
 .elpa-callout {border:1px solid #e6d9af; background:#fff9ed; color:#625331; border-radius:13px; padding:17px 21px; font-size:13px; margin:20px 0;}
-/* Compact mobile-first community footer. */
-.elpa-footer{background:#122d51;color:#c8daea;padding:27px 16px 22px;text-align:center;font-size:12px;line-height:1.6}
+/* Shared compact footer; detailed source notes live on sources.html. */
+.elpa-footer{background:#122d51;color:#c8daea;padding:29px 16px 23px;text-align:center;font-size:12px;line-height:1.65}
 .elpa-footer-inner{max-width:780px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
 .elpa-footer p{margin:0}
 .elpa-footer-intro,.elpa-footer-identity{display:flex;flex-direction:column;align-items:center}
 .elpa-footer-slogan{color:#fff;font-size:clamp(15px,2.5vw,19px);line-height:1.4;font-weight:750}
 .elpa-footer-motto{margin-top:4px!important;color:#d8e6f3;font-size:12.5px}
-.elpa-footer-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:15px}
+.elpa-footer-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:9px 27px;margin-top:14px}
 .elpa-footer a{color:#f4d17b;text-decoration:none;text-underline-offset:3px}
 .elpa-footer a:hover{text-decoration:underline}
 .elpa-footer a:focus-visible{outline:2px solid #f4d17b;outline-offset:3px;border-radius:3px}
-.elpa-footer .elpa-footer-action{display:inline-flex;justify-content:center;align-items:center;gap:6px;height:38px;padding:8px 15px;border:0;border-radius:8px;color:#fff;font-size:12.5px;font-weight:700;line-height:1;white-space:nowrap;transition:background .16s ease,transform .16s ease}
-.elpa-footer .elpa-footer-action-primary{background:#f4d17b;color:#17375d}
-.elpa-footer .elpa-footer-action-primary:hover{background:#ffdd8f;transform:translateY(-1px);text-decoration:none}
-.elpa-footer .elpa-footer-action-secondary{background:rgba(255,255,255,.1)}
-.elpa-footer .elpa-footer-action-secondary:hover{background:rgba(255,255,255,.18);transform:translateY(-1px);text-decoration:none}
-.elpa-footer-divider{height:1px;width:min(100%,400px);background:rgba(192,215,233,.21);margin:20px auto 14px}
+.elpa-footer .elpa-footer-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:28px;padding:3px 1px;color:#f4d17b;font-size:12.5px;font-weight:700;line-height:1.5;white-space:nowrap}
+.elpa-footer-divider{height:1px;width:min(100%,400px);background:rgba(192,215,233,.21);margin:17px auto 12px}
 .elpa-footer-tech{color:#bdd1e2;font-size:12px}
-.elpa-footer-disclaimer{color:#94afc6;font-size:10.5px;margin-top:11px!important;max-width:680px}
-.elpa-footer-source{font-size:11px;margin-top:3px!important}
-.elpa-footer-identity{margin-top:12px}
-.elpa-footer-byline{font-size:11.5px;color:#c6d8e7}
-.elpa-footer-cohort{font-size:11px;color:#90abc2;margin-top:1px!important}
-@media(max-width:560px){.elpa-footer{padding:25px 16px 20px}.elpa-footer-slogan{font-size:clamp(14px,4vw,17px)}.elpa-footer-actions{gap:9px}.elpa-footer-divider{margin:18px auto 13px}}
-@media(prefers-reduced-motion:reduce){.elpa-footer .elpa-footer-action{transition:none;transform:none!important}}
+.elpa-footer-identity{margin-top:7px}
+.elpa-footer-byline{font-size:11.5px;color:#9fb7cd}
+@media(max-width:560px){.elpa-footer{padding:25px 16px 20px}.elpa-footer-slogan{font-size:clamp(14px,4vw,17px)}.elpa-footer-actions{gap:10px 21px}}
 /* Practice page controls are layered over its existing functional styles. */
 .page-practice .campus-hero {min-height:240px; padding:35px 24px 34px;}
 .page-practice .campus-hero h1 {font-size:clamp(29px,4vw,39px);}
