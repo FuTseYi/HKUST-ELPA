@@ -129,8 +129,9 @@ jobs:
           assert Path("submission-config.js").is_file(), "Public config file missing"
 
           home=pages["index.html"]
-          assert 'class="elpa-next-primary" href="./practice.html"' in home and 'class="elpa-community"' in home, "Home practice or community entry missing"
-          assert 'elpa-start-actions' not in home and '提交 → 后端校验 → 审核 → 入库' not in home, "Deprecated homepage layout or review copy still visible"
+          assert home.count('class="elpa-home-feature"') == 4 and 'class="elpa-home-journey"' in home, "First-visit feature walkthrough missing"
+          assert 'href="./practice.html"' in home and 'href="./sources.html"' in home and 'href="./submit.html"' in home, "Homepage resource or contribution entry missing"
+          assert 'elpa-next-primary' not in home and 'elpa-start-actions' not in home and '提交 → 后端校验 → 审核 → 入库' not in home, "Repeated practice CTA or deprecated moderation copy still visible"
           sources=pages["sources.html"]
           for url in ("docs.qq.com/doc/DT3BxSkJzSGdUamJE","docs.qq.com/doc/DSHJydEVYSHBtdkZO","share.note.youdao.com"):
               assert url in sources, f"Original source link missing: {url}"
