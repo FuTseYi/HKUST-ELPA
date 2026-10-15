@@ -86,11 +86,11 @@ function chromeBinary(){
           scrollWidth:document.documentElement.scrollWidth};
       });
       assert.equal(footer.count,1,'One footer required at '+width);
-      assert.equal(footer.caption,'2026 Fall MPhil');
+      assert.equal(footer.caption,undefined,'Personal cohort label removed');
       assert.equal(footer.authorLast,true,'Author credit should be the last footer element');
       assert.equal(footer.actions,2,'Both contribution links must be present');
       assert.deepEqual(footer.buttons.map(b=>b.text.replace(/\s+/g,' ').trim()),['分享考题与经验','参与开源共建']);
-      assert.ok(footer.buttons.every(b=>b.height===38&&b.whiteSpace==='nowrap'&&b.scrollWidth<=b.clientWidth+1),
+      assert.ok(footer.buttons.every(b=>b.height>=28&&b.whiteSpace==='nowrap'&&b.scrollWidth<=b.clientWidth+1),
         'Footer labels must be single-line at '+width+': '+JSON.stringify(footer.buttons));
       assert.ok(Math.abs(footer.buttons[0].y-footer.buttons[1].y)<=1,'Footer buttons not aligned at '+width);
       assert.match(footer.tech,/Built with GitHub · Vercel · Cloudflare/);
@@ -99,6 +99,23 @@ function chromeBinary(){
       assert.ok(footer.scrollWidth<=width+2,'Footer overflows at '+width);
       assert.ok(layout.launcher.left>=0&&layout.launcher.right<=width+1,
         'Launcher escapes the mobile viewport at '+width+': '+JSON.stringify(layout.launcher));
+      // The homepage and sources now share the compact footer and mobile layout.
+      const homePage=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
+      try{
+        await homePage.goto(new URL('/index.html',host).href,{waitUntil:'load'});
+        assert.equal(await homePage.locator('.elpa-capability').count(),3);
+        assert.equal(await homePage.locator('.elpa-next-primary').count(),1);
+        assert.equal(await homePage.locator('.elpa-start-actions').count(),0);
+        assert.match(await homePage.locator('.elpa-community').innerText(),/社区分享/);
+        const dimensions=await homePage.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+        assert.ok(dimensions.scroll<=dimensions.width+2,'Home horizontal overflow at '+width+': '+JSON.stringify(dimensions));
+        await homePage.goto(new URL('/sources.html',host).href,{waitUntil:'load'});
+        assert.equal(await homePage.locator('#official-sources + .elpa-desc').count(),1);
+        assert.equal(await homePage.locator('.elpa-resource-tag').count(),4);
+        const sourcesDimensions=await homePage.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+        assert.ok(sourcesDimensions.scroll<=sourcesDimensions.width+2,'Sources horizontal overflow at '+width+': '+JSON.stringify(sourcesDimensions));
+      }finally{await homePage.close();}
+
 
       // Guide flow is tested locally at every responsive width, before any release.
       const guide=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
