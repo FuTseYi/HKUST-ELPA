@@ -1,12 +1,12 @@
 # HKUST-ELPA · Contribution v2 specification
 
-**Status:** accepted product design; deployment is staged. This document does not imply the v2 API is live.
+**Status:** v2 is in production; this document describes the backward-compatible contribution and review contract.
 
 ## Product principles
 
 - Submission is structured; maintainer reviews substance, not translation, formatting or tagging.
-- Question submissions require **both English and Chinese** for the main question and each submitted follow-up. No English-text-provenance checkbox.
-- Follow-ups are optional and dynamically added, removed and ordered; if provided, both language fields are required. Initial count is zero, not three, and cap is 20.
+- Question submissions require the remembered English main question; Chinese translations are optional. Each submitted follow-up requires English, while Chinese is optional. Never manufacture a missing translation.
+- Follow-ups are optional and dynamically added, removed and ordered; if provided, English text is required. Initial count is zero and cap is 20.
 - Preparation advice uses **a single-language required title and body**, regardless of the site's interface language. No compulsory translation.
 - All categories use fixed codes with bilingual labels in `question-bank/taxonomy.js`. No free-form categories.
 - Placeholders are **short, professional and non-repetitive**; length limits, privacy notes and instructions belong in labels, helper text or errors—not placeholder prose.
@@ -43,7 +43,15 @@ Advice:
 
 Submission envelope also contains the short-lived Turnstile token. It is **never** embedded in Issues or stored in the question bank.
 
-Recommended rules: question en 8–1000 characters, cn 4–1000, follow-up en/cn 1–400 each, up to 20 subquestions; advice title 4–120, body 20–6000; 1–4 taxonomy tags. Cap full UTF-8 request body to a safe explicit size (e.g. 24 KiB); enforce limits in both browser and Worker and repeat validation in importer. No private fields or file uploads.
+Recommended rules: question en 8–1000 characters, cn 0–1000, follow-up en 1–400, cn 0–400, up to 20 subquestions; advice title 4–120, body 20–6000; 1–4 taxonomy tags. Cap full UTF-8 request body to a safe explicit size (e.g. 24 KiB); enforce limits in both browser and Worker and repeat validation in importer. No private fields or file uploads.
+
+## Linked question and exam-occurrence counting
+
+- `linkedQuestionId` is optional for new questions. When present, `intent` is either `encounter` (one additional reported experience) or `supplement` (no new exam occurrence; must include at least one follow-up).
+- The Worker validates the payload; the importer checks that the ID actually exists in the selected campus/track bank **and** matches the canonical English text. Legacy v2 records without these fields are still treated as encounters.
+- Existing baseline student recollections contribute one historic occurrence, or the known sourced `records` count. For imported questions, the originating Issue is counted once, not both as a baseline and a new Issue.
+- Individual reviewed Issue numbers count once, regardless of the number of follow-ups or whether the same term/slot appears elsewhere. Human reviewers should decline duplicate retellings of the very same encounter.
+- Follow-up supplements are stored as reviewed appearance metadata and displayed on the question card after merging the approved PR. No new account, database, or high-frequency filter is introduced.
 
 ## Approval and archive rules
 
@@ -55,7 +63,7 @@ Recommended rules: question en 8–1000 characters, cn 4–1000, follow-up en/cn
 6. Existing learning records use stable question IDs and positional follow-up note keys. **Do not reorder existing published follow-ups** without an explicit note-key migration. New questions may use the contributor's order.
 7. Each approved advice report becomes one separately indexed article with its phase and standard tags. The raw text language is preserved; UI tag labels can be localized.
 8. Existing community `cn` entries contain mixtures of translation and provenance. Before adding “show Chinese” controls, split **confirmed translation** from source notes; never present provenance as a translation or silently invent a verified translation.
-9. Existing older questions without stage or translation remain usable. New v2 reports require all fields; do not fabricate old data.
+9. Existing older questions without stage or translation remain usable. New v2 reports require the English original and session metadata, but do not force translations; do not fabricate old data.
 10. Both Vercel and GitHub Pages use the same static files; practice notes remain browser-origin-local with existing backup/restore support.
 
 ## Placeholder copy
@@ -79,4 +87,4 @@ Placeholders are hints, **not field labels**. Required status, accessibility lab
 - **PR 3:** v2 Worker acceptance deployed only after validation; retain v1 compatibility and active public switches.
 - **PR 4:** form and practice/guide UI update after Worker deploy; exercise responsive and keyboard access.
 - **Final smoke:** both domains × question/advice submissions (synthetic), verify actual Issues, owner approval-to-PR for both types, no auto-merge; close synthetic Issues/PRs without merging data; retain all development branches.
-- CI must test missing translations, multi-follow-up, unknown taxonomy tags, oversized UTF-8 payload, CORS, Turnstile action/hostname, original v1 submissions, duplicate multi-term preservation, page rendering and old notebook backup/restore.
+- CI tests optional translations, linked-ID validation, supplement-only counting, dynamic followups, taxonomy, size, CORS, Turnstile, v1 imports, multi-term deduplication, rendering and notebook backup/restore.

@@ -255,10 +255,10 @@ test('v2 advice accepts one original-language title and article',async()=>{
   assert.match(issue.body,/elpa-submission-v2:/);
   assert.ok(!issue.body.includes('mock-valid-token'));
 });
-test('v2 rejects incomplete bilingual text and noncanonical categories before siteverify',async()=>{
+test('v2 rejects missing English and noncanonical categories before siteverify',async()=>{
   const bads=[
-    {...v2Question,main:{...v2Question.main,cn:''}},
-    {...v2Question,subs:[{en:'Why?',cn:''}]},
+    {...v2Question,main:{...v2Question.main,en:''}},
+    {...v2Question,subs:[{en:'',cn:'为什么？'}]},
     {...v2Question,examStage:'unknown'},
     {...v2Question,campus:'untrusted-campus'},
     {...v2Question,track:'untrusted-track'},
@@ -298,4 +298,39 @@ test('v2 body enforces byte-size bound with no external requests',async()=>{
   const response=await x.handler.fetch(x.request(huge),x.env);
   assert.ok(response.status===400||response.status===413);
   assert.equal(x.calls.length,0);
+});
+
+test('v2 linked encounter and optional translations reach review queue unchanged',async()=>{
+ const x=makeWorker();
+ const body={version:2,kind:'question',campus:'nansha',track:'regular',
+   term:'2026 Fall',examStage:'start',
+   main:{en:'Explain one of your projects.',cn:''},
+   subs:[{en:'What tools did you use?',cn:''}],source:'firsthand',
+   linkedQuestionId:'D-4',intent:'encounter',turnstileToken:'mock-valid-token'};
+ const result=await x.handler.fetch(x.request(body),x.env);
+ assert.equal(result.status,201,await result.text());
+ const bodyText=JSON.parse(x.calls[1].init.body).body;
+ assert.match(bodyText,/D-4/);
+ assert.match(bodyText,/新增考试经历/);
+ assert.match(bodyText,/What tools did you use\?/);
+});
+test('v2 supplement must have an existing ID and at least one followup',async()=>{
+ const base={version:2,kind:'question',campus:'nansha',track:'regular',
+   term:'2026 Fall',examStage:'start',
+   main:{en:'Explain one of your projects.',cn:''},
+   subs:[],source:'secondhand',linkedQuestionId:'D-4',
+   intent:'supplement',turnstileToken:'mock-valid-token'};
+ for(const invalid of [base,{...base,linkedQuestionId:'D-4?'},
+   {...base,linkedQuestionId:undefined,intent:'supplement'}]){
+  const x=makeWorker();
+  const r=await x.handler.fetch(x.request(invalid),x.env);
+  assert.equal(r.status,400);
+  assert.equal(x.calls.length,0);
+ }
+ const okay=makeWorker();
+ const response=await okay.handler.fetch(okay.request({
+   ...base,subs:[{en:'What did you learn?',cn:''}]
+ }),okay.env);
+ assert.equal(response.status,201,await response.text());
+ assert.match(JSON.parse(okay.calls[1].init.body).body,/仅补充小问/);
 });

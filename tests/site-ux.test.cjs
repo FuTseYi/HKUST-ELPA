@@ -28,16 +28,32 @@ test('all current IDs survive JSON backup normalization and recovery',()=>{
 test('feedback count includes reviewed submissions and ties retain original order',()=>{
  const code=section(practice,'function feedbackCount(id){','function sessionBadges(id){');
  const fixtures={
-   'F-1':{records:1},'F-2':{records:2},'D-1':{term:'2026 Fall'},'A-1':{}
+   'F-1':{num:1,records:1},'F-2':{num:2,records:2},
+   'D-1':{num:1,term:'2026 Fall'},'A-1':{num:1},
+   'D-1000301':{num:1000301,term:'2027 Fall'}
  };
  const arrivals={'F-1':[{issueNumber:9},{issueNumber:9},{issueNumber:10}],
-   'F-2':[], 'D-1':[{issueNumber:11}]};
- const funcs=new Function('questionById','appearancesFor',code+';return {feedbackCount,feedbackRanked}')(
+   'F-2':[], 'D-1':[{issueNumber:11},{issueNumber:12,intent:'supplement'}],
+   'D-1000301':[{issueNumber:301,intent:'encounter',subs:[{en:'What matters?',cn:''}]}]};
+ const funcs=new Function('questionById','appearancesFor',code+
+   ';return {feedbackCount,feedbackRanked,questionFollowups}')(
    id=>fixtures[id],id=>arrivals[id]||[]);
  assert.equal(funcs.feedbackCount('F-1'),3);
  assert.equal(funcs.feedbackCount('D-1'),2);
- assert.equal(funcs.feedbackCount('A-1'),0);
+ assert.equal(funcs.feedbackCount('A-1'),1);
+ assert.equal(funcs.feedbackCount('D-1000301'),1,'imported issue counted exactly once');
+ assert.deepEqual(funcs.questionFollowups('D-1000301',{subs:[]}),[{en:'What matters?',cn:''}]);
  assert.deepEqual(funcs.feedbackRanked(['F-2','A-1','F-1','D-1']),['F-1','F-2','D-1','A-1']);
+});
+test('practice cards expose reviewed encounter action and uniform alignment',()=>{
+ assert.match(practice,/考过 \$\{feedback\} 次/);
+ assert.match(practice,/我也考过 ↗/);
+ assert.match(practice,/submit\.html\?question=\$\{encodeURIComponent\(id\)\}/);
+ assert.match(practice,/margin:0!important/);
+ assert.match(submit,/id="contributionIntent"/);
+ assert.match(submit,/linkedQuestionId:linkedId/);
+ assert.match(submit,/id="mainCn"[^>]*maxlength="1000"/);
+ assert.doesNotMatch(submit,/id="mainCn"[^>]*required/);
 });
 test('Chinese and English matching runs locally, does not require network',()=>{
  const code=section(submit,'const normMatch=s=>','function availableQuestions(){');

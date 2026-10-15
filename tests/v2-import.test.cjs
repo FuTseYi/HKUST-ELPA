@@ -80,10 +80,10 @@ test('advice is single language and classified by exact tag codes',()=>{
   assert.equal(f.read('questions.js'),fs.readFileSync(bank,'utf8'));
  }finally{f.close();}
 });
-test('incomplete Chinese and unknown taxonomy codes are rejected',()=>{
+test('missing English and unknown taxonomy codes are rejected',()=>{
  const bads=[
-  {...question(),main:{en:question().main.en,cn:''}},
-  {...question(),subs:[{en:'English only',cn:''}]},
+  {...question(),main:{en:'',cn:'只有中文'}},
+  {...question(),subs:[{en:'',cn:'可选中文'}]},
   {...question(),examStage:'unknown'},
   {...question(),campus:'unknown-campus'},
   {...question(),track:'unknown-assessment'},
@@ -211,5 +211,49 @@ test('regular and Fast Track each show their own latest reviewed term and histor
   assert.ok(grouping.past.includes('F-1000602'));
   assert.deepEqual([...grouping.originalSource],[]);
   assert.equal(grouping.current.length+grouping.past.length,14);
+ }finally{f.close();}
+});
+
+test('linked repeat adds an encounter and supplemental followups do not inflate count',()=>{
+ const f=fixture();try{
+  const linked={...question('Explain one of your projects.'),linkedQuestionId:'D-4',
+    intent:'encounter',main:{en:'Explain one of your projects.',cn:''},subs:[]};
+  const first=f.run(linked,801);
+  assert.equal(first.status,0,first.stderr);
+  assert.match(first.stdout,/status: linked/);
+  const supplement={...linked,intent:'supplement',
+    subs:[{en:'What tools did you use?',cn:''}]};
+  const extra=f.run(supplement,802);
+  assert.equal(extra.status,0,extra.stderr);
+  assert.match(extra.stdout,/status: linked/);
+  assert.doesNotMatch(f.read('questions.js'),/1000801/);
+  assert.match(f.read('appearances.js'),/"intent": "encounter"/);
+  assert.match(f.read('appearances.js'),/"intent": "supplement"/);
+  assert.match(f.read('appearances.js'),/What tools did you use\?/);
+  assert.match(f.read('community-submissions.md'),/仅补充小问/);
+ }finally{f.close();}
+});
+test('tampered linked ID cannot credit a different question',()=>{
+ const f=fixture();try{
+  const wrong={...question('Explain one of your projects.'),linkedQuestionId:'D-5',intent:'encounter'};
+  const failure=f.run(wrong,803);
+  assert.notEqual(failure.status,0);
+  assert.match(failure.stderr,/Linked question ID does not match/);
+  assert.equal(f.read('appearances.js').trim(),
+    '/* Reviewed appearances of a canonical question across semesters. */\nconst ELPA_APPEARANCES = {};');
+  const notLinked={...wrong,intent:'supplement',linkedQuestionId:undefined};
+  const failed=f.run(notLinked,804);
+  assert.notEqual(failed.status,0);
+ }finally{f.close();}
+});
+test('new question accepts optional Chinese explanation without inventing translation',()=>{
+ const f=fixture();try{
+  const data={...question('How do you prepare to communicate your research to audiences?'),
+    main:{en:'How do you prepare to communicate your research to audiences?',cn:''},
+    subs:[{en:'What example would you give?',cn:''}]};
+  const r=f.run(data,805);
+  assert.equal(r.status,0,r.stderr);
+  assert.match(f.read('questions.js'),/"cn":""/);
+  assert.match(f.read('appearances.js'),/"D-1000805"/);
  }finally{f.close();}
 });

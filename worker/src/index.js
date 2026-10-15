@@ -74,10 +74,15 @@ function validV2(body) {
       (body.campus===undefined||ELPA_CAMPUSES.has(body.campus)) &&
       (body.track===undefined||ELPA_TRACKS.has(body.track)) &&
       EXAM_STAGES.has(body.examStage) && body.main &&
-      validText(body.main.en,8,1000) && validText(body.main.cn,4,1000) &&
+      validText(body.main.en,8,1000) && validText(body.main.cn,0,1000) &&
       Array.isArray(body.subs) && body.subs.length<=20 &&
-      body.subs.every(s=>s&&validText(s.en,1,400)&&validText(s.cn,1,400)) &&
-      ['firsthand','secondhand'].includes(body.source);
+      body.subs.every(s=>s&&validText(s.en,1,400)&&validText(s.cn,0,400)) &&
+      ['firsthand','secondhand'].includes(body.source) &&
+      (body.linkedQuestionId===undefined||
+        (/^[A-DFHT]-[0-9]+$/.test(body.linkedQuestionId)&&
+         ['encounter','supplement'].includes(body.intent))) &&
+      (body.intent===undefined||body.linkedQuestionId!==undefined) &&
+      (body.intent!=='supplement'||body.subs.length>0);
   if(body.kind==='advice')
     return ADVICE_PHASES.has(body.phase) &&
       Array.isArray(body.tags) && body.tags.length>=1 && body.tags.length<=4 &&
@@ -90,7 +95,9 @@ function cleanV2(body){
     version:2,kind:'question',term:body.term,examStage:body.examStage,
     campus:body.campus||'nansha',track:body.track||'regular',
     main:{en:body.main.en.trim(),cn:body.main.cn.trim()},
-    subs:body.subs.map(s=>({en:s.en.trim(),cn:s.cn.trim()})),source:body.source
+    subs:body.subs.map(s=>({en:s.en.trim(),cn:s.cn.trim()})),source:body.source,
+    ...(body.linkedQuestionId?{linkedQuestionId:body.linkedQuestionId,
+      intent:body.intent}:{} )
   };
   return {version:2,kind:'advice',phase:body.phase,tags:[...body.tags],
     title:body.title.trim(),body:body.body.trim()};
@@ -117,6 +124,10 @@ function formatV2(record){
     '**考试学期：** '+record.term,
     '**考试阶段：** '+record.examStage,
     '**来源：** '+(record.source==='firsthand'?'本人亲历':'同学转述'),
+    ...(record.linkedQuestionId?[
+      '**已关联题目：** '+record.linkedQuestionId,
+      '**反馈类型：** '+(record.intent==='supplement'?'仅补充小问（不计次数）':'新增考试经历')
+    ]:[]),
     '', '### 主问题 / English',mdQuote(record.main.en),
     '', '### 主问题 / 中文',mdQuote(record.main.cn),'',
     '### 提示小问（'+record.subs.length+'）'
@@ -178,7 +189,7 @@ export default {
     let turnstileToken;
     if(isV2){
       if(testMode)return reject('测试窗口仅接受指定旧版测试内容。',403);
-      if(!validV2(body))return reject('请检查双语内容、分类和字符长度。');
+      if(!validV2(body))return reject('请检查英文题干、投稿类型及内容长度。');
       turnstileToken=body.turnstileToken;
     }else{
       const {term,question,subquestions,source,turnstileToken:token} = body || {};

@@ -811,6 +811,27 @@
   .page-practice .qcard.drill-active{
     border-left-color:#23649f;box-shadow:0 0 0 2px rgba(30,102,164,.25),0 8px 30px rgba(10,47,82,.08)
   }
+
+  /* Card actions: a single baseline in iOS Safari; no inherited margins. */
+  .page-practice .qcard .q-actions > button{
+    display:inline-flex;align-items:center;justify-content:center;
+    box-sizing:border-box;margin:0!important;border-width:1px;
+    height:40px;min-height:40px;line-height:1.2;
+    font-family:inherit;font-size:12px;font-weight:650;vertical-align:middle;
+  }
+  .page-practice .qcard .q-actions > .translation-toggle{margin:0!important}
+  .page-practice .question-feedback{
+    display:flex;align-items:center;flex-wrap:wrap;gap:5px 12px;
+    font-size:12px;color:#526d85;line-height:1.5;margin-top:6px;
+  }
+  .page-practice .question-feedback a{
+    color:#125b8e;font-weight:650;text-decoration:none;white-space:nowrap;
+  }
+  .page-practice .question-feedback a:hover{text-decoration:underline}
+  .page-practice .question-feedback a:focus-visible{
+    outline:2px solid #d5a83f;outline-offset:3px;border-radius:3px;
+  }
+
 </style>
 </head>
 <body class="page-practice">
@@ -831,7 +852,7 @@
 
 <div class="wrap">
   <aside class="source-notice" role="note">
-    本站为学生维护的<strong>非官方备考资料</strong>。题库可以直接用于模拟练习；少数回忆不完整的题目会单独标注。考试信息以学校当期通知为准。<a href="https://github.com/FuTseYi/HKUST-ELPA/tree/main/question-bank">查看题目来源与分类说明</a>。
+    本站为学生维护的<strong>非官方备考资料</strong>。题库可以直接用于模拟练习；少数回忆不完整的题目会单独标注。「考过次数」根据已整理的历史回忆及审核反馈统计，并非官方完整抽题数据。考试信息以学校当期通知为准。<a href="https://github.com/FuTseYi/HKUST-ELPA/tree/main/question-bank">查看题目来源与分类说明</a>。
   </aside>
 
   <section class="elpa-choices" id="examChoices" aria-label="考试校区和类型">
@@ -1371,10 +1392,25 @@ function appearancesFor(id){
 }
 function feedbackCount(id){
   const item=questionById(id);
-  const baseline=item&&Number.isInteger(item.records)&&item.records>0?item.records:
-    (item&&item.term?1:0);
-  const reports=appearancesFor(id).filter(x=>x&&Number.isInteger(x.issueNumber)&&x.issueNumber>0);
-  return baseline+new Set(reports.map(x=>x.issueNumber)).size;
+  if(!item)return 0;
+  const reports=appearancesFor(id);
+  // Historic student recollections start at one; Fast Track retains its sourced report count.
+  // Newly imported questions already have their originating Issue in appearances.
+  const imported=Number(item.num)>=1000000&&reports.length>0;
+  const baseline=imported?0:(Number.isInteger(item.records)&&item.records>0?item.records:1);
+  const encounters=reports.filter(x=>x&&x.intent!=='supplement'&&
+    Number.isInteger(x.issueNumber)&&x.issueNumber>0);
+  return baseline+new Set(encounters.map(x=>x.issueNumber)).size;
+}
+function questionFollowups(id,item){
+  const result=[],seen=new Set();
+  for(const sub of [...(item.subs||[]),...appearancesFor(id).flatMap(x=>Array.isArray(x.subs)?x.subs:[])]){
+    if(!sub||(!sub.en&&!sub.cn))continue;
+    const key=String(sub.en||sub.cn).normalize('NFKC').toLowerCase().replace(/[\p{P}\p{S}\s]/gu,'');
+    if(seen.has(key))continue;
+    seen.add(key);result.push(sub);
+  }
+  return result;
 }
 function feedbackRanked(ids){
   return ids.map((id,i)=>({id,i,count:feedbackCount(id)}))
@@ -1481,14 +1517,15 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
     const id = qId(bankKey, item.num);
     const st = statuses[id] || 'new';
     const stMap = { new: ['未练', 'active-new'], doing: ['练习中', 'active-doing'], done: ['已掌握', 'active-done'] };
-    const hasSubs = item.subs && item.subs.length > 0;
+    const subs=questionFollowups(id,item);
+    const hasSubs=subs.length>0;
     const qnoteKey = 'qn-' + id;
     const qnoteSaved = notes[qnoteKey] || '';
     const translation=questionTranslation(bankKey,item);
     const sourceNote=questionSourceNote(bankKey,item);
     const badges=sessionBadges(id);
     const feedback=feedbackCount(id);
-    const searchText = (item.en + ' ' + (item.cn||'') + ' ' + (item.subs||[]).map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
+    const searchText = (item.en + ' ' + (item.cn||'') + ' ' + subs.map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
     return `
     <div class="qcard status-${st}" id="q-${id}" data-search="${escAttr(searchText)}">
       <div class="q-top">
@@ -1496,7 +1533,7 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
         <div class="q-title">
           <div class="en">${esc(item.en)}</div>
           ${item.recallTag ? `<span class="recall-mark">${esc(item.recallTag)}</span>` : ""}
-          ${feedback ? `<div class="question-feedback">↻ 已收录 ${feedback} 条反馈</div>` : ''}
+          ${feedback ? `<div class="question-feedback"><span>↻ 考过 ${feedback} 次</span><a href="./submit.html?question=${encodeURIComponent(id)}&campus=${encodeURIComponent(activeCampus)}&track=${encodeURIComponent(activeTrack)}&intent=encounter" aria-label="我也考过这道题，提交考试反馈">我也考过 ↗</a></div>` : ''}
           ${badges ? `<div class="session-badges">${badges}</div>` : ''}
           ${translation ? `<div class="cn translation" id="cn-${id}" hidden>${esc(translation)}</div>` : ''}
           ${sourceNote ? `<div class="question-provenance">${esc(sourceNote)}</div>` : ''}
@@ -1510,11 +1547,11 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
       ${hasSubs ? `
       <div class="subq" id="subq-${id}">
         <button type="button" class="subq-head" onclick="toggleSub('${id}')" aria-expanded="false" aria-controls="subq-list-${id}">
-          <span class="arrow">▶</span>查看提示小问（${item.subs.length} 个）
+          <span class="arrow">▶</span>查看提示小问（${subs.length} 个）
         </button>
         <div class="subq-list" id="subq-list-${id}">
-        ${item.subs.some(x=>x.cn) ? `<button type="button" class="translation-toggle translation-toggle-sub" aria-expanded="false" onclick="toggleFollowupChinese('${id}',this)">查看小问中文</button>` : ''}<ol>
-          ${item.subs.map((s, si) => {
+        ${subs.some(x=>x.cn) ? `<button type="button" class="translation-toggle translation-toggle-sub" aria-expanded="false" onclick="toggleFollowupChinese('${id}',this)">查看小问中文</button>` : ''}<ol>
+          ${subs.map((s, si) => {
             const nk = id + '-' + si;
             const saved = notes[nk] || '';
             return `
