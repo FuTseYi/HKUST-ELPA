@@ -670,6 +670,50 @@
   .elpa-fast-intro li span{display:block;color:#64748b;font-size:12px}
   @media(max-width:640px){.elpa-choices{padding:14px}.elpa-choice-row{gap:7px;flex-direction:column;align-items:stretch}.elpa-choice-row+.elpa-choice-row{margin-top:14px}.elpa-choice-buttons{width:100%}.elpa-choice-buttons button{flex:1 1 0;min-width:0;padding:8px 6px;font-size:12px}}
 
+
+  /* Mobile practice layout: keep title and count on separate aligned rows. */
+  @media (max-width: 760px) {
+    .page-practice .sec-head {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      align-items: start;
+      column-gap: 9px;
+      row-gap: 8px;
+    }
+    .page-practice .sec-head .emoji {grid-column:1;grid-row:1;line-height:1.35;font-size:22px;}
+    .page-practice .sec-head h2 {
+      grid-column:2;grid-row:1;min-width:0;margin:0;
+      font-size:clamp(20px,4.9vw,24px);line-height:1.4;
+      overflow-wrap:break-word;
+    }
+    .page-practice .sec-head .tag {
+      grid-column:2;grid-row:2;justify-self:start;
+      max-width:100%;min-width:0;padding:5px 11px;
+      line-height:1.45;white-space:normal;overflow-wrap:break-word;
+    }
+  }
+  @media (max-width: 640px) {
+    .page-practice .qcard {padding:16px 13px;}
+    .page-practice .qcard .q-top {
+      display:grid;grid-template-columns:36px minmax(0,1fr);
+      align-items:start;column-gap:10px;row-gap:9px;
+    }
+    .page-practice .qcard .q-num {grid-column:1;grid-row:1;}
+    .page-practice .qcard .q-title {grid-column:2;grid-row:1;min-width:0;}
+    .page-practice .qcard .q-title .en {
+      font-size:clamp(15px,4vw,16.5px);line-height:1.48;
+      overflow-wrap:break-word;
+    }
+    .page-practice .qcard .q-actions {
+      grid-column:2;grid-row:2;
+      width:auto;min-width:0;margin:0;padding:0;
+      display:flex;justify-content:flex-start;flex-wrap:wrap;gap:8px;
+    }
+    .page-practice .qcard .q-actions button {flex:0 0 auto;min-height:32px;}
+    .page-practice .qcard .note-toolbar {display:flex;flex-wrap:wrap;gap:7px;}
+    .page-practice .sec-desc {line-height:1.75;}
+  }
+
 </style>
 </head>
 <body class="page-practice">
