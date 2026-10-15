@@ -373,3 +373,11 @@ test('guide switch preserves accessible state and works without a second page',(
    {location:{search:'?track=fast-track',hash:''}},()=>{});
  selected('fast-track');assert.equal(two.hidden,false);
 });
+
+test('Fast Track documentation links to the selectable practice route',()=>{
+ const fastDoc=fs.readFileSync(path.join(__dirname,'../question-bank/fast-track.md'),'utf8');
+ const indexDoc=fs.readFileSync(path.join(__dirname,'../question-bank/README.md'),'utf8');
+ assert.match(fastDoc,/practice\\.html\\?campus=nansha&track=fast-track/);
+ assert.doesNotMatch(fastDoc,/practice\\.html#fast-track/);
+ assert.match(indexDoc,/\\| \\[Fast Track · 南沙校区\\]\\(\\.\\/fast-track\\.md\\) \\|/);
+});
