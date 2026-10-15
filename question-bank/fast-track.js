@@ -4,7 +4,7 @@
  * No term is invented for these historical recollections.
  */
 BANKS.F = {
-  name: 'ELPA Fast Track · 南沙校区',
+  name: 'ELPA Fast Track · GZ',
   items: [
   {
     "num": 1,
@@ -107,8 +107,8 @@ BANKS.F = {
 /* Reserve campus-specific banks for future reviewed contributions.
  * Keep old Nansha regular question IDs (A/B/C/D) and progress untouched.
  */
-BANKS.H = {name:'常规 ELPA · 清水湾校区',items:[]};
-BANKS.T = {name:'ELPA Fast Track · 清水湾校区',items:[]};
+BANKS.H = {name:'常规 ELPA · HK',items:[]};
+BANKS.T = {name:'ELPA Fast Track · HK',items:[]};
 const ELPA_FAST_TRACK_INTRO = {
   en:'Please introduce yourself and your research. Include the following points.',
   cn:'请介绍你自己及你的研究，并尽可能涵盖以下要点。',

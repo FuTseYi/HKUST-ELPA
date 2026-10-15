@@ -102,6 +102,11 @@ jobs:
           assert "dataset.filterMatch" in practice, "Search and random-drill coordination missing"
           assert practice.count('<section id="sec-bank')==2, "Expected two practice banks"
           assert 'faqList' not in practice and '<section id="sec-process">' not in practice, "Guide content leaked into practice"
+          assert 'id="quickDrawBtn"' in practice and 'id="mockExamBtn"' in practice, "Two practice actions missing"
+          assert 'function feedbackRanked(' in practice and 'function feedbackCount(' in practice, "Feedback sorting missing"
+          assert 'id="recordsMenuBtn"' in practice and 'id="recordsBackupBtn"' in practice, "Compact records menu missing"
+          assert 'id="matchingPanel"' in pages["submit.html"] and 'function renderSuggestions()' in pages["submit.html"], "Bilingual matching missing"
+          assert 'value="nansha">GZ' in pages["submit.html"] and 'value="clear-water-bay">HK' in pages["submit.html"], "Campus labels missing"
           assert 'src="./question-bank/questions.js"' in practice, "Structured question bank not loaded"
 
           guide=pages["guide.html"]
@@ -166,6 +171,7 @@ jobs:
           node --test tests/approved-import.test.cjs
           node --test tests/v2-import.test.cjs
           node --test tests/worker.test.cjs
+          node --test tests/site-ux.test.cjs
       - name: Decode campus JPEG
         run: |
           python3 -m pip install --quiet pillow
