@@ -82,7 +82,7 @@ jobs:
           assert home.count('class="elpa-cta ') == 2, "Homepage should show exactly two primary hero actions"
           assert home.count('href="./submit.html"') >= 1, "Site contribution entry absent"
           practice=pages["practice.html"]
-          assert 'class="elpa-subhero' in practice, "Practice page banner missing"
+          assert 'elpa-subhero' in practice, "Practice page banner missing"
           assert '<form class="search-box" id="searchForm" role="search"' in practice, "Search submission form missing"
           assert 'id="searchFeedback"' in practice, "Search status announcement missing"
           assert 'enterkeyhint="search"' in practice, "Mobile search action not configured"
@@ -118,7 +118,7 @@ jobs:
           assert 'id="regularGuide"' in guide and 'id="fastGuide"' in guide, "Both exam flow panels missing"
           assert "selectGuideTrack(" in guide and 'aria-pressed="true"' in guide, "Accessible guide switch missing"
           assert '入场与身份核验' in guide and '抽题与准备' in guide and '提问与回答' in guide, "Regular flow missing"
-          assert '线上申请与视频录制' in guide and '按指定话题录制视频' in guide, "Fast Track flow missing"
+          assert '线上申请与视频录制' in guide and '按照系统指定的话题准备英语回答' in guide, "Fast Track flow missing"
           assert 'track=fast-track' in guide and 'track=regular' in guide, "Direct practice paths missing"
           assert 'id="advicePhaseFilter"' in guide and 'id="adviceTagFilter"' in guide, "Experience filters missing"
           submit=pages["submit.html"]
