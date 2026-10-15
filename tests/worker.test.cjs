@@ -335,7 +335,7 @@ test('v2 linked encounter and optional translations reach review queue unchanged
  assert.match(bodyText,/新增考试经历/);
  assert.match(bodyText,/What tools did you use\?/);
 });
-test('v2 supplement must have an existing ID and at least one followup',async()=>{
+test('v2 supplement must have an existing ID and either a similar wording or followup',async()=>{
  const base={version:2,kind:'question',campus:'nansha',track:'regular',
    term:'2026 Fall',examStage:'start',
    main:{en:'Explain one of your projects.',cn:''},
@@ -353,5 +353,13 @@ test('v2 supplement must have an existing ID and at least one followup',async()=
    ...base,subs:[{en:'What did you learn?',cn:''}]
  }),okay.env);
  assert.equal(response.status,201,await response.text());
- assert.match(JSON.parse(okay.calls[1].init.body).body,/仅补充小问/);
+ assert.match(JSON.parse(okay.calls[1].init.body).body,/补充题目内容/);
+ const wording=makeWorker();
+ const wordingResponse=await wording.handler.fetch(wording.request({
+   ...base,alternatives:[{en:'Could you explain one of the projects you completed?',cn:'请介绍一个你完成的项目。'}]
+ }),wording.env);
+ assert.equal(wordingResponse.status,201,await wordingResponse.text());
+ const wordingBody=JSON.parse(wording.calls[1].init.body).body;
+ assert.match(wordingBody,/相似问法（1）/);
+ assert.match(wordingBody,/Could you explain one of the projects you completed\?/);
 });

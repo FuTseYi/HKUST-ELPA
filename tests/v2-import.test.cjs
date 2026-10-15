@@ -221,12 +221,12 @@ test('regular and Fast Track each show their own latest reviewed term and histor
   assert.deepEqual([...grouping.current],['F-1000601']);
   assert.ok(grouping.past.includes('F-1'));
   assert.ok(grouping.past.includes('F-1000602'));
-  assert.deepEqual([...grouping.originalSource],[]);
+  assert.deepEqual([...grouping.originalSource],['2026 Fall']);
   assert.equal(grouping.current.length+grouping.past.length,14);
  }finally{f.close();}
 });
 
-test('linked repeat adds an encounter and supplemental followups do not inflate count',()=>{
+test('linked repeat adds an encounter while similar wording and followups remain on the original ID',()=>{
  const f=fixture();try{
   const linked={...question('Explain one of your projects.'),linkedQuestionId:'D-4',
     intent:'encounter',main:{en:'Explain one of your projects.',cn:''},subs:[]};
@@ -234,6 +234,7 @@ test('linked repeat adds an encounter and supplemental followups do not inflate 
   assert.equal(first.status,0,first.stderr);
   assert.match(first.stdout,/status: linked/);
   const supplement={...linked,intent:'supplement',
+    alternatives:[{en:'Could you explain a project you completed?',cn:'请介绍一个你完成的项目。'}],
     subs:[{en:'What tools did you use?',cn:''}]};
   const extra=f.run(supplement,802);
   assert.equal(extra.status,0,extra.stderr);
@@ -242,7 +243,8 @@ test('linked repeat adds an encounter and supplemental followups do not inflate 
   assert.match(f.read('appearances.js'),/"intent": "encounter"/);
   assert.match(f.read('appearances.js'),/"intent": "supplement"/);
   assert.match(f.read('appearances.js'),/What tools did you use\?/);
-  assert.match(f.read('community-submissions.md'),/仅补充小问/);
+  assert.match(f.read('appearances.js'),/Could you explain a project you completed\?/);
+  assert.match(f.read('community-submissions.md'),/补充题目内容/);
  }finally{f.close();}
 });
 test('tampered linked ID cannot credit a different question',()=>{
