@@ -82,7 +82,7 @@ jobs:
           assert home.count('class="elpa-cta ') == 2, "Homepage should show exactly two primary hero actions"
           assert home.count('href="./submit.html"') >= 1, "Site contribution entry absent"
           practice=pages["practice.html"]
-          assert practice.count('class="elpa-cta ') == 2, "Practice hero should contain exactly two matched actions"
+          assert 'class="elpa-subhero' in practice, "Practice page banner missing"
           assert '<form class="search-box" id="searchForm" role="search"' in practice, "Search submission form missing"
           assert 'id="searchFeedback"' in practice, "Search status announcement missing"
           assert 'enterkeyhint="search"' in practice, "Mobile search action not configured"
