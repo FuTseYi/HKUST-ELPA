@@ -191,6 +191,14 @@ test('footer is a consistent student-led open community component across all fiv
    assert.match(html,/href="\.\/submit\.html">分享考题<\/a>/);
    for(const stack of ['GitHub','Vercel','Cloudflare'])assert.ok(html.includes('<span>'+stack+'</span>'),page+' missing '+stack);
    assert.match(html,/Not affiliated with or endorsed by HKUST/);
+   // Intentional hierarchy: collective purpose and contribution first; author in the final lines.
+   const expectedOrder=['elpa-footer-intro','elpa-footer-contribute','elpa-footer-tech',
+     'elpa-footer-disclaimer','elpa-footer-source','elpa-footer-identity'];
+   const positions=expectedOrder.map(name=>html.indexOf('class="'+name+'"'));
+   assert.ok(positions.every(pos=>pos>=0),page+' missing an expected footer section');
+   assert.ok(positions.every((pos,i)=>i===0||pos>positions[i-1]),
+     page+' creator credit must be the final footer section');
+   assert.equal((html.match(/class="elpa-footer-identity"/g)||[]).length,1,page+' should show author once');
    assert.match(html,/href="\.\/sources\.html">资料来源与声明<\/a>/);
  }
  const practice=read('practice.html');
