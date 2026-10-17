@@ -326,15 +326,17 @@ test('homepage explains the full learning workflow without a repeated oversized 
  const questions=fs.readFileSync(path.join(__dirname,'../question-bank/questions.js'),'utf8');
  const sessionData=new Function(questions+'\n'+appearances+'\nreturn {ids:PAST_QUESTION_IDS,data:ELPA_APPEARANCES};')();
  assert.equal(sessionData.ids.length,25);
- for(const id of sessionData.ids)assert.deepEqual(sessionData.data[id],[{term:'2025 Fall',examStage:'start'}],id);
- // Assert the original 2026 Fall records by ID, independent of importer formatting
- // and of any additional reviewed contributions.
- for(let num=1;num<=12;num++)
-   assert.deepEqual(sessionData.data['D-'+num],[{term:'2026 Fall',examStage:'start'}],'D-'+num);
+ // Legacy questions must not acquire invented year/stage evidence.
+ // Future issue-linked reports may still add reviewed appearances to these IDs.
+ for(const id of [...sessionData.ids,...Array.from({length:12},(_,i)=>'D-'+(i+1))])
+   for(const entry of sessionData.data[id]||[])
+     assert.ok(Number.isSafeInteger(entry.issueNumber)&&entry.issueNumber>0,id);
  const fastTrack=fs.readFileSync(path.join(__dirname,'../question-bank/fast-track.js'),'utf8');
  const fastSessionData=new Function(questions+'\n'+fastTrack+'\n'+appearances+'\nreturn {ids:BANKS.F.items.map(x=>"F-"+x.num),data:ELPA_APPEARANCES};')();
  assert.equal(fastSessionData.ids.length,12);
- for(const id of fastSessionData.ids)assert.deepEqual(fastSessionData.data[id],[{term:'2026 Fall',examStage:'start'}],id);
+ for(const id of fastSessionData.ids)
+   for(const entry of fastSessionData.data[id]||[])
+     assert.ok(Number.isSafeInteger(entry.issueNumber)&&entry.issueNumber>0,id);
  assert.match(fastTrack,/"num": 1,[\s\S]*?"subs": \[\]/);
  assert.doesNotMatch(fastTrack,/"num": 13/);
  assert.doesNotMatch(questions,/"F-13"/);
@@ -368,6 +370,13 @@ test('latest bank advances by complete term and stage while older sessions remai
  assert.deepEqual(funcs.activeLatestSession(),{term:'2026 Fall',stage:'mid'});
  assert.deepEqual(funcs.activeCurrentIds(),['Q-mid']);
  assert.deepEqual(funcs.activeArchivedIds(),['Q-start','Q-old']);
+ // Undated Fast Track recollections must remain immediately practiceable.
+ const undated=new Function('activePracticeIds','appearancesFor','elpaLatestTermForIds','elpaReportedTerms','ELPA_TAXONOMY',
+   code+';return {activeLatestSessionLabel,activeCurrentIds,activeArchivedIds};')(
+     ()=>['F-1','F-2'],()=>[],()=>'',()=>[],{examStages:{}});
+ assert.equal(undated.activeLatestSessionLabel(),'场次待核实');
+ assert.deepEqual(undated.activeCurrentIds(),['F-1','F-2']);
+ assert.deepEqual(undated.activeArchivedIds(),[]);
  assert.match(practice,/sessions\.set\(entry\.term\+'\|'\+entry\.examStage/);
  assert.match(practice,/sessionFilter\.append\(new Option\(session\.label,value\)\)/);
 });

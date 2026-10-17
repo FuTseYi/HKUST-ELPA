@@ -252,15 +252,13 @@ test('regular and Fast Track each show their own latest reviewed term and histor
     const nanshaRegular=elpaLatestTerm();
     const fastLatest=elpaLatestTermForIds(fastIds);
     const current=fastIds.filter(id=>elpaReportedTerms(id).includes(fastLatest));
-    return {nanshaRegular,fastLatest,current,past:fastIds.filter(id=>!current.includes(id)),
-      originalSource:elpaReportedTerms('F-1')};
+    return {nanshaRegular,fastLatest,current,past:fastIds.filter(id=>!current.includes(id))};
   `)();
   assert.equal(grouping.nanshaRegular,'2026 Fall');
   assert.equal(grouping.fastLatest,'2027 Spring');
   assert.deepEqual([...grouping.current],['F-1000601']);
   assert.ok(grouping.past.includes('F-1'));
   assert.ok(grouping.past.includes('F-1000602'));
-  assert.deepEqual([...grouping.originalSource],['2026 Fall']);
   assert.equal(grouping.current.length+grouping.past.length,14);
  }finally{f.close();}
 });

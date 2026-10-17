@@ -343,8 +343,10 @@ function questionTranslation(bankKey,item) {
   return item.cn || '';
 }
 function questionSourceNote(bankKey,item) {
-  // Show only provenance explicitly recorded with a question; never use its translation as a source note.
-  return item && typeof item.recallTag === 'string' ? item.recallTag : '';
+  if(item && typeof item.recallTag === 'string')return item.recallTag;
+  if(bankKey==='F' && item && item.verbatim===false)
+    return '英文根据中文回忆整理，用于练习；非已核实的现场逐字题干。';
+  return '';
 }
 function appearancesFor(id){
   const records=ELPA_APPEARANCES[id];
@@ -442,14 +444,14 @@ function activeLatestSession(){
 function activeLatestSessionLabel(){
   const session=activeLatestSession();
   if(session)return session.term+' · '+ELPA_TAXONOMY.examStages[session.stage].zh;
-  return activeLatestTerm()||'当前场次题库';
+  return activeLatestTerm()||(activePracticeIds().length?'场次待核实':'当前场次题库');
 }
 function activeCurrentIds(){
   const session=activeLatestSession();
   if(session)return activePracticeIds().filter(id=>appearancesFor(id).some(entry=>
     entry&&entry.term===session.term&&entry.examStage===session.stage));
   const term=activeLatestTerm();
-  return term?activePracticeIds().filter(id=>elpaReportedTerms(id).includes(term)):[];
+  return term?activePracticeIds().filter(id=>elpaReportedTerms(id).includes(term)):activePracticeIds();
 }
 function activeArchivedIds(){
   const current=new Set(activeCurrentIds());
@@ -474,7 +476,7 @@ function renderTOC() {
   document.getElementById('pagerPast').setAttribute('aria-label',(selectedValue&&!selectedIsCurrent?selectedLabel:'过往题库')+'分页');
   document.getElementById('feedbackBankCount').textContent=current.length+' 题';
   document.getElementById('pastBankCount').textContent=past.length+' 题';
-  examChoiceNote.textContent=campus+' · '+type+' · '+count+' 道题；按考试学期自动归类。';
+  examChoiceNote.textContent=campus+' · '+type+' · '+count+' 道题；仅按有来源依据的场次归类。';
   const items=selectedValue?
     [[selectedIsCurrent?'sec-bankD':'sec-bankA',selectedIsCurrent?'🎓':'📚',selectedLabel]]:
     [['sec-bankD','🎓',sessionLabel],['sec-bankA','📚','过往题库']];
@@ -518,6 +520,7 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
     const qnoteKey = 'qn-' + id;
     const qnoteSaved = notes[qnoteKey] || '';
     const translation=questionTranslation(bankKey,item);
+    const recallLabel=questionSourceNote(bankKey,item);
     const feedback=feedbackCount(id);
     const searchText = (item.en + ' ' + (item.cn||'') + ' ' + alternatives.map(s=>s.en+' '+(s.cn||'')).join(' ') + ' ' + subs.map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
     return `
@@ -526,7 +529,7 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
         <div class="q-num">${idx + startIndex + 1}</div>
         <div class="q-title">
           <div class="en">${esc(item.en)}</div>
-          ${item.recallTag ? `<span class="recall-mark">${esc(item.recallTag)}</span>` : ""}
+          ${recallLabel ? `<span class="recall-mark">${esc(recallLabel)}</span>` : ""}
           ${feedback ? `<div class="question-feedback"><span>↻ 过往考过 ${feedback} 次</span><a href="./submit.html?question=${encodeURIComponent(id)}&track=${encodeURIComponent(activeTrack)}&intent=encounter" aria-label="我也考过这道题，提交考试反馈">我也考过 / Seen this</a></div>` : ''}
           ${translation ? `<div class="cn translation" id="cn-${id}" hidden>${esc(translation)}</div>` : ''}
         </div>
