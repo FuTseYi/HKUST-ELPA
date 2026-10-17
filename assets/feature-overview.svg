@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc" width="1280" height="716" viewBox="0 0 1280 716">
+<title id="title">HKUST-ELPA 功能预览</title>
+<desc id="desc">四个功能界面示意：考试指南、结构化题库与搜索、随机抽题及自主计时、学习状态与笔记备份。示意图不是可点击的真实操作界面。</desc>
+<rect width="1280" height="716" fill="#F5F8FB"/>
+<rect x="24" y="24" width="601" height="319" rx="18" fill="#ffffff" stroke="#D9E4EF" stroke-width="1.4"/>
+<rect x="45" y="43" width="35" height="26" rx="7" fill="#FBF0D0"/>
+<text x="62.5" y="61" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="800" fill="#9B6A13" text-anchor="middle">01</text>
+<text x="93" y="62" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="750" fill="#173C60" text-anchor="start">考试指南</text>
+<text x="584" y="61" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="550" fill="#6B8298" text-anchor="end">EXAM GUIDE</text>
+<line x1="45" y1="83" x2="604" y2="83" stroke="#e1e9f0" stroke-width="1"/>
+<rect x="49" y="101" width="145" height="35" rx="8" fill="#E9F3FA" stroke="#BAD3E6" stroke-width="1"/>
+<text x="121.5" y="124" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="750" fill="#185A89" text-anchor="middle">常规 ELPA</text>
+<rect x="205" y="101" width="130" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="270" y="124" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="500" fill="#526D86" text-anchor="middle">Fast Track</text>
+<rect x="49" y="153" width="540" height="38" rx="9" fill="#F9FBFD" stroke="#E5EDF3" stroke-width="1"/>
+<text x="69" y="178" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="800" fill="#9B6A15" text-anchor="start">01</text>
+<text x="110" y="178" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="550" fill="#35536D" text-anchor="start">入场与身份核验</text>
+<rect x="49" y="199" width="540" height="38" rx="9" fill="#F9FBFD" stroke="#E5EDF3" stroke-width="1"/>
+<text x="69" y="224" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="800" fill="#9B6A15" text-anchor="start">02</text>
+<text x="110" y="224" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="550" fill="#35536D" text-anchor="start">抽题与准备</text>
+<rect x="49" y="245" width="540" height="38" rx="9" fill="#F9FBFD" stroke="#E5EDF3" stroke-width="1"/>
+<text x="69" y="270" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="800" fill="#9B6A15" text-anchor="start">03</text>
+<text x="110" y="270" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="550" fill="#35536D" text-anchor="start">个人陈述与互动问答</text>
+<text x="319" y="318" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="500" fill="#8094A7" text-anchor="middle">按考试方式查看对应流程</text>
+<rect x="655" y="24" width="601" height="319" rx="18" fill="#ffffff" stroke="#D9E4EF" stroke-width="1.4"/>
+<rect x="676" y="43" width="35" height="26" rx="7" fill="#FBF0D0"/>
+<text x="693.5" y="61" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="800" fill="#9B6A13" text-anchor="middle">02</text>
+<text x="724" y="62" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="750" fill="#173C60" text-anchor="start">结构化题库</text>
+<text x="1215" y="61" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="550" fill="#6B8298" text-anchor="end">QUESTION BANK</text>
+<line x1="676" y1="83" x2="1235" y2="83" stroke="#e1e9f0" stroke-width="1"/>
+<rect x="680" y="101" width="60" height="35" rx="8" fill="#E9F3FA" stroke="#BAD3E6" stroke-width="1"/>
+<text x="710" y="124" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="750" fill="#185A89" text-anchor="middle">GZ</text>
+<rect x="747" y="101" width="60" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="777" y="124" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="500" fill="#526D86" text-anchor="middle">HK</text>
+<rect x="818" y="101" width="129" height="35" rx="8" fill="#E9F3FA" stroke="#BAD3E6" stroke-width="1"/>
+<text x="882.5" y="124" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12.5" font-weight="750" fill="#185A89" text-anchor="middle">常规 ELPA</text>
+<rect x="955" y="101" width="124" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="1017" y="124" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12.5" font-weight="500" fill="#526D86" text-anchor="middle">Fast Track</text>
+<rect x="680" y="147" width="550" height="39" rx="9" fill="#ffffff" stroke="#d9e4ef" stroke-width="1"/>
+<text x="702" y="173" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="500" fill="#8194A6" text-anchor="start">⌕</text>
+<text x="738" y="171" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="15" font-weight="400" fill="#8798A7" text-anchor="start">搜索题干或关键词</text>
+<rect x="680" y="199" width="133" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="746.5" y="222" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="500" fill="#526D86" text-anchor="middle">考试场次</text>
+<rect x="825" y="199" width="135" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="892.5" y="222" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="500" fill="#526D86" text-anchor="middle">备考状态</text>
+<rect x="680" y="245" width="550" height="81" rx="10" fill="#F8FBFF" stroke="#DAE6F1" stroke-width="1"/>
+<text x="700" y="266" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="500" fill="#6987A1" text-anchor="start">示例题目 · 过往题库</text>
+<text x="700" y="290" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="15" font-weight="650" fill="#234D73" text-anchor="start">Describe and reflect upon your</text>
+<text x="700" y="309" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="15" font-weight="650" fill="#234D73" text-anchor="start">experience of undergraduate study.</text>
+<rect x="24" y="372" width="601" height="319" rx="18" fill="#ffffff" stroke="#D9E4EF" stroke-width="1.4"/>
+<rect x="45" y="391" width="35" height="26" rx="7" fill="#FBF0D0"/>
+<text x="62.5" y="409" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="800" fill="#9B6A13" text-anchor="middle">03</text>
+<text x="93" y="410" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="750" fill="#173C60" text-anchor="start">随机抽题与计时</text>
+<text x="584" y="409" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="550" fill="#6B8298" text-anchor="end">RANDOM PRACTICE</text>
+<line x1="45" y1="431" x2="604" y2="431" stroke="#e1e9f0" stroke-width="1"/>
+<rect x="49" y="447" width="129" height="35" rx="8" fill="#E9F3FA" stroke="#BAD3E6" stroke-width="1"/>
+<text x="113.5" y="470" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="750" fill="#185A89" text-anchor="middle">模拟考试</text>
+<rect x="186" y="447" width="110" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="241" y="470" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="500" fill="#526D86" text-anchor="middle">倒计时</text>
+<rect x="304" y="447" width="116" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="362" y="470" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="500" fill="#526D86" text-anchor="middle">正向计时</text>
+<text x="321" y="519" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="500" fill="#60758B" text-anchor="middle">准备阶段</text>
+<text x="321" y="589" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="62" font-weight="800" fill="#173C60" text-anchor="middle">01:00</text>
+<rect x="91" y="608" width="460" height="7" rx="3" fill="#E5EDF5"/>
+<rect x="91" y="608" width="178" height="7" rx="3" fill="#D5B05D"/>
+<rect x="101" y="630" width="119" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="160.5" y="653" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="500" fill="#526D86" text-anchor="middle">随机抽题</text>
+<rect x="234" y="630" width="137" height="35" rx="8" fill="#E9F3FA" stroke="#BAD3E6" stroke-width="1"/>
+<text x="302.5" y="653" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="750" fill="#185A89" text-anchor="middle">开始 / 暂停</text>
+<rect x="385" y="630" width="129" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="449.5" y="653" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="500" fill="#526D86" text-anchor="middle">重置</text>
+<rect x="655" y="372" width="601" height="319" rx="18" fill="#ffffff" stroke="#D9E4EF" stroke-width="1.4"/>
+<rect x="676" y="391" width="35" height="26" rx="7" fill="#FBF0D0"/>
+<text x="693.5" y="409" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="800" fill="#9B6A13" text-anchor="middle">04</text>
+<text x="724" y="410" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="750" fill="#173C60" text-anchor="start">学习记录与复习</text>
+<text x="1215" y="409" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="550" fill="#6B8298" text-anchor="end">STUDY RECORD</text>
+<line x1="676" y1="431" x2="1235" y2="431" stroke="#e1e9f0" stroke-width="1"/>
+<rect x="681" y="447" width="106" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="734" y="470" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="500" fill="#526D86" text-anchor="middle">未练</text>
+<rect x="794" y="447" width="118" height="35" rx="8" fill="#E9F3FA" stroke="#BAD3E6" stroke-width="1"/>
+<text x="853" y="470" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="750" fill="#185A89" text-anchor="middle">练习中</text>
+<rect x="920" y="447" width="115" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="977.5" y="470" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="500" fill="#526D86" text-anchor="middle">已掌握</text>
+<rect x="680" y="495" width="550" height="121" rx="10" fill="#F9FBFD" stroke="#E0E9F2" stroke-width="1"/>
+<text x="699" y="519" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="700" fill="#54738C" text-anchor="start">笔记 · 回答思路</text>
+<text x="700" y="544" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="500" fill="#536A80" text-anchor="start">开头：介绍我的本科专业</text>
+<text x="700" y="568" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="500" fill="#536A80" text-anchor="start">例子：分享最有收获的课程</text>
+<text x="700" y="592" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="500" fill="#536A80" text-anchor="start">待改进：讲清楚为什么喜欢</text>
+<rect x="680" y="630" width="113" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="736.5" y="653" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="500" fill="#526D86" text-anchor="middle">↓ 备份</text>
+<rect x="801" y="630" width="113" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="857.5" y="653" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="500" fill="#526D86" text-anchor="middle">↑ 恢复</text>
+<rect x="922" y="630" width="121" height="35" rx="8" fill="#F7F9FB" stroke="#DCE6F0" stroke-width="1"/>
+<text x="982.5" y="653" font-family="Inter, Noto Sans CJK SC, Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="500" fill="#526D86" text-anchor="middle">导出笔记</text>
+</svg>
