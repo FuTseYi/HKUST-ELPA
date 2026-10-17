@@ -22,7 +22,7 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 | 社区分享 | 无需注册，可提交回忆题、提示小问、不同问法或备考经验。投稿公开保存，复核后才考虑收录。 |
 | 资料来源 | 区分学校说明与学生整理资料，保留参考链接和内容限制。 |
 
-![考试指南、抽题计时、笔记进度与考题经验分享的四宫格演示](./promotion/2026-10-17/web/feature-grid.gif)
+![考试指南、抽题计时、笔记进度与考题经验分享的四宫格演示](./promotion/web/feature-grid.gif)
 
 ### 练习与复习
 

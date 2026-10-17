@@ -38,7 +38,7 @@ function validateSite(){
     if(script)assert.ok(html.includes('src="'+script+'"'),'Page script missing: '+name);
   }
   for(const [name,html] of pages){
-    for(const [,raw] of html.matchAll(/(?:src|href)="([^"]+)"/g)){
+    for(const [,raw] of html.matchAll(/(?:src|href|data-demo)="([^"]+)"/g)){
       const url=new URL(raw.replace(/&amp;/g,'&'),'https://elpa.local/'+name);
       if(url.origin!=='https://elpa.local')continue;
       const file=decodeURIComponent(url.pathname).slice(1);
