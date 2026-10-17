@@ -65,7 +65,7 @@ body { margin:0; }
 .elpa-home-section-head{max-width:850px}
 .elpa-home-section-head .elpa-desc{max-width:800px;margin-bottom:0;line-height:1.85}
 .elpa-home-feature{display:grid;grid-template-rows:1fr auto;min-width:0;padding:26px;border:1px solid var(--site-line);border-radius:14px;background:#fff;scroll-margin-top:16px}
-.elpa-home-feature-copy{min-width:0}
+.elpa-home-feature-copy{min-width:0;display:flex;flex-direction:column}
 .elpa-home-feature-index{display:block;color:#9a6d13;font-size:12px;font-weight:800;letter-spacing:.04em}
 .elpa-home-feature-copy h3{margin:8px 0 10px;color:var(--site-navy);font-size:20px;line-height:1.5}
 .elpa-home-feature-copy>p:not(.elpa-home-feature-note){margin:0;color:#506477;font-size:14px;line-height:1.9}
@@ -85,7 +85,7 @@ body { margin:0; }
 .elpa-home-feature-note{margin:17px 0 0;padding:11px 13px;border-radius:8px;background:#eef4fa;color:#546e85;font-size:12px;line-height:1.75}
 .elpa-home-feature-link,.elpa-home-more-card>a{display:inline-flex;gap:7px;align-items:center;margin-top:19px;color:var(--site-blue)!important;font-size:13px;font-weight:800;text-decoration:none;text-underline-offset:4px}
 .elpa-home-feature-link:hover,.elpa-home-more-card>a:hover{text-decoration:underline}
-.elpa-home-feature-link{min-height:44px;margin-top:10px}
+.elpa-home-feature-link{min-height:44px;margin-top:auto;padding-top:10px;align-self:flex-start}
 .elpa-home-help{margin-top:12px;border-top:1px solid var(--site-line)}
 .elpa-home-help summary{padding:14px 0 0;min-height:44px;cursor:pointer;color:var(--site-blue);font-size:14px;font-weight:650}
 .elpa-home-help summary:hover{text-decoration:underline;text-underline-offset:4px}
@@ -96,8 +96,8 @@ body { margin:0; }
 .elpa-home-demo-play{min-height:44px;padding:9px 12px;border:1px solid var(--site-line);border-radius:8px;background:#fff;color:var(--site-blue);font:inherit;font-weight:650;cursor:pointer}
 .elpa-home-demo-play:hover{background:#eef4fa}
 .elpa-home-demo-play:focus-visible{outline:3px solid #e5a921;outline-offset:3px}
-.elpa-home-share-help{margin-top:18px;border-top:1px solid var(--site-line)}
-.elpa-home-share-help summary{padding:14px 0;min-height:44px;color:var(--site-blue);font-size:14px;font-weight:650;cursor:pointer}
+.elpa-home-share-help{grid-column:2;grid-row:4;align-self:end;margin-top:17px}
+.elpa-home-share-help summary{padding:10px 0;min-height:44px;white-space:nowrap;color:var(--site-blue);font-size:13px;font-weight:650;cursor:pointer}
 .elpa-home-share-help summary:focus-visible{outline:3px solid #e5a921;outline-offset:3px}
 .elpa-home-help-content{padding-top:14px;color:#506477;font-size:14px;line-height:1.85}
 .elpa-home-help-text>p{margin:0 0 12px}
@@ -123,13 +123,21 @@ body { margin:0; }
 .elpa-demo-question div{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .elpa-demo-question div span{padding:5px 8px;border-radius:6px;background:#e7f1f9;color:#47718f;font-size:10.5px}
 .elpa-home-more{padding-top:52px}
-.elpa-home-more-grid{display:grid;align-items:start;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:23px}
-.elpa-home-more-card{min-width:0;padding:27px 28px;border:1px solid var(--site-line);border-radius:14px;background:#fff}
+.elpa-home-more-grid{display:grid;align-items:stretch;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:23px}
+.elpa-home-more-card{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto 1fr auto;column-gap:12px;min-width:0;padding:27px 28px;border:1px solid var(--site-line);border-radius:14px;background:#fff;scroll-margin-top:16px}
+.elpa-home-more-card>:is(.elpa-home-more-tag,h3,p){grid-column:1/-1}
 .elpa-home-more-tag{font-size:11px;font-weight:800;letter-spacing:.055em;color:#567998}
 .elpa-home-more-card h3{margin:10px 0;color:var(--site-navy);font-size:18px;line-height:1.5}
 .elpa-home-more-card p{margin:0;color:#5b6f82;font-size:13px;line-height:1.8}
-.elpa-home-more-card>a{margin-top:17px}
+.elpa-home-more-card>a{grid-column:1;align-self:end;min-height:44px;margin-top:17px}
+.elpa-home-share-help[open]{grid-column:1/-1;grid-row:5;max-width:600px;width:100%;justify-self:center}
 @media(min-width:701px){
+ .elpa-home-feature{grid-row:span 2;grid-template-rows:subgrid;row-gap:0}
+ .elpa-home-more-grid:has(.elpa-home-share-help[open]){grid-template-columns:1fr}
+ .elpa-home-more-card:has(.elpa-home-share-help[open]){grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto auto 1fr;column-gap:28px}
+ .elpa-home-more-card:has(.elpa-home-share-help[open])>:is(.elpa-home-more-tag,h3,p){grid-column:1}
+ .elpa-home-share-help[open]{grid-column:2;grid-row:1/-1;align-self:start;margin-top:0}
+ .elpa-home-more-card:has(.elpa-home-share-help[open])>a{align-self:start}
  .elpa-home-feature:has(.elpa-home-help[open]){grid-column:1/-1}
  .elpa-home-help[open] .elpa-home-help-content{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:28px}
  .elpa-home-help-text{min-width:0}

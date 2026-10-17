@@ -124,6 +124,21 @@ const serve=http.createServer((request,response)=>{
         assert.equal(await homePage.locator('.elpa-home-backup-guide').count(),1);
         assert.match(await homePage.locator('#home-practice-title').innerText(),/随机抽题，开口练习/);
         assert.equal(await homePage.locator('.elpa-home-help[open]').count(),0,'Detailed instructions start collapsed');
+        const alignment=await homePage.evaluate(()=>{
+          const edges=selector=>[...document.querySelectorAll(selector)].map(el=>{
+            const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom};
+          });
+          return {links:edges('.elpa-home-feature-link'),dividers:edges('.elpa-home-help'),
+            community:edges('.elpa-home-more-card'),share:edges('.elpa-home-more-card>a')[0],demo:edges('.elpa-home-share-help summary')[0]};
+        });
+        if(width>700){
+          for(const index of [0,2]){
+            assert.ok(Math.abs(alignment.links[index].bottom-alignment.links[index+1].bottom)<2,'Feature links align at '+width);
+            assert.ok(Math.abs(alignment.dividers[index].top-alignment.dividers[index+1].top)<2,'Feature dividers align at '+width);
+          }
+          assert.ok(Math.abs(alignment.community[0].bottom-alignment.community[1].bottom)<2,'Community cards align at '+width);
+        }
+        assert.ok(Math.abs(alignment.share.bottom-alignment.demo.bottom)<2,'Sharing demo stays beside its action at '+width);
         for(const help of await homePage.locator('.elpa-home-help').all()){
           await help.locator('summary').click();
           assert.equal(await help.locator('.elpa-home-demo').isVisible(),true,'Preview is available on request');
