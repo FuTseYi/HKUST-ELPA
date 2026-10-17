@@ -66,6 +66,3 @@ async page => {
   await shot('share-5');
   return 'Captured 17 real UI screenshots; note persistence verified; no submission sent.';
 }
-
-
-
