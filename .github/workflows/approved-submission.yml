@@ -28,16 +28,11 @@ jobs:
       - name: Import approved submission as data only
         id: import
         run: node scripts/import-approved-submission.cjs
-      - name: Validate generated question-bank JavaScript
+      - name: Validate imported data and website
         if: steps.import.outputs.result == 'added' || steps.import.outputs.result == 'linked'
         run: |
-          node --check question-bank/questions.js
-          node --check question-bank/appearances.js
-          node --check question-bank/advice.js
-          node --check scripts/import-v2-submission.cjs
-          node --test tests/approved-import.test.cjs
-          node --test tests/v2-import.test.cjs
-          node --test tests/worker.test.cjs
+          npm run check
+          npm test
       - name: Open data-only PR
         if: steps.import.outputs.result == 'added' || steps.import.outputs.result == 'linked'
         env:

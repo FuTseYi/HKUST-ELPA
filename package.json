@@ -5,7 +5,7 @@
   "description": "Static, community-maintained ELPA speaking preparation resources",
   "engines": { "node": ">=22" },
   "scripts": {
-    "check": "node scripts/validate-site.cjs && node scripts/check-syntax.cjs",
+    "check": "node scripts/validate-site.cjs",
     "test": "node --test tests/*.test.cjs",
     "test:browser": "node tests/mobile-browser-smoke.cjs"
   },

@@ -1,6 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const {execFileSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..');
 const pageNames=['index','guide','practice','sources','submit'];
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
@@ -106,5 +107,18 @@ function validateSite(){
   assert.ok(jpeg.length>8000&&jpeg[0]===255&&jpeg[1]===216&&jpeg.at(-2)===255&&jpeg.at(-1)===217,'Invalid campus JPEG');
   console.log('Validated 5 pages, local resources, '+questionIds.size+' stable question IDs, '+data.advice.length+' advice entries and legacy aliases');
 }
-if(require.main===module)validateSite();
+if(require.main===module){
+  validateSite();
+  const files=['submission-config.js'];
+  for(const dir of ['js','question-bank','scripts','tests']){
+    for(const file of fs.readdirSync(path.join(root,dir)))
+      if(/\.(?:js|cjs)$/.test(file))files.push(path.join(dir,file));
+  }
+  for(const file of files)
+    execFileSync(process.execPath,['--check',file],{cwd:root,stdio:'inherit'});
+  execFileSync(process.execPath,['--input-type=module','--check'],{
+    input:read('worker/src/index.js'),stdio:['pipe','inherit','inherit']
+  });
+  console.log('JavaScript syntax checks passed');
+}
 module.exports={readPageSource,validateSite};
