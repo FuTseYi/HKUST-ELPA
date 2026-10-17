@@ -22,9 +22,9 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 | 社区分享 | 无需注册，可提交回忆题、提示小问、不同问法或备考经验。投稿公开保存，复核后才考虑收录。 |
 | 资料来源 | 区分学校说明与学生整理资料，保留参考链接和内容限制。 |
 
-![考试指南、题库筛选、随机抽题计时与学习记录的静态功能示意](./assets/feature-overview.svg)
+<a href="./promotion/2026-10-17/05-features.png"><img src="./promotion/2026-10-17/05-features.png" width="600" alt="HKUST-ELPA 六项功能：指南与经验、题库筛选、抽题计时、笔记与状态、备份导出、考题与经验分享"></a>
 
-*功能图用于说明概念，实际排版与操作以网站为准。*
+*下方可展开练习、笔记与分享的真实页面演示。更多图片及制作源文件见[宣传素材目录](./promotion/README.md)。*
 
 ### 练习与复习
 
@@ -35,12 +35,43 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 
 网站提供抽题和计时工具，**由你自己开口回答，不提供自动对话或 AI 口语评分**。练习计时并非对学校实际考试时长的承诺，现场安排以考官指引为准。
 
+<details>
+<summary>查看练习演示 · Practice demo</summary>
+
+选择练习范围 → 随机抽题 → 开始计时 → 查看练习阶段与剩余时间。
+
+<img src="./promotion/2026-10-17/practice-demo.gif" width="480" alt="随机抽题与计时的分步骤演示">
+
+</details>
+
 ### 保存与迁移记录
 
 - 练习状态与笔记默认自动保存在**当前浏览器、当前网站地址**下，不需要账号。
 - 换设备、浏览器或网站地址前，先「备份学习记录」；在新环境中用「恢复学习记录」导入。
 - **恢复会替换当前记录，建议先备份。** 清除浏览器数据也可能删除本地记录。
 - 支持单独导出笔记；部分浏览器还提供可选的本地文件夹同步。浏览器内自动保存不依赖该功能。
+
+<details>
+<summary>查看笔记演示 · Notes demo</summary>
+
+展开笔记 → 记录回答思路 → 标记练习中 → 刷新后笔记仍在。
+
+<img src="./promotion/2026-10-17/notes-demo.gif" width="480" alt="逐题笔记、练习状态及同一浏览器内保存的分步骤演示">
+
+</details>
+
+### 分享考题与经验
+
+考后可以留下题目回忆、提示小问或备考经验。无需注册，投稿内容公开保存，复核后才考虑收录。
+
+<details>
+<summary>查看分享演示 · Share demo</summary>
+
+填写考题或切换至分享经验 → 选择主题并填写 → 预览投稿。演示使用示例内容，未发送真实投稿。
+
+<img src="./promotion/2026-10-17/share-demo.gif" width="480" alt="贡献考题与分享备考经验的分步骤演示，展示至投稿预览">
+
+</details>
 
 ## 本地预览与验证
 
