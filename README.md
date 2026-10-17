@@ -83,7 +83,6 @@ HKUST-ELPA/
 ├── site.css                       # 全站共享布局、导航、双语标签与页脚
 ├── css/                           # 练习页、投稿页专用样式
 ├── js/                            # 首页、指南、练习和投稿页逻辑
-├── github-stars.js                # 可选星数增强：GitHub API → Shields 备用
 ├── submission-config.js           # 公开投稿端点与 Turnstile Site Key
 ├── elpa_data.json                 # 空的初始记录文件，非个人备份
 ├── assets/                        # 图片、图标和功能示意
@@ -114,7 +113,7 @@ HKUST-ELPA/
 | 组件 | 职责与边界 |
 | --- | --- |
 | 静态前端 | Vercel / GitHub Pages 托管相同文件，无构建依赖；学习记录按浏览器来源隔离。 |
-| GitHub 星数 | 优先读取 GitHub 官方接口，失败时使用 Shields；会话内缓存一小时。两者不可用时隐藏数字，仓库链接仍可用。 |
+| GitHub 星数 | HTML 直接嵌入 Shields 数字徽章，无自定义请求和缓存脚本；加载失败时隐藏数字，仓库链接仍可用。 |
 | 投稿 Worker | 校验来源、Turnstile、频率、大小和字段，成功后只创建待处理的公开 Issue。 |
 | 审核工作流 | 仅仓库所有者为开放 Issue 添加 `submission:approved` 时执行，验证数据后生成独立 PR。 |
 | 结构化题库 | 常规、Fast Track 和不同校区使用稳定 ID；场次与补充问法独立关联。 |

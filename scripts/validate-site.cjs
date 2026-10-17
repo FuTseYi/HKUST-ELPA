@@ -27,7 +27,7 @@ function validateSite(){
     assert.equal((nav.match(/class="elpa-nav-github"/g)||[]).length,1,'One GitHub entry: '+name);
     assert.equal((nav.match(/<small lang="en">/g)||[]).length,5,'Bilingual navigation and sharing: '+name);
     assert.ok(html.includes('href="./site.css"'),'Shared CSS missing: '+name);
-    assert.ok(html.includes('src="./github-stars.js" defer'),'Shared star enhancement missing: '+name);
+    assert.ok(nav.includes('https://img.shields.io/github/stars/FuTseYi/HKUST-ELPA?'),'Star badge missing: '+name);
     assert.ok(html.includes('href="./assets/elpa-mark.svg"'),'Favicon missing: '+name);
     const currentFooter=html.match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/)?.[0];
     assert.ok(currentFooter,'Missing footer: '+name);

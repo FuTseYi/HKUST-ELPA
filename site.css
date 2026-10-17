@@ -279,7 +279,7 @@ body { margin:0; }
 @keyframes elpa-star-breathe{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.16);opacity:1}}
 .elpa-nav-github:hover .elpa-star-icon,.elpa-nav-github:focus-visible .elpa-star-icon{animation:none;transform:scale(1.12);opacity:1;fill:var(--site-gold)}
 @media(prefers-reduced-motion:reduce){.elpa-star-icon{animation:none;transform:none!important;opacity:1}}
-.elpa-star-count{padding-left:7px;border-left:1px solid #d8e2ec;font-size:11px;font-weight:650;font-variant-numeric:tabular-nums}
+.elpa-nav-github .elpa-star-count{width:auto;height:20px;padding-left:5px;border-left:1px solid #d8e2ec}
 .elpa-star-count[hidden]{display:none}
 .elpa-nav-submit {display:inline-flex;align-items:center;justify-content:center;min-height:43px;white-space:nowrap;gap:5px;padding:9px 17px;border-radius:12px;background:var(--site-gold);color:#18344e!important;border:1px solid #ecc151;text-decoration:none;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(190,136,24,.16);transition:transform .16s ease,box-shadow .16s ease,background .16s ease;}
 .elpa-nav-submit:hover,.elpa-nav-submit[aria-current="page"] {background:#ffd779;box-shadow:0 6px 18px rgba(190,136,24,.22);transform:translateY(-1px);}

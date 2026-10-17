@@ -15,6 +15,6 @@ for(const dir of ['js','question-bank','scripts','tests']){
     if(/\.(?:js|cjs)$/.test(file))check(path.join(dir,file));
   }
 }
-for(const file of ['submission-config.js','github-stars.js'])check(file);
+check('submission-config.js');
 check('worker/src/index.js',true);
 console.log('JavaScript syntax checks passed');

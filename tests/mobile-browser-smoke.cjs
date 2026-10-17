@@ -24,8 +24,8 @@ const serve=http.createServer((request,response)=>{
     async function newPage(options){
       const page=await browser.newPage(options);
       // UI regressions must not depend on external quotas or create public Issues.
-      await page.route('https://api.github.com/repos/FuTseYi/HKUST-ELPA',route=>route.fulfill({
-        status:200,contentType:'application/json',body:'{"stargazers_count":2}'
+      await page.route('https://img.shields.io/github/stars/**',route=>route.fulfill({
+        status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="17" height="20"><text x="5" y="14">2</text></svg>'
       }));
       await page.route('https://challenges.cloudflare.com/**',route=>route.fulfill({
         status:200,contentType:'application/javascript',body:''
@@ -40,6 +40,14 @@ const serve=http.createServer((request,response)=>{
       page.on('pageerror',error=>errors.push(error.message));
       await page.goto(host,{waitUntil:'load'});
       await page.waitForSelector('#bankD .qcard',{timeout:20000});
+      assert.equal(await page.locator('.elpa-star-count').evaluate(img=>img.complete&&img.naturalWidth>0),true,'Star count badge loads without custom JavaScript');
+      if(width===390){
+        await page.route('https://img.shields.io/github/stars/**',route=>route.abort());
+        await page.reload();
+        await page.waitForFunction(()=>document.querySelector('.elpa-star-count').hidden);
+        assert.equal(await page.locator('.elpa-nav-github').isVisible(),true,'Repository link remains available if the badge fails');
+        await page.waitForSelector('#bankD .qcard');
+      }
       const layout=await page.evaluate(()=>{
         const full=document.documentElement.scrollWidth,view=document.documentElement.clientWidth;
         const card=document.querySelector('#bankD .qcard');
