@@ -56,10 +56,7 @@ jobs:
           git add -A -- question-bank/
           changed="$(git diff --cached --name-only)"
           test -n "$changed"
-          if echo "$changed" | grep -Ev '^question-bank/(questions\.js|community-submissions\.md|appearances\.js|advice\.js|community-advice\.md)$'; then
-            echo 'Unexpected changed file outside reviewed data allowlist'
-            exit 1
-          fi
+          node scripts/check-submission-diff.cjs
           git commit -m "docs: propose approved ELPA question from issue #${ISSUE_NUMBER}"
           git push --set-upstream origin "${BRANCH}"
           gh pr create --base main --head "${BRANCH}" \

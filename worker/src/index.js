@@ -70,7 +70,7 @@ const ADVICE_PHASES = new Set(['before','during','after']);
 function validV2(body) {
   if(!body||body.version!==2||!validText(body.turnstileToken,1,2048)) return false;
   if(body.kind==='question')
-    return /^20\d{2} (Spring|Fall)$/.test(body.term||'') &&
+    return typeof body.term==='string' && /^20\d{2} (Spring|Fall)$/.test(body.term) &&
       (body.campus===undefined||ELPA_CAMPUSES.has(body.campus)) &&
       (body.track===undefined||ELPA_TRACKS.has(body.track)) &&
       EXAM_STAGES.has(body.examStage) && body.main &&
@@ -81,7 +81,7 @@ function validV2(body) {
         body.alternatives.every(s=>s&&validText(s.en,8,1000)&&validText(s.cn,0,1000)))) &&
       ['firsthand','secondhand'].includes(body.source) &&
       (body.linkedQuestionId===undefined||
-        (/^[A-DFHT]-[0-9]+$/.test(body.linkedQuestionId)&&
+        (typeof body.linkedQuestionId==='string'&&/^[A-DFHT]-[0-9]+$/.test(body.linkedQuestionId)&&
          ['encounter','supplement'].includes(body.intent))) &&
       (body.intent===undefined||body.linkedQuestionId!==undefined) &&
       (body.intent!=='supplement'||body.subs.length>0||(body.alternatives&&body.alternatives.length>0));
@@ -228,7 +228,7 @@ export default {
     }catch{
       return reject('人机验证暂不可用，请稍后重试。',503);
     }
-    if (!verified.success || verified.hostname!==new URL(origin).hostname || verified.action!=='elpa_submit')
+    if (!verified || verified.success!==true || verified.hostname!==new URL(origin).hostname || verified.action!=='elpa_submit')
       return reject('人机验证失败或已过期，请重试。',403);
     let title,issueBody;
     if(isV2){

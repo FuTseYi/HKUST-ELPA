@@ -67,7 +67,8 @@ test('valid long Chinese submission accepted and queued only as an issue',async(
  assert.ok(!payload.body.includes('CF-Connecting-IP'));
 });
 test('invalid Turnstile hostname/action cannot create GitHub issue',async()=>{
- for(const bad of [{success:true,hostname:'attacker.example',action:'elpa_submit'},
+ for(const bad of [null,{success:1,hostname:'futseyi.github.io',action:'elpa_submit'},
+                  {success:true,hostname:'attacker.example',action:'elpa_submit'},
                   {success:true,hostname:'futseyi.github.io',action:'other'},
                   {success:false,hostname:'futseyi.github.io',action:'elpa_submit'}]){
   const x=makeWorker({siteverify:bad});
@@ -277,6 +278,8 @@ test('older advice submissions default to Regular',async()=>{
 });
 test('v2 rejects missing English and noncanonical categories before siteverify',async()=>{
   const bads=[
+    {...v2Question,term:['2026 Fall']},
+    {...v2Question,linkedQuestionId:['D-4'],intent:'encounter'},
     {...v2Question,main:{...v2Question.main,en:''}},
     {...v2Question,subs:[{en:'',cn:'为什么？'}]},
     {...v2Question,examStage:'unknown'},

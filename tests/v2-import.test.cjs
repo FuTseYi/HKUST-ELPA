@@ -2,6 +2,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {spawnSync}=require('node:child_process');
+const {checkSubmissionFiles}=require('../scripts/check-submission-diff.cjs');
 const importer=path.resolve(__dirname,'../scripts/import-approved-submission.cjs');
 const bank=path.resolve(__dirname,'../question-bank/questions.js');
 function fixture(){
@@ -33,6 +34,35 @@ const question=(main='How can you prepare for interdisciplinary research at univ
 const advice=()=>({version:2,kind:'advice',phase:'before',
  tags:['speaking-strategy','time-management'],title:'考前素材准备',
  body:'尽量准备真实经历，并练习在有限时间内提炼清晰观点。'});
+
+test('non-string terms and linked IDs are rejected without changing data',()=>{
+ for(const invalid of [{term:['2026 Fall']},{linkedQuestionId:['D-4'],intent:'encounter'}]){
+  const f=fixture();try{
+   const before=f.read('questions.js');
+   const r=f.run({...question('Explain one of your projects.'),...invalid},501);
+   assert.notEqual(r.status,0);
+   assert.equal(f.read('questions.js'),before);
+  }finally{f.close();}
+ }
+});
+
+test('every campus/track import fits the data-only PR allowlist',()=>{
+ let number=600;
+ for(const [campus,track] of [['nansha','regular'],['nansha','fast-track'],['clear-water-bay','regular'],['clear-water-bay','fast-track']]){
+  const f=fixture();try{
+   const files=['questions.js','fast-track.js','appearances.js','advice.js'];
+   const before=Object.fromEntries(files.map(name=>[name,f.read(name)]));
+   const result=f.run({...question(),campus,track},++number);
+   assert.equal(result.status,0,result.stderr);
+   const changed=files.filter(name=>f.read(name)!==before[name]).map(name=>'question-bank/'+name);
+   changed.push('question-bank/community-submissions.md');
+   assert.doesNotThrow(()=>checkSubmissionFiles(changed));
+  }finally{f.close();}
+ }
+ assert.throws(()=>checkSubmissionFiles(['js/practice.js']),/Unexpected submission file/);
+ assert.throws(()=>checkSubmissionFiles(['question-bank/../../README.md']),/Unexpected submission file/);
+ assert.throws(()=>checkSubmissionFiles([]),/No submission changes/);
+});
 test('v2 new question keeps bilingual main, dynamic subs, and stable ID',()=>{
  const f=fixture();try{
   const r=f.run(question(),101);assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/status: added/);

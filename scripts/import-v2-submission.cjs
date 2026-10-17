@@ -23,7 +23,7 @@ const tags=['exam-process','speaking-strategy','time-management','stress-managem
 function validate(data){
  if(!data||data.version!==2)return false;
  if(data.kind==='question')
-   return /^20\d{2} (Spring|Fall)$/.test(data.term||'') &&
+   return typeof data.term==='string' && /^20\d{2} (Spring|Fall)$/.test(data.term) &&
      (data.campus===undefined||['nansha','clear-water-bay'].includes(data.campus)) &&
      (data.track===undefined||['regular','fast-track'].includes(data.track)) &&
      ['start','mid','end'].includes(data.examStage) &&
@@ -34,7 +34,7 @@ function validate(data){
        data.alternatives.every(s=>s&&valid(s.en,8,1000)&&valid(s.cn,0,1000)))) &&
      ['firsthand','secondhand'].includes(data.source) &&
      (data.linkedQuestionId===undefined||
-       (/^[A-DFHT]-[0-9]+$/.test(data.linkedQuestionId)&&
+       (typeof data.linkedQuestionId==='string'&&/^[A-DFHT]-[0-9]+$/.test(data.linkedQuestionId)&&
         ['encounter','supplement'].includes(data.intent))) &&
      (data.intent===undefined||data.linkedQuestionId!==undefined) &&
      (data.intent!=='supplement'||data.subs.length>0||(data.alternatives&&data.alternatives.length>0));
