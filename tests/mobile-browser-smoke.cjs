@@ -328,7 +328,7 @@ const serve=http.createServer((request,response)=>{
         await page.evaluate(()=>{
           const id='D-1';
           BANKS.D.items[0].recallTag='考生回忆，待核实';
-          ELPA_APPEARANCES[id].push({issueNumber:99999,term:'2026 Fall',examStage:'start',
+          (ELPA_APPEARANCES[id] ||= []).push({issueNumber:99999,term:'2026 Fall',examStage:'start',
             intent:'supplement',subs:[{en:'Community-added follow-up',cn:'社区补充小问'}]});
           ELPA_APPEARANCES[id].push({issueNumber:100000,term:'2026 Fall',examStage:'start',intent:'supplement',alternatives:[{en:'Alternative community phrasing',cn:'另一种社区问法'}]});
           notes[id+'-0']='Community supplement notes';
