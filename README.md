@@ -156,3 +156,5 @@ HKUST-ELPA 不代表香港科技大学或任何校区的官方立场，也不保
 **Built with Passion. Shared with Everyone.**
 
 Initiated by [Shine](https://github.com/FuTseYi) · 2026 Fall MPhil
+
+<sub>由 Shine 持续维护，并提供个人 Vercel 与 Cloudflare 部署资源。项目开源，免费向同学开放。<br>Personally maintained &amp; hosted · Open source, free to use.</sub>

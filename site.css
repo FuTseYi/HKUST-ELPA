@@ -225,6 +225,7 @@ body { margin:0; }
 .elpa-footer-divider{height:1px;width:min(100%,400px);background:rgba(192,215,233,.21);margin:17px auto 12px}
 .elpa-footer-tech{color:#bdd1e2;font-size:12px}
 .elpa-footer-identity{margin-top:12px}
+.elpa-footer-support{display:flex;flex-direction:column;gap:2px;margin-top:7px!important;color:#a5bbcf;font-size:11px;line-height:1.7;text-wrap:balance}
 .elpa-footer-byline{display:flex;align-items:center;justify-content:center;gap:9px;font-size:11.5px;line-height:1.6;color:#afc3d7}
 .elpa-footer-credit-label{font-size:13px;font-weight:650;letter-spacing:.025em;color:#afc3d7}
 .elpa-footer-byline a{font-size:13px;font-weight:650;letter-spacing:.025em;color:#f0d9a3}
