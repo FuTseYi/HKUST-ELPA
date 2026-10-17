@@ -775,7 +775,7 @@ function copyQuestion(id) {
   const inCurrent=currentIds.includes(id);
   const category=activeTrack==='fast-track'?'ELPA Fast Track':'常规 ELPA · Regular';
   const section=category+' · '+(inCurrent?activeLatestSessionLabel():'过往题库');
-  const number=(inCurrent?currentIds:activeArchivedIds()).indexOf(id)+1;
+  const number=feedbackRanked(inCurrent?currentIds:activeArchivedIds()).indexOf(id)+1;
   let text = `【${section} · 第 ${number} 题】\n${item.en}\n`;
   const copyCn=questionTranslation(id.split('-')[0],item);
   if (copyCn) text += `（${copyCn}）\n`;
