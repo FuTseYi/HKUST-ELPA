@@ -159,6 +159,16 @@ test('same Issue imported twice is idempotent',()=>{
 
 test('current-term grouping archives other sessions without renumbering saved IDs',()=>{
  const f=fixture();try{
+  // Measure the reviewed fixture before importing; new approved questions may
+  // already exist, so fixed historical totals are not stable.
+  const baseline=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+`
+    return {
+      fall:elpaCurrentQuestionIds('2026 Fall').length,
+      total:new Set([
+        ...elpaCurrentQuestionIds('2026 Fall'),
+        ...elpaArchivedQuestionIds('2026 Fall')
+      ]).size
+    };`)();
   assert.equal(f.run(question(),301).status,0);
   const spring={...question('Can you describe your current academic interests in simple terms?'),
     term:'2027 Spring'};
@@ -172,7 +182,7 @@ test('current-term grouping archives other sessions without renumbering saved ID
       sorted:elpaArchivedQuestionIds(elpaLatestTerm())
     };`);
   const groups=classify();
-  assert.equal(groups.fall.length,13); // The 12 original 2026 Fall reports + Issue #301.
+  assert.equal(groups.fall.length,baseline.fall+1); // Exactly one new Fall question.
   assert.deepEqual([...groups.spring],['D-1000302']);
   assert.ok(groups.past.includes('D-1'));
   assert.ok(groups.past.includes('D-1000301'));
@@ -186,8 +196,7 @@ test('current-term grouping archives other sessions without renumbering saved ID
   assert.ok(groups.sorted.includes('D-1'));
   assert.ok(!groups.sorted.includes('D-1000302'));
   const every=new Set([...groups.spring,...groups.past]);
-  assert.equal(every.size,elpaTotal());
-  function elpaTotal(){return 25+12+2;}
+  assert.equal(every.size,baseline.total+2); // Exactly two new canonical questions.
  }finally{f.close();}
 });
 
