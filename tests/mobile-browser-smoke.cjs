@@ -266,7 +266,12 @@ const serve=http.createServer((request,response)=>{
           assert.equal(await contrib.locator('input[value="supplement"][name="contributionIntent"]').isChecked(),true);
           assert.equal(await contrib.locator('#supplementQuestionFields').isVisible(),true);
           assert.equal(await contrib.locator('#supplementEn').isEnabled(),true);
-          await contrib.locator('#unlinkQuestion').click();
+          // A deep-linked question stays linked for its own campus, but changing
+          // to another campus must clear the incompatible ID before submission.
+          await contrib.locator('#submissionCampus').selectOption('nansha');
+          assert.equal(await contrib.locator('#linkedQuestion').isVisible(),true);
+          await contrib.locator('#submissionCampus').selectOption('clear-water-bay');
+          assert.equal(await contrib.locator('#linkedQuestion').isVisible(),false);
           assert.equal(await contrib.locator('#mainEnField').isVisible(),true);
           assert.equal(await contrib.locator('#supplementQuestionFields').isVisible(),false);
           assert.equal(await contrib.locator('#mainCn').getAttribute('required'),null);
