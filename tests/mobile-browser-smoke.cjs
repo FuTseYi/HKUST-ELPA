@@ -145,6 +145,21 @@ const serve=http.createServer((request,response)=>{
         assert.equal(await homePage.locator('.elpa-cta-primary').count(),1,'Only the original hero CTA remains');
         assert.match(await homePage.locator('.elpa-home-more').innerText(),/社区分享/);
         await homePage.locator('#home-record summary').click();
+        // Demonstrations load motion only after an explicit play action.
+        assert.equal(await homePage.locator('img[src$="-demo.gif"]').count(),0);
+        for(const selector of ['#home-practice .elpa-home-help','#home-record .elpa-home-help','.elpa-home-share-help']){
+          const details=homePage.locator(selector);
+          await details.locator('summary').click();
+          const play=details.locator('.elpa-home-demo-play');
+          const image=details.locator('.elpa-home-promo img');
+          const poster=await image.getAttribute('src');
+          await play.click();
+          assert.equal(await play.getAttribute('aria-pressed'),'true');
+          await homePage.waitForFunction(src=>[...document.images].some(img=>img.getAttribute('src')===src&&img.complete&&img.naturalWidth>0),await image.getAttribute('data-demo'));
+          await details.locator('summary').click();
+          await homePage.waitForFunction(()=>document.querySelectorAll('.elpa-home-demo-play[aria-pressed="true"]').length===0);
+          assert.equal(await image.getAttribute('src'),poster,'Closing instructions stops the demonstration');
+        }
         await homePage.locator('.elpa-home-journey a[href="#home-practice"]').click();
         await homePage.waitForFunction(()=>{
           const target=document.querySelector('#home-practice').getBoundingClientRect();

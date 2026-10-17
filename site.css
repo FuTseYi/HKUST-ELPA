@@ -90,6 +90,15 @@ body { margin:0; }
 .elpa-home-help summary{padding:14px 0 0;min-height:44px;cursor:pointer;color:var(--site-blue);font-size:14px;font-weight:650}
 .elpa-home-help summary:hover{text-decoration:underline;text-underline-offset:4px}
 .elpa-home-help summary:focus-visible{outline:3px solid #e5a921;outline-offset:3px;border-radius:3px}
+.elpa-home-promo{margin:0;min-width:0}
+.elpa-home-promo img{display:block;width:100%;height:auto;border-radius:8px}
+.elpa-home-promo figcaption{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;color:#62768a;font-size:12px}
+.elpa-home-demo-play{min-height:44px;padding:9px 12px;border:1px solid var(--site-line);border-radius:8px;background:#fff;color:var(--site-blue);font:inherit;font-weight:650;cursor:pointer}
+.elpa-home-demo-play:hover{background:#eef4fa}
+.elpa-home-demo-play:focus-visible{outline:3px solid #e5a921;outline-offset:3px}
+.elpa-home-share-help{margin-top:18px;border-top:1px solid var(--site-line)}
+.elpa-home-share-help summary{padding:14px 0;min-height:44px;color:var(--site-blue);font-size:14px;font-weight:650;cursor:pointer}
+.elpa-home-share-help summary:focus-visible{outline:3px solid #e5a921;outline-offset:3px}
 .elpa-home-help-content{padding-top:14px;color:#506477;font-size:14px;line-height:1.85}
 .elpa-home-help-text>p{margin:0 0 12px}
 .elpa-home-help-content .elpa-home-demo{margin-top:20px;box-shadow:none;background:#f8fafc}
@@ -97,9 +106,9 @@ body { margin:0; }
 .elpa-home-demo{min-width:0;padding:23px;border:1px solid #d9e4ef;border-radius:16px;background:#fff;box-shadow:0 12px 28px rgba(23,57,87,.035)}
 .elpa-demo-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;color:#72869b;font-size:10px;font-weight:750;letter-spacing:.055em}
 .elpa-demo-top span:last-child{font-weight:500;letter-spacing:0}
-.elpa-demo-tabs,.elpa-demo-filters,.elpa-demo-status,.elpa-demo-backup{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:15px}
-.elpa-demo-tabs span,.elpa-demo-filters span,.elpa-demo-status span,.elpa-demo-backup span{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border:1px solid #dce6f0;border-radius:8px;background:#f8fafc;color:#607489;font-size:11px;line-height:1.4}
-.elpa-demo-tabs .is-active,.elpa-demo-status .is-active{background:#eaf3fa;border-color:#bad3e6;color:#175889;font-weight:800}
+.elpa-demo-tabs,.elpa-demo-filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:15px}
+.elpa-demo-tabs span,.elpa-demo-filters span{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border:1px solid #dce6f0;border-radius:8px;background:#f8fafc;color:#607489;font-size:11px;line-height:1.4}
+.elpa-demo-tabs .is-active{background:#eaf3fa;border-color:#bad3e6;color:#175889;font-weight:800}
 .elpa-demo-flow{display:grid;gap:9px}
 .elpa-demo-flow>div{display:flex;gap:11px;align-items:center;padding:12px 13px;border:1px solid #e5edf3;border-radius:9px;background:#f9fbfd;color:#3d5870;font-size:12.5px}
 .elpa-demo-flow b{color:#9b6b15;font-size:11px}
@@ -113,21 +122,8 @@ body { margin:0; }
 .elpa-demo-question strong{display:block;color:#234d73;font-size:13px;font-weight:750;line-height:1.6}
 .elpa-demo-question div{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .elpa-demo-question div span{padding:5px 8px;border-radius:6px;background:#e7f1f9;color:#47718f;font-size:10.5px}
-.elpa-home-demo-timer .elpa-demo-tabs{justify-content:center}
-.elpa-demo-timer-phase{text-align:center;color:#60758b;font-size:12px}
-.elpa-demo-timer-count{color:var(--site-navy);font-size:clamp(42px,5vw,57px);font-weight:800;font-variant-numeric:tabular-nums;text-align:center;line-height:1.45}
-.elpa-demo-timer-track{height:5px;margin:5px 12px 20px;border-radius:6px;background:#e5edf5;overflow:hidden}
-.elpa-demo-timer-track span{display:block;width:38%;height:100%;border-radius:6px;background:#d5b05d}
-.elpa-demo-timer-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-.elpa-demo-timer-controls span{padding:8px 10px;border:1px solid #dae5ee;border-radius:8px;color:#426783;font-size:11px}
-.elpa-demo-timer-controls span:nth-child(2){background:#f8d77e;border-color:#e9c868;color:#2c4659;font-weight:750}
-.elpa-demo-note{padding:15px;border:1px solid #e0e9f2;border-radius:10px;background:#f9fbfd}
-.elpa-demo-note>span{display:block;margin-bottom:10px;color:#54738c;font-size:11px;font-weight:750}
-.elpa-demo-note p{margin:6px 0;color:#536a80;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;line-height:1.65}
-.elpa-demo-backup{margin:15px 0 0}
-.elpa-demo-backup span{background:#fff}
 .elpa-home-more{padding-top:52px}
-.elpa-home-more-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:23px}
+.elpa-home-more-grid{display:grid;align-items:start;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:23px}
 .elpa-home-more-card{min-width:0;padding:27px 28px;border:1px solid var(--site-line);border-radius:14px;background:#fff}
 .elpa-home-more-tag{font-size:11px;font-weight:800;letter-spacing:.055em;color:#567998}
 .elpa-home-more-card h3{margin:10px 0;color:var(--site-navy);font-size:18px;line-height:1.5}

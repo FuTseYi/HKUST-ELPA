@@ -12,3 +12,17 @@ document.querySelectorAll('.elpa-home-help').forEach(help=>{
     });
   });
 });
+
+document.querySelectorAll('.elpa-home-demo-play').forEach(button=>{
+  const image=button.closest('figure').querySelector('img');
+  const poster=image.getAttribute('src');
+  button.addEventListener('click',()=>{
+    const playing=button.getAttribute('aria-pressed')!=='true';
+    image.src=playing?image.dataset.demo:poster;
+    button.setAttribute('aria-pressed',String(playing));
+    button.textContent=playing?'停止演示 · Stop demo':'播放演示 · Play demo';
+  });
+  button.closest('details').addEventListener('toggle',event=>{
+    if(!event.currentTarget.open&&button.getAttribute('aria-pressed')==='true')button.click();
+  });
+});
