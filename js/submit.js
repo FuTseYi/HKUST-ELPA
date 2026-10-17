@@ -119,8 +119,10 @@ function availableQuestions(){
   }).filter(Boolean);
 }
 function findQuestion(id){
-  const track=trimmed('submissionTrack');
-  const allowed=track==='fast-track'?['F','T']:['A','B','C','D','H'];
+  const track=trimmed('submissionTrack'),campus=trimmed('submissionCampus');
+  const allowed=campus==='nansha'?(track==='fast-track'?['F']:['A','B','C','D']):
+    campus==='clear-water-bay'?(track==='fast-track'?['T']:['H']):
+    (track==='fast-track'?['F','T']:['A','B','C','D','H']);
   const key=String(id||'').split('-')[0],bank=allowed.includes(key)&&BANKS[key];
   const entry=bank&&bank.items.find(it=>key+'-'+it.num===id);
   return entry?{id,en:entry.en,cn:entry.cn||''}:null;
@@ -180,9 +182,11 @@ function renderSuggestions(){
 }
 get('unlinkQuestion').addEventListener('click',clearLink);
 for(const id of ['mainEn','mainCn'])get(id).addEventListener('input',()=>{if(!linkedId)renderSuggestions();});
-get('submissionCampus').addEventListener('change',()=>renderSuggestions());
-get('submissionTrack').addEventListener('change',()=>{
-  if(linkedId)clearLink();else renderSuggestions();
+// A deep link may start with no campus selected; once selected, never keep a
+// canonical question from another campus or assessment in the draft.
+for(const id of ['submissionCampus','submissionTrack'])get(id).addEventListener('change',()=>{
+  if(linkedId&&!findQuestion(linkedId))clearLink();
+  else renderSuggestions();
 });
 function loadQuestionLink(){
   const params=new URLSearchParams(location.search);
