@@ -22,32 +22,7 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 | 社区分享 | 无需注册，可提交回忆题、提示小问、不同问法或备考经验。投稿公开保存，复核后才考虑收录。 |
 | 资料来源 | 区分学校说明与学生整理资料，保留参考链接和内容限制。 |
 
-<table>
-  <tr>
-    <td width="50%" valign="top">
-      <strong>01 · 考试指南与经验 / Guide &amp; Tips</strong><br>
-      常规 ELPA / Fast Track 流程与考生经验。<br><br>
-      <a href="https://hkust-elpa.vercel.app/guide.html"><img src="./promotion/2026-10-17/web/guide.png" width="440" alt="考试指南与考生经验界面"></a>
-    </td>
-    <td width="50%" valign="top">
-      <strong>02 · 抽题与计时 / Practice</strong><br>
-      选择范围，随机抽题，开口计时练习。<br><br>
-      <a href="https://hkust-elpa.vercel.app/practice.html"><img src="./promotion/2026-10-17/web/practice.gif" width="440" alt="随机抽题与计时的分步骤演示"></a>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <strong>03 · 笔记与进度 / Notes &amp; Progress</strong><br>
-      逐题记录思路，标记状态，保存在当前浏览器。<br><br>
-      <a href="https://hkust-elpa.vercel.app/practice.html"><img src="./promotion/2026-10-17/web/notes.gif" width="440" alt="逐题笔记与练习状态的分步骤演示"></a>
-    </td>
-    <td width="50%" valign="top">
-      <strong>04 · 考题与经验分享 / Share</strong><br>
-      填写考题或备考经验，预览后再分享。<br><br>
-      <a href="https://hkust-elpa.vercel.app/submit.html"><img src="./promotion/2026-10-17/web/share.gif" width="440" alt="分享考题与经验的分步骤演示，使用示例内容，未发送真实投稿"></a>
-    </td>
-  </tr>
-</table>
+![考试指南、抽题计时、笔记进度与考题经验分享的四宫格演示](./promotion/2026-10-17/web/feature-grid.gif)
 
 ### 练习与复习
 

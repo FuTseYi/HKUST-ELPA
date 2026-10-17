@@ -34,3 +34,30 @@ for kind, captions in labels.items():
     gif[0].save(out / f'{kind}.gif', save_all=True, append_images=gif[1:],
                 duration=[2400, 2400, 2400, 2400, 3200], loop=0, optimize=True, disposal=2)
 print('Built four compact posters and three compact GIFs in', out)
+
+# One responsive image keeps the four panels together in GitHub's README.
+heading = ImageFont.truetype('C:/Windows/Fonts/msyhbd.ttc', 25)
+panels = [('guide', '01  考试指南与经验 / Guide & Tips'),
+          ('practice', '02  抽题与计时 / Practice'),
+          ('notes', '03  笔记与进度 / Notes & Progress'),
+          ('share', '04  考题与经验分享 / Share')]
+grids = []
+for index in range(5):
+    grid = Image.new('RGB', (1280, 1164), '#f5f8fb')
+    draw = ImageDraw.Draw(grid)
+    for number, (kind, title) in enumerate(panels):
+        x, y = 24 + (number % 2) * 626, 24 + (number // 2) * 568
+        draw.rounded_rectangle((x, y, x + 606, y + 548), radius=15, fill='white', outline='#d9e4ef', width=2)
+        draw.text((x + 18, y + 18), title, font=heading, fill='#193552')
+        image = frame('guide', '考试流程与考生经验 / Guide & student tips') if kind == 'guide' else frame(f'{kind}-{index + 1}', labels[kind][index])
+        grid.paste(image.resize((582, 463), Image.Resampling.LANCZOS), (x + 12, y + 69))
+    grids.append(grid)
+grids[-1].save(out / 'feature-grid.png')
+atlas = Image.new('RGB', (1280, 1164 * 5))
+for index, image in enumerate(grids):
+    atlas.paste(image, (0, index * 1164))
+palette = atlas.resize((640, 2910)).quantize(colors=224)
+gif = [image.quantize(palette=palette, dither=Image.Dither.NONE) for image in grids]
+gif[0].save(out / 'feature-grid.gif', save_all=True, append_images=gif[1:],
+            duration=[2400, 2400, 2400, 2400, 3200], loop=0, optimize=True, disposal=2)
+print('Built a responsive 2 x 2 feature grid.')
