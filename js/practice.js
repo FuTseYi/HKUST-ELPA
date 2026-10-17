@@ -520,7 +520,7 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
     const qnoteKey = 'qn-' + id;
     const qnoteSaved = notes[qnoteKey] || '';
     const translation=questionTranslation(bankKey,item);
-    const sourceNote=questionSourceNote(bankKey,item);
+    const recallLabel=questionSourceNote(bankKey,item);
     const feedback=feedbackCount(id);
     const searchText = (item.en + ' ' + (item.cn||'') + ' ' + alternatives.map(s=>s.en+' '+(s.cn||'')).join(' ') + ' ' + subs.map(s => s.en + ' ' + (s.cn||'')).join(' ')).toLowerCase();
     return `
@@ -529,7 +529,7 @@ function renderBank(bankKey, items = BANKS[bankKey].items, startIndex = 0) {
         <div class="q-num">${idx + startIndex + 1}</div>
         <div class="q-title">
           <div class="en">${esc(item.en)}</div>
-          ${sourceNote ? `<span class="recall-mark">${esc(sourceNote)}</span>` : ""}
+          ${recallLabel ? `<span class="recall-mark">${esc(recallLabel)}</span>` : ""}
           ${feedback ? `<div class="question-feedback"><span>↻ 过往考过 ${feedback} 次</span><a href="./submit.html?question=${encodeURIComponent(id)}&track=${encodeURIComponent(activeTrack)}&intent=encounter" aria-label="我也考过这道题，提交考试反馈">我也考过 / Seen this</a></div>` : ''}
           ${translation ? `<div class="cn translation" id="cn-${id}" hidden>${esc(translation)}</div>` : ''}
         </div>
