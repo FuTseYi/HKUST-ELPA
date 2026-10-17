@@ -1,0 +1,29 @@
+{
+  "practice-demo.gif": {
+    "size": [
+      810,
+      1080
+    ],
+    "frames": 17,
+    "duration_ms": 12640,
+    "bytes": 1405391
+  },
+  "notes-demo.gif": {
+    "size": [
+      810,
+      1080
+    ],
+    "frames": 17,
+    "duration_ms": 12640,
+    "bytes": 1420334
+  },
+  "share-demo.gif": {
+    "size": [
+      810,
+      1080
+    ],
+    "frames": 17,
+    "duration_ms": 12640,
+    "bytes": 1444853
+  }
+}

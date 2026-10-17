@@ -1,5 +1,7 @@
 node_modules/
 output/
+promotion/**/frames/
+promotion/**/*.zip
 .playwright-cli/
 playwright-report/
 test-results/

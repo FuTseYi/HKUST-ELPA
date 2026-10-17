@@ -94,6 +94,7 @@ HKUST-ELPA/
 ├── tests/                         # Worker、导入器、页面逻辑与浏览器回归
 ├── worker/                        # 独立部署的 Cloudflare 投稿接口
 ├── docs/                          # 投稿数据约定及维护说明
+├── promotion/                     # 按批次归档的宣传成品、截图与制作源文件
 ├── package.json / package-lock.json # 统一检查命令与锁定的测试依赖
 └── .github/workflows/             # 网站校验、批准投稿后生成数据 PR
 ```
@@ -148,6 +149,7 @@ HKUST-ELPA/
 | [投稿数据规范](./docs/submission-v2-spec.md) | 字段、分类、相似问法、小问及计数规则。 |
 | [Worker 文档](./worker/README.md) | 独立部署、开关、密钥和生产验证。 |
 | [本次维护审查](./docs/maintenance-review-2026-10-17.md) | 整理范围、已修复问题、验证结果与后续维护边界。 |
+| [宣传素材](./promotion/README.md) | 按批次归档宣传图片、GIF、原始截图与制作源文件。 |
 
 考前参考已有经验，考后欢迎通过[站内分享](https://hkust-elpa.vercel.app/submit.html)留下题目与心得。发现资料问题可提交 [Issue](https://github.com/FuTseYi/HKUST-ELPA/issues)，代码和文档改进欢迎提交 [Pull Request](https://github.com/FuTseYi/HKUST-ELPA/pulls)。尊重原作者权益，保留来源，不补造未记录的题干或小问。
 
