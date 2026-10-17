@@ -144,7 +144,6 @@ HKUST-ELPA/
 | [审核维护说明](./question-bank/MODERATION.md) | v1 / v2 审核、生成 PR、数据文件白名单与发布边界。 |
 | [投稿数据规范](./docs/submission-v2-spec.md) | 字段、分类、相似问法、小问及计数规则。 |
 | [Worker 文档](./worker/README.md) | 独立部署、开关、密钥和生产验证。 |
-| [本次维护审查](./docs/maintenance-review-2026-10-17.md) | 整理范围、已修复问题、验证结果与后续维护边界。 |
 
 考前参考已有经验，考后欢迎通过[站内分享](https://hkust-elpa.vercel.app/submit.html)留下题目与心得。发现资料问题可提交 [Issue](https://github.com/FuTseYi/HKUST-ELPA/issues)，代码和文档改进欢迎提交 [Pull Request](https://github.com/FuTseYi/HKUST-ELPA/pulls)。尊重原作者权益，保留来源，不补造未记录的题干或小问。
 
