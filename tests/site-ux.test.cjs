@@ -370,6 +370,13 @@ test('latest bank advances by complete term and stage while older sessions remai
  assert.deepEqual(funcs.activeLatestSession(),{term:'2026 Fall',stage:'mid'});
  assert.deepEqual(funcs.activeCurrentIds(),['Q-mid']);
  assert.deepEqual(funcs.activeArchivedIds(),['Q-start','Q-old']);
+ // Undated Fast Track recollections must remain immediately practiceable.
+ const undated=new Function('activePracticeIds','appearancesFor','elpaLatestTermForIds','elpaReportedTerms','ELPA_TAXONOMY',
+   code+';return {activeLatestSessionLabel,activeCurrentIds,activeArchivedIds};')(
+     ()=>['F-1','F-2'],()=>[],()=>'',()=>[],{examStages:{}});
+ assert.equal(undated.activeLatestSessionLabel(),'场次待核实');
+ assert.deepEqual(undated.activeCurrentIds(),['F-1','F-2']);
+ assert.deepEqual(undated.activeArchivedIds(),[]);
  assert.match(practice,/sessions\.set\(entry\.term\+'\|'\+entry\.examStage/);
  assert.match(practice,/sessionFilter\.append\(new Option\(session\.label,value\)\)/);
 });
