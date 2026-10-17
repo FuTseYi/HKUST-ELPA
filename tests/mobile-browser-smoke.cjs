@@ -256,12 +256,16 @@ const serve=http.createServer((request,response)=>{
           }});
           copyQuestion('F-2');
           const displayed=document.querySelector('#q-F-2 .q-num').textContent;
+          const session=document.getElementById('currentBankTitle').textContent;
+          const source=document.querySelector('#q-F-2 .recall-mark')?.textContent;
           delete navigator.clipboard;
           setExamChoice('track','regular');
-          return {copied,displayed};
+          return {copied,displayed,session,source};
         });
         assert.equal(numbering.displayed,'1');
         assert.match(numbering.copied,new RegExp('第 '+numbering.displayed+' 题'));
+        assert.equal(numbering.session,'场次待核实');
+        assert.match(numbering.source,/英文根据中文回忆整理/);
         const feedback=page.locator('#bankD .qcard .question-feedback').first();
         assert.match(await feedback.innerText(),/过往考过 \d+ 次/);
         const link=feedback.locator('a');
