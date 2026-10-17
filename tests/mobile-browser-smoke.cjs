@@ -146,7 +146,7 @@ const serve=http.createServer((request,response)=>{
         assert.match(await homePage.locator('.elpa-home-more').innerText(),/社区分享/);
         await homePage.locator('#home-record summary').click();
         // Demonstrations load motion only after an explicit play action.
-        assert.equal(await homePage.locator('img[src$="-demo.gif"]').count(),0);
+        assert.equal(await homePage.locator('.elpa-home-promo img[src$=".gif"]').count(),0);
         for(const selector of ['#home-practice .elpa-home-help','#home-record .elpa-home-help','.elpa-home-share-help']){
           const details=homePage.locator(selector);
           await details.locator('summary').click();
