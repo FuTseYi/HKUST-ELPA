@@ -16,6 +16,19 @@ body { margin:0; }
 .elpa-nav-github:hover { background:#eaf2fa; }
 .elpa-body { background:var(--site-bg); color:var(--site-ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,"PingFang SC","Microsoft YaHei",sans-serif; line-height:1.7; }
 .elpa-body a { color:var(--site-blue); }
+/* English companions are visible alongside the Chinese interface. */
+.elpa-en-sub{display:block;margin-top:4px;font-size:clamp(12px,.55em,18px);line-height:1.5;font-weight:550;letter-spacing:.01em}
+.elpa-en-inline{font-size:.82em;font-weight:500;line-height:1.45;letter-spacing:0}
+.elpa-en-summary{display:block;margin-top:6px;font-size:.9em;line-height:1.65;font-weight:400}
+.elpa-nav-links a{flex-direction:column;justify-content:center;gap:1px}
+.elpa-nav-links a small{font-size:9px;font-weight:500;line-height:1.25;letter-spacing:.035em}
+.elpa-nav-submit small{display:block;font-size:9px;font-weight:550;line-height:1.15;letter-spacing:.03em}
+.elpa-home-journey strong .elpa-en-inline{display:inline-block;margin-left:5px;white-space:nowrap}
+.contrib-field label>.elpa-en-inline,.contrib-field legend>.elpa-en-inline,.elpa-choice-label>.elpa-en-inline{display:inline-block;margin-left:5px}
+.elpa-home-feature-link,.elpa-home-more-card>a{flex-wrap:wrap}
+.elpa-home-help summary>.elpa-en-inline{margin-left:4px}
+.elpa-footer-action .elpa-en-inline{font-size:10px}
+.timer-tab .elpa-en-inline,.timer-btn .elpa-en-inline,.contrib-button .elpa-en-inline{display:block}
 .elpa-hero {position:relative; isolation:isolate; min-height:470px; display:flex; align-items:center; color:#fff; background:linear-gradient(95deg,rgba(0,28,58,.91),rgba(0,49,91,.78) 40%,rgba(0,47,88,.25) 85%),url('./assets/Administration-Building-14-1536x864.jpg') center 58%/cover no-repeat;}
 .elpa-hero::after { content:""; position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(to right,#f4c65a 0%,#f4c65a 23%,transparent 23%); }
 .elpa-hero-inner { width:min(1180px,calc(100% - 48px)); margin:0 auto; padding:68px 0 78px; }
@@ -34,24 +47,27 @@ body { margin:0; }
 .elpa-kicker {font-size:12px; color:#9b6a09; text-transform:uppercase; letter-spacing:.12em; font-weight:800;}
 .elpa-heading {margin:8px 0 6px; font-size:clamp(26px,3vw,36px); color:var(--site-navy); line-height:1.3;}
 .elpa-desc {color:var(--site-muted); max-width:770px; margin:0 0 27px; font-size:14px;}
-/* Homepage: editorial introduction and real feature walkthroughs. */
+/* Homepage: quick orientation with optional, complete walkthroughs. */
 .elpa-home-main{padding-top:54px;padding-bottom:78px}
 .elpa-home-overview{padding-bottom:42px;border-bottom:1px solid var(--site-line)}
 .elpa-home-overview .elpa-heading{max-width:850px;margin:11px 0 14px}
 .elpa-home-lead{max-width:850px;margin:0;font-size:15px;line-height:1.95;color:#53677b}
 .elpa-home-journey{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:27px 0 0;padding:0;border:1px solid var(--site-line);border-radius:15px;overflow:hidden;background:#fff}
-.elpa-home-journey li{display:flex;flex-direction:column;min-width:0;padding:19px;border-right:1px solid var(--site-line)}
+.elpa-home-journey li{min-width:0;border-right:1px solid var(--site-line)}
+.elpa-home-journey a{display:flex;flex-direction:column;height:100%;padding:19px;text-decoration:none}
+.elpa-home-journey a:hover{background:#eef4fa}
 .elpa-home-journey li:last-child{border-right:0}
-.elpa-home-journey li>span{color:#956711;font-size:11px;font-weight:850}
+.elpa-home-journey a>span{color:#956711;font-size:11px;font-weight:850}
 .elpa-home-journey strong{margin-top:6px;color:var(--site-navy);font-size:14px}
 .elpa-home-journey small{margin-top:4px;color:#6d8091;font-size:11.5px;line-height:1.55}
-.elpa-home-features{padding-top:51px}
+.elpa-home-features{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:20px;padding-top:36px}
+.elpa-home-features>.elpa-home-section-head,.elpa-home-storage-note{grid-column:1/-1}
 .elpa-home-section-head{max-width:850px}
 .elpa-home-section-head .elpa-desc{max-width:800px;margin-bottom:0;line-height:1.85}
-.elpa-home-feature{display:grid;grid-template-columns:minmax(0,1.03fr) minmax(0,.97fr);align-items:center;gap:45px;padding:45px 0;border-bottom:1px solid var(--site-line)}
+.elpa-home-feature{display:grid;grid-template-rows:1fr auto;min-width:0;padding:26px;border:1px solid var(--site-line);border-radius:14px;background:#fff;scroll-margin-top:16px}
 .elpa-home-feature-copy{min-width:0}
 .elpa-home-feature-index{display:block;color:#9a6d13;font-size:12px;font-weight:800;letter-spacing:.04em}
-.elpa-home-feature-copy h3{margin:10px 0 13px;color:var(--site-navy);font-size:clamp(20px,2.25vw,25px);line-height:1.4}
+.elpa-home-feature-copy h3{margin:8px 0 10px;color:var(--site-navy);font-size:20px;line-height:1.5}
 .elpa-home-feature-copy>p:not(.elpa-home-feature-note){margin:0;color:#506477;font-size:14px;line-height:1.9}
 .elpa-home-feature-details{display:grid;gap:9px;margin-top:18px}
 .elpa-home-feature-details p{margin:0;padding-left:13px;border-left:2px solid #cbdeed;color:#5c6f80;font-size:13px;line-height:1.75}
@@ -60,15 +76,24 @@ body { margin:0; }
 .elpa-home-instructions li{display:flex;align-items:flex-start;gap:12px}
 .elpa-home-instructions-num{display:grid;place-items:center;flex:0 0 24px;height:24px;margin-top:2px;border:1px solid #cbdbe9;border-radius:7px;background:#f5f9fc;color:#235980;font-size:11px;font-weight:800}
 .elpa-home-instructions li>div{min-width:0}
-.elpa-home-instructions strong{display:block;color:#274b6b;font-size:13px;line-height:1.6}
-.elpa-home-instructions p{margin:3px 0 0;color:#5b6f82;font-size:12.5px;line-height:1.75}
+.elpa-home-instructions strong{display:block;color:#274b6b;font-size:14px;line-height:1.6}
+.elpa-home-instructions p{margin:3px 0 0;color:#5b6f82;font-size:14px;line-height:1.75}
 .elpa-home-backup-guide{margin-top:21px;padding:17px 18px;border:1px solid #dce7f0;border-radius:11px;background:#f8fafc}
 .elpa-home-backup-guide h4{margin:0 0 7px;color:var(--site-navy);font-size:14px;line-height:1.5}
-.elpa-home-backup-guide p{margin:0;color:#4f6476;font-size:12.5px;line-height:1.8}
-.elpa-home-backup-guide small{display:block;margin-top:10px;color:#718294;font-size:11.5px;line-height:1.65}
+.elpa-home-backup-guide p{margin:0;color:#4f6476;font-size:14px;line-height:1.8}
+.elpa-home-backup-guide small{display:block;margin-top:10px;color:#5b6f82;font-size:12.5px;line-height:1.65}
 .elpa-home-feature-note{margin:17px 0 0;padding:11px 13px;border-radius:8px;background:#eef4fa;color:#546e85;font-size:12px;line-height:1.75}
 .elpa-home-feature-link,.elpa-home-more-card>a{display:inline-flex;gap:7px;align-items:center;margin-top:19px;color:var(--site-blue)!important;font-size:13px;font-weight:800;text-decoration:none;text-underline-offset:4px}
 .elpa-home-feature-link:hover,.elpa-home-more-card>a:hover{text-decoration:underline}
+.elpa-home-feature-link{min-height:44px;margin-top:10px}
+.elpa-home-help{margin-top:12px;border-top:1px solid var(--site-line)}
+.elpa-home-help summary{padding:14px 0 0;min-height:44px;cursor:pointer;color:var(--site-blue);font-size:14px;font-weight:650}
+.elpa-home-help summary:hover{text-decoration:underline;text-underline-offset:4px}
+.elpa-home-help summary:focus-visible{outline:3px solid #e5a921;outline-offset:3px;border-radius:3px}
+.elpa-home-help-content{padding-top:14px;color:#506477;font-size:14px;line-height:1.85}
+.elpa-home-help-text>p{margin:0 0 12px}
+.elpa-home-help-content .elpa-home-demo{margin-top:20px;box-shadow:none;background:#f8fafc}
+.elpa-home-storage-note{margin:0;color:#53677b;font-size:13px;line-height:1.8;padding:4px 0}
 .elpa-home-demo{min-width:0;padding:23px;border:1px solid #d9e4ef;border-radius:16px;background:#fff;box-shadow:0 12px 28px rgba(23,57,87,.035)}
 .elpa-demo-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;color:#72869b;font-size:10px;font-weight:750;letter-spacing:.055em}
 .elpa-demo-top span:last-child{font-weight:500;letter-spacing:0}
@@ -108,23 +133,28 @@ body { margin:0; }
 .elpa-home-more-card h3{margin:10px 0;color:var(--site-navy);font-size:18px;line-height:1.5}
 .elpa-home-more-card p{margin:0;color:#5b6f82;font-size:13px;line-height:1.8}
 .elpa-home-more-card>a{margin-top:17px}
-@media(max-width:900px){.elpa-home-feature{gap:24px}.elpa-home-demo{padding:18px}}
+@media(min-width:701px){
+ .elpa-home-feature:has(.elpa-home-help[open]){grid-column:1/-1}
+ .elpa-home-help[open] .elpa-home-help-content{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:28px}
+ .elpa-home-help-text{min-width:0}
+ .elpa-home-help[open] .elpa-home-demo{margin-top:0}
+}
+@media(max-width:900px){.elpa-home-demo{padding:18px}}
 @media(max-width:700px){
  .elpa-home-main{padding-top:32px;padding-bottom:60px}
  .elpa-home-overview{padding-bottom:30px}
  .elpa-home-lead{font-size:13.5px;line-height:1.85}
  .elpa-home-journey{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:22px}
- .elpa-home-journey li{padding:15px;border-bottom:1px solid var(--site-line)}
+ .elpa-home-journey li{border-bottom:1px solid var(--site-line)}
+ .elpa-home-journey a{padding:15px}
  .elpa-home-journey li:nth-child(2){border-right:0}
  .elpa-home-journey li:nth-child(n+3){border-bottom:0}
- .elpa-home-features{padding-top:36px}
- .elpa-home-feature{grid-template-columns:1fr;gap:23px;padding:32px 0}
- .elpa-home-feature-copy h3{font-size:21px}
- .elpa-home-feature-copy>p:not(.elpa-home-feature-note){font-size:13px}
+ .elpa-home-features{grid-template-columns:1fr;gap:14px;padding-top:28px}
+ .elpa-home-feature{padding:21px 20px}
+ .elpa-home-feature-copy h3{font-size:19px}
+ .elpa-home-feature-copy>p:not(.elpa-home-feature-note){font-size:14px}
  .elpa-home-instructions{gap:12px}
- .elpa-home-instructions p{font-size:12px}
  .elpa-home-backup-guide{padding:16px 15px;margin-top:18px}
- .elpa-home-backup-guide p{font-size:12px}
  .elpa-home-demo{max-width:560px;width:100%;margin:0 auto;padding:20px}
  .elpa-home-more{padding-top:36px}
  .elpa-home-more-grid{grid-template-columns:1fr;gap:10px;margin-top:18px}
@@ -190,8 +220,11 @@ body { margin:0; }
 .elpa-footer .elpa-footer-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:28px;padding:3px 1px;color:#f4d17b;font-size:12.5px;font-weight:700;line-height:1.5;white-space:nowrap}
 .elpa-footer-divider{height:1px;width:min(100%,400px);background:rgba(192,215,233,.21);margin:17px auto 12px}
 .elpa-footer-tech{color:#bdd1e2;font-size:12px}
-.elpa-footer-identity{margin-top:7px}
-.elpa-footer-byline{font-size:11.5px;color:#9fb7cd}
+.elpa-footer-identity{margin-top:12px}
+.elpa-footer-byline{display:flex;align-items:center;justify-content:center;gap:9px;font-size:11.5px;line-height:1.6;color:#afc3d7}
+.elpa-footer-credit-label{font-size:13px;font-weight:650;letter-spacing:.025em;color:#afc3d7}
+.elpa-footer-byline a{font-size:13px;font-weight:650;letter-spacing:.025em;color:#f0d9a3}
+.elpa-footer-credit-cohort{padding-left:10px;border-left:1px solid rgba(192,215,233,.3);font-size:13px;font-weight:650;letter-spacing:.025em;white-space:nowrap}
 @media(max-width:560px){.elpa-footer{padding:25px 16px 20px}.elpa-footer-slogan{font-size:clamp(14px,4vw,17px)}.elpa-footer-actions{gap:10px 21px}}
 /* Practice page controls are layered over its existing functional styles. */
 .page-practice .campus-hero {min-height:240px; padding:35px 24px 34px;}
@@ -243,9 +276,15 @@ body { margin:0; }
 .elpa-brand-icon img {width:100%;height:100%;display:block;}
 .elpa-brand-name {letter-spacing:.01em;white-space:nowrap;}
 .elpa-nav-actions {margin-left:4px;display:flex;align-items:center;gap:10px;flex:none;}
- .elpa-nav-actions .elpa-nav-github {margin-left:0;width:35px;height:35px;border:0;border-radius:0;box-shadow:none;background:none;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;}
+ .elpa-nav-actions .elpa-nav-github {margin-left:0;min-height:38px;border:1px solid #d8e2ec;border-radius:10px;box-shadow:none;background:#fff;padding:7px 10px;gap:6px;display:inline-flex;align-items:center;justify-content:center;flex:none;text-decoration:none;color:var(--site-navy);}
 .elpa-nav-github img {width:20px;height:20px;display:block;}
-.elpa-nav-github:hover {border-color:transparent;background:none;opacity:.76;}
+.elpa-nav-github:hover {border-color:#d6b354;background:#fff9eb;}
+.elpa-star-icon{color:#a87510;flex:none;transform-origin:center;animation:elpa-star-breathe 3.2s ease-in-out infinite}
+@keyframes elpa-star-breathe{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.16);opacity:1}}
+.elpa-nav-github:hover .elpa-star-icon,.elpa-nav-github:focus-visible .elpa-star-icon{animation:none;transform:scale(1.12);opacity:1;fill:var(--site-gold)}
+@media(prefers-reduced-motion:reduce){.elpa-star-icon{animation:none;transform:none!important;opacity:1}}
+.elpa-star-count{padding-left:7px;border-left:1px solid #d8e2ec;font-size:11px;font-weight:650;font-variant-numeric:tabular-nums}
+.elpa-star-count[hidden]{display:none}
 .elpa-nav-submit {display:inline-flex;align-items:center;justify-content:center;min-height:43px;white-space:nowrap;gap:5px;padding:9px 17px;border-radius:12px;background:var(--site-gold);color:#18344e!important;border:1px solid #ecc151;text-decoration:none;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(190,136,24,.16);transition:transform .16s ease,box-shadow .16s ease,background .16s ease;}
 .elpa-nav-submit:hover,.elpa-nav-submit[aria-current="page"] {background:#ffd779;box-shadow:0 6px 18px rgba(190,136,24,.22);transform:translateY(-1px);}
 .elpa-nav-submit:focus-visible {outline:3px solid #003e74;outline-offset:3px;}
@@ -255,7 +294,7 @@ body { margin:0; }
  .elpa-nav-actions {gap:6px;}
 }
 @media (max-width:780px) {
- .elpa-nav-actions .elpa-nav-github {width:38px;height:38px;}
+ .elpa-nav-actions .elpa-nav-github {padding:7px 8px;gap:5px;}
  .elpa-nav-submit {padding:8px 11px;font-size:12px;min-height:38px;}
  .elpa-nav-links {margin-left:auto;}
  .elpa-nav-links a {padding-left:7px;padding-right:7px;}
@@ -266,7 +305,7 @@ body { margin:0; }
  .elpa-brand-name {font-size:12px;}
  .elpa-brand small {font-size:8px;}
  .elpa-nav-actions {margin-left:auto;gap:7px;}
- .elpa-nav-actions .elpa-nav-github {width:35px;height:35px;}
+ .elpa-nav-actions .elpa-nav-github {min-height:35px;padding:6px 8px;gap:5px;}
  .elpa-nav-submit {min-height:35px;padding:7px 11px;}
  .elpa-nav-links {order:3;flex-basis:100%;margin:0;justify-content:space-between;}
  .elpa-nav-links a {padding:7px 10px 10px;font-size:12px;}
@@ -355,6 +394,25 @@ body { margin:0; }
   .contrib-actions a::after,.question-feedback a::after{transition:none;}
 }
 
+/* Compact homepage banner; shared banners on other pages keep their dimensions. */
+.elpa-home .elpa-hero{min-height:360px;background-image:linear-gradient(95deg,rgba(0,28,58,.92),rgba(0,49,91,.8) 45%,rgba(0,47,88,.5)),url('./assets/Administration-Building-14-1536x864.jpg')}
+.elpa-home .elpa-hero-inner{max-width:1132px;padding:46px 0}
+.elpa-home .elpa-hero h1{font-size:clamp(28px,3.8vw,46px);line-height:1.3}
+.elpa-home .elpa-hero p{max-width:580px;font-size:15px;line-height:1.8}
+.elpa-home .elpa-hero .elpa-home-hero-note{margin-top:16px;font-size:12px;color:#e0e9f2}
+.elpa-home .elpa-eyebrow{font-size:12px;letter-spacing:.04em}
+.elpa-home .elpa-heading{font-size:clamp(23px,2.6vw,30px)}
+@media(max-width:650px){
+ .elpa-home .elpa-hero{min-height:0}
+ .elpa-home .elpa-hero-inner{width:calc(100% - 40px);padding:32px 0}
+ .elpa-home .elpa-hero h1{font-size:clamp(25px,6.4vw,36px);margin:16px 0 12px}
+ .elpa-home .elpa-actions{grid-template-columns:1fr;margin-top:20px;gap:8px}
+ .elpa-home .elpa-cta{min-height:46px;font-size:14px;white-space:normal}
+ .elpa-home-main{padding-left:20px;padding-right:20px}
+ .elpa-home-journey small{font-size:12px}
+ .elpa-home-journey strong{font-size:14px}
+}
+
 /* Minimal regular / Fast Track guide switch. */
 .elpa-guide-main{max-width:970px}
 .elpa-guide-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:5px;border:1px solid #dce6f1;border-radius:13px;background:#eaf1f8;margin:19px 0 21px}
@@ -386,3 +444,22 @@ body { margin:0; }
 .elpa-guide-main .elpa-advice-section{margin-top:34px}
 .elpa-guide-main .elpa-advice-section .elpa-desc a{font-weight:700;white-space:nowrap}
 @media(max-width:640px){.elpa-guide-panel{padding:20px 16px}.elpa-guide-switch{margin-top:15px}.elpa-guide-steps li{padding-left:36px}.elpa-guide-steps-detailed li,.elpa-guide-steps-detailed li:last-child{padding:15px 16px}.elpa-guide-overview h3{font-size:20px}.elpa-guide-practice{display:flex;width:100%}}
+
+.elpa-cta small{display:block;margin-top:4px;font-size:11px;font-weight:500;line-height:1.3}
+.elpa-heading:has(>.elpa-en-sub),h3:has(>.elpa-en-sub){display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:2px}
+.elpa-heading>.elpa-en-sub,h3>.elpa-en-sub{display:inline-block;margin-top:0;white-space:nowrap}
+.elpa-guide-intro a{display:inline-block;padding:3px 0;color:#fff;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(255,255,255,.45);white-space:nowrap}
+.elpa-guide-intro a:hover{color:var(--site-gold)}
+.elpa-guide-intro a span{font-size:.85em}
+.elpa-nav-submit>span:last-child{line-height:1.15}
+.elpa-footer .elpa-footer-action{display:grid;grid-template-columns:1fr auto;column-gap:6px;row-gap:0}
+.elpa-footer-action>.elpa-en-inline{grid-column:1}
+.elpa-footer-action::after{grid-column:2;grid-row:1/3}
+@media(max-width:650px){
+ .elpa-home .elpa-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .elpa-home .elpa-cta{padding:12px 8px;min-height:64px;font-size:13px;gap:6px}
+ .elpa-home .elpa-cta::after{width:6px;height:6px}
+ .elpa-nav-links a{line-height:1.25}
+ .elpa-nav-links a small{font-size:9px}
+ .elpa-home-hero-note .elpa-en-summary{font-size:11px}
+}

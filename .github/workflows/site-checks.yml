@@ -2,36 +2,8 @@ name: Validate ELPA website
 
 on:
   pull_request:
-    paths:
-      - '*.html'
-      - 'site.css'
-      - 'assets/elpa-mark.svg'
-      - 'assets/github-mark.svg'
-      - 'question-bank/**'
-      - 'question-bank/taxonomy.js'
-      - 'docs/submission-v2-spec.md'
-      - 'submission-config.js'
-      - 'scripts/**'
-      - 'tests/**'
-      - 'worker/**'
-      - '.github/workflows/approved-submission.yml'
-      - 'assets/Administration-Building-14-1536x864.jpg'
-      - '.github/workflows/site-checks.yml'
   push:
     branches: [main]
-    paths:
-      - '*.html'
-      - 'site.css'
-      - 'question-bank/**'
-      - 'question-bank/taxonomy.js'
-      - 'docs/submission-v2-spec.md'
-      - 'submission-config.js'
-      - 'scripts/**'
-      - 'tests/**'
-      - 'worker/**'
-      - '.github/workflows/approved-submission.yml'
-      - 'assets/Administration-Building-14-1536x864.jpg'
-      - '.github/workflows/site-checks.yml'
 
 permissions:
   contents: read
@@ -41,159 +13,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check multi-page routes, practice controls and hero image
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          from html.parser import HTMLParser
-          import re
-
-          class Inspector(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.ids=[]
-              def handle_starttag(self,tag,attrs):
-                  fields=dict(attrs)
-                  if "id" in fields: self.ids.append(fields["id"])
-
-          pages={}
-          for filename in ["index.html","guide.html","practice.html","sources.html","submit.html"]:
-              content=Path(filename).read_text(encoding="utf-8")
-              pages[filename]=content
-              assert 'class="elpa-nav"' in content, f"Shared header absent in {filename}"
-              assert 'href="./site.css"' in content, f"Shared styles absent in {filename}"
-              assert content.count('class="elpa-nav-github"') == 1, f"GitHub nav missing or duplicated in {filename}"
-              assert 'aria-label="HKUST-ELPA GitHub 仓库（新窗口打开）"' in content, f"Accessible GitHub link name absent in {filename}"
-              assert 'title="GitHub · HKUST-ELPA"><img src="./assets/github-mark.svg"' in content, f"Visible GitHub logo absent in {filename}"
-              for linked in pages.keys():
-                  pass
-              for route in ["index.html","guide.html","practice.html","sources.html"]:
-                  assert 'href="./'+route+'"' in content, f"Broken navigation: {filename} -> {route}"
-              inspector=Inspector()
-              inspector.feed(content)
-              assert len(inspector.ids)==len(set(inspector.ids)), f"Duplicate DOM ID in {filename}"
-              scripts=re.findall(r"<script>([\s\S]*?)</script>",content)
-              expected_scripts=1 if filename in ("guide.html","practice.html","submit.html") else 0
-              assert len(scripts)==expected_scripts, f"Unexpected inline scripts in {filename}"
-              if scripts:
-                  Path("/tmp/elpa-"+filename+".js").write_text(scripts[0],encoding="utf-8")
-
-          home=pages["index.html"]
-          assert home.count('class="elpa-cta ') == 2, "Homepage should show exactly two primary hero actions"
-          assert home.count('href="./submit.html"') >= 1, "Site contribution entry absent"
-          practice=pages["practice.html"]
-          assert 'elpa-subhero' in practice, "Practice page banner missing"
-          assert '<form class="search-box" id="searchForm" role="search"' in practice, "Search submission form missing"
-          assert 'id="searchFeedback"' in practice, "Search status announcement missing"
-          assert 'enterkeyhint="search"' in practice, "Mobile search action not configured"
-          assert "searchForm.addEventListener('submit'" in practice, "Search button and Enter key must invoke result navigation"
-          assert "first.scrollIntoView(" in practice, "Explicit search should navigate to the first match"
-
-          assert 'id="sessionFilter"' in practice, "Session filter missing"
-          assert 'function toggleTranslation(' in practice and 'function toggleFollowupChinese(' in practice, "Chinese-on-click controls missing"
-          assert 'src="./question-bank/appearances.js"' in practice and 'src="./question-bank/taxonomy.js"' in practice, "Session metadata scripts missing"
-          assert 'function activeLatestSession(' in practice, "Latest session grouping missing"
-
-          inspector=Inspector()
-          inspector.feed(practice)
-          for key in ("searchInput","statusFilter","matchCount","backupBtn","restoreBtn","restoreInput",
-                      "bankPast","bankD","pagerPast","pagerFall","progressBar","saveBtn","saveTopBtn"):
-              assert key in inspector.ids, f"Missing practice control: {key}"
-          assert "function renderPager(" in practice and "PAGE_SIZE=8" in practice, "Practice pagination missing"
-          assert "dataset.filterMatch" in practice, "Search and random-drill coordination missing"
-          assert practice.count('<section id="sec-bank')==2, "Expected two practice banks"
-          assert 'faqList' not in practice and '<section id="sec-process">' not in practice, "Guide content leaked into practice"
-          assert 'id="practiceLauncher"' in practice and 'id="tabMock"' in practice and 'id="timerDrill"' in practice, "Unified practice launcher missing"
-          assert 'function feedbackRanked(' in practice and 'function feedbackCount(' in practice, "Feedback sorting missing"
-          assert 'id="recordsMenuBtn"' in practice and 'id="recordsBackupBtn"' in practice, "Compact records menu missing"
-          assert 'id="matchingPanel"' in pages["submit.html"] and 'function renderSuggestions()' in pages["submit.html"], "Bilingual matching missing"
-          assert 'value="nansha">GZ' in pages["submit.html"] and 'value="clear-water-bay">HK' in pages["submit.html"], "Campus labels missing"
-          assert 'src="./question-bank/questions.js"' in practice, "Structured question bank not loaded"
-
-          guide=pages["guide.html"]
-          assert 'id="guideAdviceList"' in guide and 'id="sec-advice" hidden' in guide, "Reviewed advice container missing"
-          assert 'src="./question-bank/advice.js"' in guide and 'src="./question-bank/taxonomy.js"' in guide, "Reviewed advice scripts missing"
-          assert "renderCommunityAdvice(" in guide and "selectAdviceTrack(" in guide, "Track-specific advice rendering missing"
-          assert 'id="guideRegularTab"' in guide and 'id="guideFastTab"' in guide, "Both exam type controls missing"
-          assert 'id="regularGuide"' in guide and 'id="fastGuide"' in guide, "Both exam flow panels missing"
-          assert "selectGuideTrack(" in guide and 'aria-pressed="true"' in guide, "Accessible guide switch missing"
-          assert '入场与身份核验' in guide and '抽题与准备' in guide and '提问与回答' in guide, "Regular flow missing"
-          assert '线上申请与视频录制' in guide and '按照系统指定的话题准备英语回答' in guide, "Fast Track flow missing"
-          assert 'track=fast-track' in guide and 'track=regular' in guide, "Direct practice paths missing"
-          assert 'id="advicePhaseFilter"' in guide and 'id="adviceTagFilter"' in guide, "Experience filters missing"
-          submit=pages["submit.html"]
-          assert 'id="submissionForm"' in submit and 'id="submissionButton"' in submit, "Native submission form missing"
-          assert 'turnstile.getResponse' in submit and 'type="submit" disabled' in submit, "Submit must require Turnstile and fail closed"
-          assert 'href="./submit.html"' in pages["practice.html"], "Practice submit entry missing"
-          assert 'href="./submit.html"' in pages["index.html"], "Home submit entry missing"
-          assert Path("submission-config.js").is_file(), "Public config file missing"
-
-          home=pages["index.html"]
-          assert home.count('class="elpa-home-feature"') == 4 and 'class="elpa-home-journey"' in home, "First-visit feature walkthrough missing"
-          assert 'href="./practice.html"' in home and 'href="./sources.html"' in home and 'href="./submit.html"' in home, "Homepage resource or contribution entry missing"
-          assert 'elpa-next-primary' not in home and 'elpa-start-actions' not in home and '提交 → 后端校验 → 审核 → 入库' not in home, "Repeated practice CTA or deprecated moderation copy still visible"
-          sources=pages["sources.html"]
-          for url in ("docs.qq.com/doc/DT3BxSkJzSGdUamJE","docs.qq.com/doc/DSHJydEVYSHBtdkZO","share.note.youdao.com"):
-              assert url in sources, f"Original source link missing: {url}"
-          data=Path("question-bank/questions.js").read_text(encoding="utf-8")
-          assert 'BANKS.D = {' in data and 'PAST_QUESTION_IDS' in data, "Question data invalid"
-
-          for filename, markup in pages.items():
-              assert 'href="./assets/elpa-mark.svg"' in markup, f"Favicon missing on {filename}"
-              assert 'class="elpa-nav-submit"' in markup, f"Contribution button missing on {filename}"
-              assert 'src="./assets/github-mark.svg"' in markup, f"GitHub icon missing on {filename}"
-              assert 'src="./assets/elpa-mark.svg"' in markup, f"Site mark missing on {filename}"
-          for svgfile in ("assets/elpa-mark.svg","assets/github-mark.svg"):
-              mark=Path(svgfile).read_text(encoding="utf-8")
-              assert mark.startswith("<svg") and "</svg>" in mark and "<path" in mark, f"SVG invalid: {svgfile}"
-          css=Path("site.css").read_text(encoding="utf-8")
-          assert "bank-pagination" in css and "elpa-nav-links" in css, "Page and pagination styling missing"
-          assert "@view-transition { navigation:auto; }" in css, "Progressive page transition missing"
-          assert ".elpa-cta-primary" in css and ".elpa-cta-secondary" in css, "Shared hero action system absent"
-          assert "elpa-hero::after,.page-practice .campus-hero::after{display:none" in css, "Decorative stripes not disabled"
-          asset=Path("assets/Administration-Building-14-1536x864.jpg").read_bytes()
-          assert asset[:3]==b"\xff\xd8\xff" and asset[-2:]==b"\xff\xd9", "Invalid JPEG"
-          assert len(asset)>8000
-          assert "./assets/Administration-Building-14-1536x864.jpg" in css
-          assert "./assets/Administration-Building-14-1536x864.jpg" in practice
-          print("4 pages, 2 paginated question banks, stable IDs, source links, and campus image validated")
-          PY
-      - name: Check JavaScript syntax
-        run: |
-          node --check /tmp/elpa-guide.html.js
-          node --check /tmp/elpa-practice.html.js
-          node --check /tmp/elpa-submit.html.js
-          node --check submission-config.js
-          cp worker/src/index.js /tmp/elpa-worker.mjs
-          node --check /tmp/elpa-worker.mjs
-          node --check question-bank/questions.js
-          node --check question-bank/taxonomy.js
-          node --check question-bank/appearances.js
-          node --check question-bank/advice.js
-      - name: Test approved-question import and stable IDs
-        run: |
-          node --check scripts/import-approved-submission.cjs
-          node --check scripts/import-v2-submission.cjs
-          node --test tests/approved-import.test.cjs
-          node --test tests/v2-import.test.cjs
-          node --test tests/worker.test.cjs
-          node --test tests/site-ux.test.cjs
-      - name: Decode campus JPEG
-        run: |
-          python3 -m pip install --quiet pillow
-          python3 - <<'PY'
-          from PIL import Image
-          with Image.open("assets/Administration-Building-14-1536x864.jpg") as img:
-              img.verify()
-              assert img.width>=450 and img.height>=240
-              print(img.size)
-          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run check
+      - run: npm test
 
   browser-smoke:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install browser driver (test only)
-        run: npm install --no-save --no-package-lock playwright
-      - name: Verify responsive layout and exercise interactions in headless Chrome
-        run: node tests/mobile-browser-smoke.cjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser

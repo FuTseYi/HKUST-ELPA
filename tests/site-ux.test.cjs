@@ -1,8 +1,9 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
-const practice=fs.readFileSync(path.join(__dirname,'../practice.html'),'utf8');
-const submit=fs.readFileSync(path.join(__dirname,'../submit.html'),'utf8');
+const {readPageSource}=require('../scripts/validate-site.cjs');
+const practice=readPageSource('practice.html');
+const submit=readPageSource('submit.html');
 function section(source,start,end){
  const a=source.indexOf(start),b=source.indexOf(end,a);
  assert.ok(a>=0&&b>a,'missing section '+start);return source.slice(a,b);
@@ -55,7 +56,7 @@ test('feedback count includes reviewed submissions and ties retain original orde
 });
 test('practice cards expose reviewed encounter action and uniform alignment',()=>{
  assert.match(practice,/过往考过 \$\{feedback\} 次/);
- assert.match(practice,/我也考过<\/a>/);
+ assert.match(practice,/我也考过 \/ Seen this<\/a>/);
  assert.match(practice,/submit\.html\?question=\$\{encodeURIComponent\(id\)\}/);
  assert.doesNotMatch(practice,/submit\.html\?question=\$\{encodeURIComponent\(id\)\}[^"`]*campus=/);
  assert.match(practice,/margin:0!important/);
@@ -64,10 +65,10 @@ test('practice cards expose reviewed encounter action and uniform alignment',()=
  assert.match(submit,/id="supplementQuestionFields"[^>]*hidden/);
  assert.match(submit,/id="supplementEn"/);
  assert.match(submit,/填写相似问法或至少添加一条新的提示小问/);
- assert.match(practice,/查看相似问法（\$\{alternatives\.length\} 个）/);
+ assert.match(practice,/相似问法 \/ Variants \(\$\{alternatives\.length\}\)/);
  assert.match(practice,/function questionAlternatives\(id,item\)/);
  assert.match(submit,/id="exam-context">01 · 考试校区与类型/);
- assert.match(submit,/id="submissionCampus" required>[\s\S]*?<option value="" selected disabled>选择考试校区<\/option>/);
+ assert.match(submit,/id="submissionCampus" required>[\s\S]*?<option value="" selected disabled>选择校区 \/ Select campus<\/option>/);
  assert.match(submit,/if\(intent==='encounter'\)requestAnimationFrame\(\(\)=>\{/);
  assert.match(submit,/get\('exam-context'\)\.scrollIntoView\(\{block:'start',behavior:'instant'\}\)/);
  assert.match(submit,/get\('submissionCampus'\)\.focus\(\{preventScroll:true\}\)/);
@@ -206,11 +207,11 @@ test('footer is concise, community-oriented and identical across five pages',()=
  });
  for(const f of footers){
    assert.equal(f,footers[0],'Footer must match across all pages');
-   for(const label of ['Built with Passion. Shared with Everyone.','为爱发电 · 开源共建 · 互帮互助','Built with GitHub · Vercel · Cloudflare','Initiated by','Open to Contributions'])
+   for(const label of ['Built with Passion. Shared with Everyone.','为爱发电 · 开源共建 · 互帮互助','Built with GitHub · Vercel · Cloudflare','Initiated by','2026 Fall MPhil'])
      assert.ok(f.includes(label),'Footer missing '+label);
-   assert.match(f,/href="\.\/submit\.html">分享考题与经验<\/a>/);
-   assert.match(f,/>参与开源共建<\/a>/);
-   assert.doesNotMatch(f,/Not affiliated with or endorsed by HKUST|资料来源与声明|2026 Fall MPhil|Created &amp; Maintained by/);
+   assert.match(f,/href="\.\/submit\.html">分享考题与经验 <span[^>]*lang="en">Share questions & tips<\/span><\/a>/);
+   assert.match(f,/>参与开源共建 <span[^>]*lang="en">Contribute on GitHub<\/span><\/a>/);
+   assert.doesNotMatch(f,/Not affiliated with or endorsed by HKUST|资料来源与声明|Created &amp; Maintained by/);
  }
  assert.match(read('sources.html'),/本站为学生整理的备考资源，并非学校官方题库/);
  assert.match(read('site.css'),/\.elpa-footer \.elpa-footer-action\{[^}]*min-height:28px/);
@@ -230,8 +231,8 @@ test('internal pages share one compact banner and the practice brand uses the si
 
 test('sources page keeps external references without duplicate question-bank documents',()=>{
  const sources=fs.readFileSync(path.join(__dirname,'../sources.html'),'utf8');
-  assert.match(sources,/id="official-sources">学校官方说明<\/h2>/);
-  assert.match(sources,/id="community-sources">考生分享与备考资料<\/h2>/);
+  assert.match(sources,/id="official-sources">学校官方说明 <span[^>]*lang="en">Official Information<\/span><\/h2>/);
+  assert.match(sources,/id="community-sources">考生分享与备考资料 <span[^>]*lang="en">Community Resources<\/span><\/h2>/);
  assert.match(sources,/docs\.qq\.com\/doc\/DT3BxSkJzSGdUamJE/);
  assert.match(sources,/docs\.qq\.com\/doc\/DSHJydEVYSHBtdkZO/);
  assert.doesNotMatch(sources,/站内题库文档|question-bank\/(?:2026-fall|previous-years|fast-track)\.md/);
@@ -244,11 +245,11 @@ test('seed advice uses the same track, phase and topic schema without invented p
  assert.equal((advice.match(/id: 'ADVICE-REGULAR-/g)||[]).length,3);
  assert.equal((advice.match(/track: 'regular', phase: 'during'/g)||[]).length,3);
  assert.doesNotMatch(advice,/HIST-|provenance|历史考情整理/);
- assert.match(submit,/<select id="adviceTrack">[\s\S]*?<option value="regular">常规 ELPA<\/option>[\s\S]*?<option value="fast-track">ELPA Fast Track<\/option>/);
+ assert.match(submit,/<select id="adviceTrack">[\s\S]*?<option value="regular">常规 ELPA · Regular<\/option>[\s\S]*?<option value="fast-track">ELPA Fast Track<\/option>/);
 });
 
 test('guide separates the official Regular and Fast Track paths with one obvious switch',()=>{
- const guide=fs.readFileSync(path.join(__dirname,'../guide.html'),'utf8');
+ const guide=readPageSource('guide.html');
  assert.match(guide,/id="guideRegularTab"[^>]*aria-pressed="true"/);
  assert.match(guide,/id="guideFastTab"[^>]*aria-pressed="false"/);
  assert.match(guide,/id="fastGuide"[^>]*hidden/);
@@ -268,17 +269,17 @@ test('guide separates the official Regular and Fast Track paths with one obvious
  assert.equal((guide.match(/class="elpa-guide-switch"/g)||[]).length,1);
 });
 test('homepage explains the full learning workflow without a repeated oversized practice CTA',()=>{
- const home=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
- const practice=fs.readFileSync(path.join(__dirname,'../practice.html'),'utf8');
- assert.match(home,/id="home-overview-title">一站了解考试、整理考题、练习口语<\/h2>/);
- assert.match(home,/id="home-features-title">你可以在这里做什么？<\/h2>/);
+ const home=readPageSource('index.html');
+ const practice=readPageSource('practice.html');
+ assert.match(home,/id="home-overview-title">初次使用 <span[^>]*lang="en">Start here<\/span><\/h2>/);
+ assert.match(home,/id="home-features-title">使用指南 <span[^>]*lang="en">Quick guide<\/span><\/h2>/);
  assert.equal((home.match(/class="elpa-home-journey"/g)||[]).length,1);
  assert.equal((home.match(/class="elpa-home-feature"/g)||[]).length,4);
  for(const id of ['home-guide-title','home-bank-title','home-practice-title','home-record-title','home-more-title'])
    assert.ok(home.includes('id="'+id+'"'),'Missing '+id);
  for(const topic of ['常规 ELPA / Fast Track','考试场次','相似问法','提示小问','随机抽题','正向计时','记笔记','未练','练习中','已掌握','备份','恢复','换浏览器'])
    assert.ok(home.includes(topic),'Not explained: '+topic);
- assert.match(home,/网站负责抽题和计时，你来开口回答/);
+ assert.match(home,/从当前筛选结果中抽题，配合计时自己开口练习/);
  assert.match(home,/先有 1 分钟准备，接着进入 2 分钟陈述/);
  assert.match(home,/不同校区和考试类型的收录情况可能不同/);
  assert.match(home,/不会自动评价回答/);
@@ -311,11 +312,11 @@ test('homepage explains the full learning workflow without a repeated oversized 
  assert.doesNotMatch(practice,/current\.length\+' 题 · '|past\.length\+' 题 · '/);
  assert.match(practice,/feedbackBankCount'\)\.textContent=current\.length\+' 题'/);
  assert.match(practice,/pastBankCount'\)\.textContent=past\.length\+' 题'/);
- assert.match(practice,/id="sessionFilter"[\s\S]*?<option value="">全部考试场次<\/option>/);
+ assert.match(practice,/id="sessionFilter"[\s\S]*?<option value="">全部场次 \/ All sessions<\/option>/);
  assert.match(practice,/#sessionFilter\{field-sizing:content\}/);
  assert.match(practice,/\.filter-select \{[^}]*width:auto; max-width:100%/);
  assert.match(practice,/appearance:none; -webkit-appearance:none; padding:7px 28px 7px 12px/);
- assert.match(practice,/id="statusFilter"[^>]*>[\s\S]*?<option value="all">备考状态<\/option>/);
+ assert.match(practice,/id="statusFilter"[^>]*>[\s\S]*?<option value="all">备考状态 \/ Status<\/option>/);
  assert.match(practice,/\.progress-head-actions \.stat-pill,#recordsMenuBtn\{[^}]*height:36px;[^}]*white-space:nowrap/);
  assert.match(practice,/#recordsMenuBtn\{[^}]*width:auto;[^}]*padding:0 10px;[^}]*border-radius:999px/);
  assert.match(practice,/entry\.term\+' · '\+stage\.zh/);
@@ -367,7 +368,7 @@ test('latest bank advances by complete term and stage while older sessions remai
  assert.match(practice,/sessionFilter\.append\(new Option\(session\.label,value\)\)/);
 });
 test('guide switch preserves accessible state and works without a second page',()=>{
- const html=fs.readFileSync(path.join(__dirname,'../guide.html'),'utf8');
+ const html=readPageSource('guide.html');
  const code=section(html,'/* Single choice; no extra filters, accounts or persistent state. */',
    '/* Show only filters that have reviewed entries for the selected assessment. */');
  const events=new Map();

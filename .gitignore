@@ -1,0 +1,12 @@
+node_modules/
+output/
+.playwright-cli/
+playwright-report/
+test-results/
+.wrangler/
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+*.log

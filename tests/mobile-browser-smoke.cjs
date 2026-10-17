@@ -1,7 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {execFileSync}=require('node:child_process');
 const {chromium}=require('playwright');
 const root=path.resolve(__dirname,'..');
 const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8',
@@ -16,21 +15,27 @@ const serve=http.createServer((request,response)=>{
   response.setHeader('Content-Type',mime[path.extname(file)]||'application/octet-stream');
   fs.createReadStream(file).pipe(response);
 });
-function chromeBinary(){
-  for(const command of ['google-chrome','google-chrome-stable','chromium','chromium-browser']){
-    try{return execFileSync('which',[command],{encoding:'utf8'}).trim();}catch(_){}
-  }
-  throw new Error('A system Chromium/Chrome binary is required for the smoke test');
-}
 (async()=>{
   await new Promise(resolve=>serve.listen(0,'127.0.0.1',resolve));
   const host='http://127.0.0.1:'+serve.address().port+'/practice.html';
-  const browser=await chromium.launch({headless:true,executablePath:chromeBinary(),
-    args:['--no-sandbox','--disable-dev-shm-usage']});
+  let browser;
   try{
+    browser=await chromium.launch({headless:true});
+    async function newPage(options){
+      const page=await browser.newPage(options);
+      // UI regressions must not depend on external quotas or create public Issues.
+      await page.route('https://api.github.com/repos/FuTseYi/HKUST-ELPA',route=>route.fulfill({
+        status:200,contentType:'application/json',body:'{"stargazers_count":2}'
+      }));
+      await page.route('https://challenges.cloudflare.com/**',route=>route.fulfill({
+        status:200,contentType:'application/javascript',body:''
+      }));
+      await page.route('https://hkust-elpa-submissions.futseyi.workers.dev/**',route=>route.abort());
+      return page;
+    }
     for(const width of [320,375,390,430,700,768,1024,1280]){
       const mobile=width<600;
-      const page=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
+      const page=await newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
       const errors=[];
       page.on('pageerror',error=>errors.push(error.message));
       await page.goto(host,{waitUntil:'load'});
@@ -89,7 +94,7 @@ function chromeBinary(){
       assert.equal(footer.caption,undefined,'Personal cohort label removed');
       assert.equal(footer.authorLast,true,'Author credit should be the last footer element');
       assert.equal(footer.actions,2,'Both contribution links must be present');
-      assert.deepEqual(footer.buttons.map(b=>b.text.replace(/\s+/g,' ').trim()),['分享考题与经验','参与开源共建']);
+      assert.deepEqual(footer.buttons.map(b=>b.text.replace(/\s+/g,' ').trim()),['分享考题与经验 Share questions & tips','参与开源共建 Contribute on GitHub']);
       assert.ok(footer.buttons.every(b=>b.height>=28&&b.whiteSpace==='nowrap'&&b.scrollWidth<=b.clientWidth+1),
         'Footer labels must be single-line at '+width+': '+JSON.stringify(footer.buttons));
       assert.ok(Math.abs(footer.buttons[0].y-footer.buttons[1].y)<=1,'Footer buttons not aligned at '+width);
@@ -100,7 +105,7 @@ function chromeBinary(){
       assert.ok(layout.launcher.left>=0&&layout.launcher.right<=width+1,
         'Launcher escapes the mobile viewport at '+width+': '+JSON.stringify(layout.launcher));
       // The homepage and sources now share the compact footer and mobile layout.
-      const homePage=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
+      const homePage=await newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
       try{
         await homePage.goto(new URL('/index.html',host).href,{waitUntil:'load'});
         assert.equal(await homePage.locator('.elpa-home-journey li').count(),4);
@@ -109,7 +114,28 @@ function chromeBinary(){
         assert.equal(await homePage.locator('.elpa-home-instructions').count(),2);
         assert.equal(await homePage.locator('.elpa-home-instructions li').count(),6);
         assert.equal(await homePage.locator('.elpa-home-backup-guide').count(),1);
-        assert.match(await homePage.locator('#home-practice-title').innerText(),/网站负责抽题和计时/);
+        assert.match(await homePage.locator('#home-practice-title').innerText(),/随机抽题，开口练习/);
+        assert.equal(await homePage.locator('.elpa-home-help[open]').count(),0,'Detailed instructions start collapsed');
+        for(const help of await homePage.locator('.elpa-home-help').all()){
+          await help.locator('summary').click();
+          assert.equal(await help.locator('.elpa-home-demo').isVisible(),true,'Preview is available on request');
+          await homePage.waitForFunction(id=>{
+            const top=document.getElementById(id).getBoundingClientRect().top;
+            const navBottom=document.querySelector('.elpa-nav').getBoundingClientRect().bottom;
+            return Math.abs(top-navBottom-16)<2;
+          },await help.evaluate(el=>el.closest('.elpa-home-feature').id));
+          if(width>700){
+            const spansRow=await help.evaluate(el=>{
+              const card=el.closest('.elpa-home-feature');
+              return Math.abs(card.getBoundingClientRect().width-card.parentElement.getBoundingClientRect().width)<1;
+            });
+            assert.equal(spansRow,true,'Expanded feature spans the row without stretching a neighboring card');
+          }
+          await help.locator('summary').focus();
+          await homePage.keyboard.press('Enter');
+          assert.equal(await help.getAttribute('open'),null,'Keyboard can collapse instructions');
+        }
+        await homePage.locator('#home-record summary').click();
         const backupGuide=await homePage.locator('.elpa-home-backup-guide').innerText();
         assert.ok(backupGuide.includes('「备份」')&&backupGuide.includes('「恢复」'),'Explain both backup and restore in plain language');
         const plainHome=await homePage.locator('main').innerText();
@@ -118,12 +144,12 @@ function chromeBinary(){
         assert.equal(await homePage.locator('.elpa-next-primary').count(),0);
         assert.equal(await homePage.locator('.elpa-cta-primary').count(),1,'Only the original hero CTA remains');
         assert.match(await homePage.locator('.elpa-home-more').innerText(),/社区分享/);
-        const featureLayout=await homePage.locator('.elpa-home-feature').first().evaluate(el=>{
-          const copy=el.querySelector('.elpa-home-feature-copy').getBoundingClientRect();
-          const demo=el.querySelector('.elpa-home-demo').getBoundingClientRect();
-          return {copy:{top:copy.top,bottom:copy.bottom},demo:{top:demo.top,bottom:demo.bottom}};
+        await homePage.locator('#home-record summary').click();
+        await homePage.locator('.elpa-home-journey a[href="#home-practice"]').click();
+        await homePage.waitForFunction(()=>{
+          const target=document.querySelector('#home-practice').getBoundingClientRect();
+          return target.top>=document.querySelector('.elpa-nav').getBoundingClientRect().bottom && target.top<innerHeight;
         });
-        if(mobile)assert.ok(featureLayout.demo.top>=featureLayout.copy.bottom-3,'Feature explanation should precede the preview on mobile');
         const dimensions=await homePage.evaluate(()=>({width:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
         assert.ok(dimensions.scroll<=dimensions.width+2,'Home horizontal overflow at '+width+': '+JSON.stringify(dimensions));
         await homePage.goto(new URL('/sources.html',host).href,{waitUntil:'load'});
@@ -135,7 +161,7 @@ function chromeBinary(){
 
 
       // Guide flow is tested locally at every responsive width, before any release.
-      const guide=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
+      const guide=await newPage({viewport:{width,height:844},deviceScaleFactor:mobile?2:1,isMobile:mobile,hasTouch:mobile});
       try{
         const guideErrors=[];
         guide.on('pageerror',err=>guideErrors.push(err.message));
@@ -165,7 +191,7 @@ function chromeBinary(){
           assert.equal(await guide.locator('#guideAdviceList article').count(),1);
           assert.equal(await guide.locator('#guideAdviceFilters').isVisible(),true);
           assert.match(await guide.locator('#guideAdviceList article a').getAttribute('href'),/issues\/999$/);
-          const share=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+          const share=await newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
           try{
             await share.goto(new URL(await guide.locator('#guideAdviceShare').getAttribute('href'),host).href,{waitUntil:'load'});
             assert.equal(await share.locator('#tabAdvice').getAttribute('aria-pressed'),'true');
@@ -187,7 +213,7 @@ function chromeBinary(){
         const link=feedback.locator('a');
         assert.match(await link.innerText(),/我也考过/);
         const contributionHref=await link.getAttribute('href');
-        const contrib=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+        const contrib=await newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
         try{
           await contrib.goto(new URL(contributionHref,host).href,{waitUntil:'load'});
           assert.equal(await contrib.locator('#linkedQuestion').isVisible(),true);
@@ -212,22 +238,24 @@ function chromeBinary(){
         assert.equal(await page.locator('#timerDisplay').innerText(),'01:00');
         assert.match(await page.locator('#timerStartPause').innerText(),/开始/);
         const launcherBefore=await page.locator('#practiceLauncherText').innerText();
-        assert.equal(launcherBefore,'练习','Opening the panel cannot start the timer');
+        assert.match(launcherBefore,/^练习\s+Practice$/,'Opening the panel cannot start the timer');
         await page.click('#timerDrill');
         await page.waitForFunction(()=>!!document.querySelector('.qcard.drill-active'));
         assert.equal(await page.locator('#timerPanel').isVisible(),false);
-        assert.equal(await page.locator('#practiceLauncherText').innerText(),'练习',
+        assert.equal(await page.locator('#practiceLauncherText').innerText(),launcherBefore,
           'A random draw must not start a countdown');
         assert.equal(await page.locator('#practiceLauncher').isVisible(),true);
         await page.click('#practiceLauncher');
         await page.click('#timerStartPause');
         await page.waitForTimeout(300);
         assert.equal(await page.locator('#timerPanel').isVisible(),false);
-        assert.notEqual(await page.locator('#practiceLauncherText').innerText(),'练习',
+        assert.match(await page.locator('#practiceLauncherText').innerText(),/^\d{2}:\d{2}$/,
           'Active countdown should remain visible in the floating launcher');
         await page.click('#practiceLauncher');
         await page.click('#timerStartPause'); // pause
         await page.click('#timerReset');
+        // A random draw can move to another page; return to the stable note fixture.
+        await page.locator('#pagerFall').getByRole('button',{name:'1',exact:true}).click();
         const note=page.locator('#bankD .qcard .qnote').first();
         await note.locator('.note-toggle').click();
         assert.equal(await note.locator('.md-tab').first().isVisible(),true);
@@ -276,7 +304,7 @@ function chromeBinary(){
       await page.close();
     }
   }finally{
-    await browser.close();
+    if(browser)await browser.close();
     await new Promise(resolve=>serve.close(resolve));
   }
 })().catch(err=>{console.error(err);process.exitCode=1;});
