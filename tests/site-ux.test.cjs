@@ -72,7 +72,8 @@ test('practice cards expose reviewed encounter action and uniform alignment',()=
  assert.match(submit,/if\(intent==='encounter'\)requestAnimationFrame\(\(\)=>\{/);
  assert.match(submit,/get\('exam-context'\)\.scrollIntoView\(\{block:'start',behavior:'instant'\}\)/);
  assert.match(submit,/get\('submissionCampus'\)\.focus\(\{preventScroll:true\}\)/);
- assert.match(submit,/get\('submissionCampus'\)\.addEventListener\('change',\(\)=>renderSuggestions\(\)\)/);
+ assert.match(submit,/for\(const id of \['submissionCampus','submissionTrack'\]\)get\(id\)\.addEventListener\('change'/);
+ assert.match(submit,/if\(linkedId&&!findQuestion\(linkedId\)\)clearLink\(\)/);
  assert.match(submit,/id="mainCn"[^>]*maxlength="1000"/);
  assert.doesNotMatch(submit,/id="mainCn"[^>]*required/);
 });
