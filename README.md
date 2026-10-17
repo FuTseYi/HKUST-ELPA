@@ -22,7 +22,7 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 | 社区分享 | 无需注册，可提交回忆题、提示小问、不同问法或备考经验。投稿公开保存，复核后才考虑收录。 |
 | 资料来源 | 区分学校说明与学生整理资料，保留参考链接和内容限制。 |
 
-![考试指南、抽题计时、笔记进度与考题经验分享的四宫格演示](./promotion/web/feature-grid.gif)
+![考试指南、抽题计时、笔记进度与考题经验分享的四宫格演示](./assets/demos/feature-grid.gif)
 
 ### 练习与复习
 
@@ -85,7 +85,7 @@ HKUST-ELPA/
 ├── js/                            # 首页、指南、练习和投稿页逻辑
 ├── submission-config.js           # 公开投稿端点与 Turnstile Site Key
 ├── elpa_data.json                 # 空的初始记录文件，非个人备份
-├── assets/                        # 图片、图标和功能示意
+├── assets/                        # 按 images/、icons/、demos/ 统一管理静态素材
 ├── question-bank/                 # 稳定题目、场次、经验及来源文档
 ├── scripts/                       # 校验、审核数据导入及 PR 文件白名单
 ├── tests/                         # Worker、导入器、页面逻辑与浏览器回归

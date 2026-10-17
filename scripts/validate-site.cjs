@@ -29,7 +29,7 @@ function validateSite(){
     assert.equal((nav.match(/<small lang="en">/g)||[]).length,5,'Bilingual navigation and sharing: '+name);
     assert.ok(html.includes('href="./site.css"'),'Shared CSS missing: '+name);
     assert.ok(nav.includes('https://img.shields.io/github/stars/FuTseYi/HKUST-ELPA?'),'Star badge missing: '+name);
-    assert.ok(html.includes('href="./assets/elpa-mark.svg"'),'Favicon missing: '+name);
+    assert.ok(html.includes('href="./assets/icons/elpa-mark.svg"'),'Favicon missing: '+name);
     const currentFooter=html.match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/)?.[0];
     assert.ok(currentFooter,'Missing footer: '+name);
     if(footer)assert.equal(currentFooter,footer,'Shared footer drift: '+name);
@@ -103,7 +103,7 @@ function validateSite(){
     for(const tag of entry.tags)assert.ok(data.taxonomy.adviceTags[tag],'Invalid advice tag '+entry.id);
     adviceIds.add(entry.id);
   }
-  const jpeg=fs.readFileSync(path.join(root,'assets/Administration-Building-14-1536x864.jpg'));
+  const jpeg=fs.readFileSync(path.join(root,'assets/images/Administration-Building-14-1536x864.jpg'));
   assert.ok(jpeg.length>8000&&jpeg[0]===255&&jpeg[1]===216&&jpeg.at(-2)===255&&jpeg.at(-1)===217,'Invalid campus JPEG');
   console.log('Validated 5 pages, local resources, '+questionIds.size+' stable question IDs, '+data.advice.length+' advice entries and legacy aliases');
 }
