@@ -2,206 +2,161 @@
 
 **Lightweight ELPA Speaking Preparation · Community-Powered · Serverless by Design**
 
-面向香港科技大学（HKUST）及香港科技大学（广州）（HKUST(GZ)）学生的**开放共建、持续积累的非官方 ELPA 口语备考资源**。
+面向香港科技大学及香港科技大学（广州）同学的**非官方 ELPA 口语备考资源**。查阅考试流程与考生经验，按校区和场次筛选题目，配合随机抽题、计时、笔记和学习记录练习；考后也欢迎留下自己的题目回忆与经验。
 
-**项目的核心是考生之间的经验传承。** 将同学们分享的考后题目、提示小问、不同问法与备考心得逐步整理成可查找、可复习、可持续补充的资源。考前可以参考前人的实际经历；考后也欢迎留下自己的回忆，帮助下一位同学更有针对性地准备。
+An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the exam process and student tips, practise English questions, and keep your progress in your browser. Key navigation and controls show Chinese and English together; community contributions retain their original language.
 
-网站同时提供考试指南、题库检索、随机抽题、计时和本地学习记录。**无需注册账号即可开始练习，也可以直接分享考题与经验。**
+[首页](https://hkust-elpa.vercel.app/) · [指南与经验](https://hkust-elpa.vercel.app/guide.html) · [题库练习](https://hkust-elpa.vercel.app/practice.html) · [分享考题与经验](https://hkust-elpa.vercel.app/submit.html) · [资料来源](https://hkust-elpa.vercel.app/sources.html)
 
-[**浏览题库与练习**](https://hkust-elpa.vercel.app/practice.html) · [**分享考题与经验**](https://hkust-elpa.vercel.app/submit.html) · [**了解考试流程**](https://hkust-elpa.vercel.app/guide.html)
-
-网站入口：[Vercel](https://hkust-elpa.vercel.app/) · [GitHub Pages](https://futseyi.github.io/HKUST-ELPA/)
+备用入口：[GitHub Pages](https://futseyi.github.io/HKUST-ELPA/)。两个网站使用同一套静态代码，**学习记录不会跨域名自动同步**。
 
 [![Website validation](https://github.com/FuTseYi/HKUST-ELPA/actions/workflows/site-checks.yml/badge.svg)](https://github.com/FuTseYi/HKUST-ELPA/actions/workflows/site-checks.yml)
 
-**快速导航：**[社区共建](#社区共建与持续积累) · [功能概览](#功能概览) · [使用指南](#使用指南) · [技术架构](#技术架构与工程实现)
+## 使用方式
 
-## 社区共建与持续积累
-
-一份静态题单能解决当下的问题，而**持续补充的考后反馈**能让后来的同学了解更多场次、不同提问方式和实际备考经验。这也是 HKUST-ELPA 希望长期积累的核心价值。
-
-- **考前有参考**：从已整理的考题、提示小问和备考经验出发，按考试类型与场次找到适合自己练习的内容。
-- **考后有地方分享**：欢迎贡献亲历的英文主问题、记得的提示小问、相似问法，或者真正帮到自己的备考方法。不需要编写文档，也不需要注册账号。
-- **反馈能够持续沉淀**：对已有题目可以补充考试经历或不同问法；新题目与经验也可以陆续整理。稳定题目编号、场次信息和来源记录，帮助资料在更新时保持关联与可追溯。
-
-**如果你刚考完 ELPA，不妨把还记得的题目和有用的经验留下来。** 即使只是一道完整的问题或一条具体建议，也可能成为下一位同学准备时的重要参考。
-
-[**贡献考题与经验 →**](https://hkust-elpa.vercel.app/submit.html) · [查看已有题目 →](https://hkust-elpa.vercel.app/practice.html)
-
-> 考题来自考生回忆及资料整理，并非学校确认的官方题库。分享内容会公开保存，经必要核对与整理后才可能被正式收录；请勿提供个人敏感信息。
-
-## 功能概览
-
-| 功能 | 可以做什么 |
+| 页面 | 用途 |
 | --- | --- |
-| **考试指南与题库** | 了解常规 ELPA / Fast Track 的流程；按校区、考试类型、场次和关键词查找题目，按需展开翻译与提示小问。 |
-| **随机抽题与自主练习** | 从当前筛选结果中随机抽一道题，配合准备计时、陈述计时、倒计时或正向计时，自己开口练习。 |
-| **学习记录与复习** | 给题目标记「未练 / 练习中 / 已掌握」，记录回答思路；下次筛选没练熟的题目继续复习，支持备份与恢复。 |
-| **考后反馈与社区共建** | 无需注册账号，可分享亲历题目、补充相似问法与提示小问，或交流备考经验；资料在持续整理中积累。 |
-| **官方说明与资料溯源** | 区分学校 ELPA 官方说明与学生整理的资料，保留参考链接和来源信息。 |
+| 首页 | 首次使用路线、功能入口及可展开的操作说明。 |
+| 指南与经验 | 分别查看常规 ELPA / Fast Track 流程，通过顶部入口阅读或分享考生经验。 |
+| 题库练习 | 按 GZ / HK 校区、考试类型、场次、关键词和练习状态筛选。英文题干优先，中文、相似问法及提示小问按需展开。 |
+| 社区分享 | 无需注册，可提交回忆题、提示小问、不同问法或备考经验。投稿公开保存，复核后才考虑收录。 |
+| 资料来源 | 区分学校说明与学生整理资料，保留参考链接和内容限制。 |
 
-![HKUST-ELPA 功能示意：考试指南、题库筛选、随机抽题计时与学习记录](./assets/feature-overview.svg)
+![考试指南、题库筛选、随机抽题计时与学习记录的静态功能示意](./assets/feature-overview.svg)
 
-*以上为依据网站首页功能界面整理的静态示意，实际操作以在线网站为准。*
+*功能图用于说明概念，实际排版与操作以网站为准。*
 
-> **关于口语练习：**网站提供随机抽题和计时工具，由使用者自行回答；不提供自动对话或 AI 口语评分。
+### 练习与复习
 
-## 使用指南
+1. 先选校区、考试类型和想练的范围。
+2. 点击右下角「练习 → 随机抽题」，从当前筛选结果中抽一道。
+3. 需要时再点「开始」计时。模拟考试模式提供 **1 分钟准备 + 2 分钟陈述**，也可使用倒计时或正向计时。
+4. 练完后标记「未练 / 练习中 / 已掌握」，记录回答思路，下次按状态筛选继续复习。
 
-### 01 · 考试指南与结构化题库
+网站提供抽题和计时工具，**由你自己开口回答，不提供自动对话或 AI 口语评分**。练习计时并非对学校实际考试时长的承诺，现场安排以考官指引为准。
 
-- **考试方式切换**：区分常规 ELPA 与 ELPA Fast Track，提供对应流程与学习入口。
-- **多维查找**：支持校区（GZ / HK）、考试类型、场次、关键词和备考状态筛选；实际题目覆盖范围以已收录内容为准。
-- **英语练习优先**：题目主问题以英文展示，中文释义、相似问法与提示小问按需查看。
-- **分期整理与溯源**：根据已收录场次区分近期与过往题目；保留考生回忆、不同问法和来源限制，不将回忆题称作官方真题。
+### 保存与迁移记录
 
-### 02 · 随机抽题与自主计时
+- 练习状态与笔记默认自动保存在**当前浏览器、当前网站地址**下，不需要账号。
+- 换设备、浏览器或网站地址前，先「备份学习记录」；在新环境中用「恢复学习记录」导入。
+- **恢复会替换当前记录，建议先备份。** 清除浏览器数据也可能删除本地记录。
+- 支持单独导出笔记；部分浏览器还提供可选的本地文件夹同步。浏览器内自动保存不依赖该功能。
 
-1. 在[题库练习页](https://hkust-elpa.vercel.app/practice.html)选择本次想练的范围。
-2. 点击页面右下角的**「练习」→「随机抽题」**，从当前符合条件的题目中抽取一道。
-3. 点击**「开始」**后自己进行口语练习。模拟考试计时先进行 **1 分钟准备**，随后进入 **2 分钟陈述**；另支持倒计时、正向计时和暂停、重置。
+## 本地预览与验证
 
-随机抽题与启动计时是独立操作，不会自动代答或评分。
+### 预览网站
 
-### 03 · 个人学习记录：练习、标记、复盘
-
-- 每道题可在 **未练 → 练习中 → 已掌握** 之间切换，优先筛选尚未掌握的问题。
-- 可对主问题及提示小问添加自己的回答思路与笔记，支持格式化编辑和预览。
-- 学习进度与笔记**默认自动保存在当前浏览器**，无需登录；可通过**备份学习记录 → 传输文件 → 在新设备恢复**迁移，也可单独导出笔记。
-- 支持部分浏览器可选关联文件夹，用于写入本地数据文件；不启用该功能也不影响浏览器内的自动保存。
-
-> **重要：**不同浏览器、设备以及 Vercel / GitHub Pages 域名不会自动同步记录。清除浏览器数据前请先备份；恢复会替换当前浏览器已有的记录。
-
-### 04 · 考后分享与社区贡献
-
-**考前参考同学们整理的经验，考后也欢迎把自己的经历分享出来。** 可以通过 [社区分享页面](https://hkust-elpa.vercel.app/submit.html)提交记得的英文主问题、相关提示小问、不同问法，或具体的备考心得；已经收录的题目也可以补充新的出现记录。
-
-提交无需注册账号。内容会以**公开 GitHub Issue** 保存，并在必要核对与整理后考虑收录。请勿填写姓名、学号、联系方式、私人笔记或其他敏感信息。
-
----
-
-## 技术架构与工程实现
-
-项目采用**原生静态前端 + Serverless 投稿接口 + GitHub 原生协作流程**。日常练习不依赖应用后端请求，社区内容通过独立接口接收、校验和版本化发布；无需自建用户账号系统、业务数据库或常驻应用服务器。
-
-### 技术设计特点
-
-| 设计维度 | 实现方式 |
-| --- | --- |
-| **静态优先** | 使用原生 HTML、CSS 与 JavaScript，无前端框架和打包流程，可直接部署到 Vercel 或 GitHub Pages。 |
-| **本地数据与隐私** | 学习记录保存在浏览器或用户主动保存的备份文件中，无需为个人练习建立服务端账号和数据库。 |
-| **无服务器投稿接口** | Cloudflare Workers 提供独立投稿入口，配合 Turnstile、来源限制、字段校验、限流与默认关闭机制。 |
-| **可追溯的内容发布** | GitHub Issues 保存公开投稿记录，GitHub Actions 在授权确认后生成数据变更 PR，由人工复核、合并并触发网站更新。 |
-| **可维护的数据模型** | 题目、相似问法、考试场次及经验独立保存为结构化数据，使用稳定 ID 并保留资料来源。 |
-
-### 系统架构：静态前端与事件驱动内容发布
-
-```mermaid
-flowchart TD
-    A["浏览器 · 静态前端<br/>HTML / CSS / JavaScript"]
-    L["本地学习记录<br/>浏览器存储 / 用户备份文件"]
-    W["Cloudflare Worker<br/>Turnstile · 字段校验 · 限流"]
-    I["GitHub Issues<br/>公开投稿记录"]
-    G["GitHub Actions<br/>受控数据导入"]
-    P["Pull Request<br/>复核变更"]
-    D["结构化题库与文档<br/>Git 仓库"]
-    H["Vercel / GitHub Pages<br/>静态部署"]
-
-    A -->|"题库练习、笔记"| L
-    A -->|"无账号投稿"| W
-    W -->|"校验通过，创建记录"| I
-    I -->|"确认后添加标记"| G
-    G -->|"生成数据更新提案"| P
-    P -->|"复核并合并"| D
-    D -->|"部署发布"| H
-    H -.->|"访问网站"| A
-```
-
-该架构将**客户端学习状态**与**服务端投稿流程**分离，各组件职责如下：
-
-- **日常练习**直接由静态页面在浏览器内完成，不需要为每次搜索、翻译展开、计时或保存笔记调用应用后端。
-- **社区投稿**才调用 Cloudflare Worker；Worker **只创建待处理的 GitHub Issue**，不会直接修改已发布题库。
-- **内容更新**由受控的 GitHub Actions 脚本处理，生成独立 PR；未经复核和合并，不会进入网站正式数据。
-- **内容与部署同源**：两个网站入口使用同一仓库代码；个人学习记录仍各自保存在对应浏览器和域名下。
-
-### 服务端安全与内容发布机制
-
-投稿接口由 [`worker/src/index.js`](./worker/src/index.js) 实现，负责接收、校验并转交投稿。后续处理由 [GitHub Actions 工作流](./.github/workflows/approved-submission.yml)及[受控导入脚本](./scripts/import-v2-submission.cjs)完成。**接口不直接修改已发布题库；数据变更须经独立 Pull Request 复核后合并。**
-
-| 控制环节 | 实现机制与约束 |
-| --- | --- |
-| 请求接收与数据校验 | Cloudflare Workers 接收题目、相似问法、提示小问及备考经验等结构化投稿，校验字段类型、长度及允许值。 |
-| 来源限制与人机验证 | 接口仅处理来自预设生产域名的浏览器请求；服务端调用 Cloudflare Turnstile Siteverify，并核对验证结果中的域名及动作。 |
-| 请求大小与频率限制 | 请求体上限为 **24 KiB**；Cloudflare 原生限流配置为每个边缘位置、每个 IP **60 秒最多 3 次**。该限制按边缘位置执行，不等同于全局配额。 |
-| 配置与故障保护 | 仓库中的 Worker 配置默认关闭投稿；生产环境需显式启用。凭据缺失、限流服务异常或人机验证不可用时，接口拒绝请求（fail closed）。 |
-| 凭据与最小权限 | 敏感凭据存放于 Cloudflare Worker Secrets，不下发到浏览器；部署文档规定 GitHub 令牌仅授予指定仓库的 Issues 读写权限。 |
-| 审核与版本化发布 | 验证通过的投稿保存为公开 GitHub Issue；经授权维护者确认后，由 GitHub Actions 再次校验并生成数据变更 PR。**PR 不自动合并，正式发布仍需人工复核。** |
-
-**架构边界：**该方案以 GitHub Issues、Pull Requests 和 Git 历史承担内容协作与变更追踪，不依赖自建用户系统、业务数据库或独立管理后台。安全控制面向当前项目规模设计；例如，边缘限流并非全局防滥用保证，人工复核也仍是内容发布流程的一部分。
-
-更详细的接口、开关和安全配置见 [Worker 文档](./worker/README.md)与 [投稿数据规范](./docs/submission-v2-spec.md)。
-
-## 技术栈与项目结构
-
-| 层次 | 技术与职责 |
-| --- | --- |
-| 前端 | Vanilla HTML、CSS、JavaScript；静态多页面网站，零前端框架和构建步骤 |
-| 个人记录 | 浏览器本地存储；JSON 备份 / 恢复；可选 File System Access API 文件夹同步 |
-| 投稿接口 | Cloudflare Workers、Turnstile、Cloudflare Rate Limiting |
-| 内容协作 | GitHub Issues、GitHub Actions、Pull Requests、结构化 JavaScript 数据文件 |
-| 部署 | Vercel + GitHub Pages |
-| 质量检查 | Node.js 测试、语法及数据校验、Playwright / Chromium 响应式浏览器回归 |
-
-```text
-HKUST-ELPA/
-├── index.html                     # 首页 / 功能介绍
-├── guide.html                     # 考试指南
-├── practice.html                  # 题库、随机抽题、计时与笔记
-├── sources.html                   # 学校说明与学生资料来源
-├── submit.html                    # 无账号社区分享
-├── site.css                       # 共享样式
-├── question-bank/                 # 结构化题目、场次、备考经验与来源文档
-├── worker/
-│   ├── src/index.js               # Serverless 投稿接口
-│   └── README.md                  # 部署与安全说明
-├── scripts/                       # 受控投稿导入脚本
-├── .github/workflows/
-│   ├── approved-submission.yml    # 已确认投稿 → 数据更新 PR
-│   └── site-checks.yml            # 代码与浏览器回归校验
-├── tests/                          # 导入器、Worker、网页交互与移动端测试
-└── docs/submission-v2-spec.md     # 社区投稿数据约定
-```
-
-### 本地预览与测试
-
-无需安装前端框架或运行应用服务器；在仓库根目录启动任意静态文件服务即可预览：
+网站无前端框架、无构建步骤。克隆后在根目录启动静态文件服务：
 
 ```bash
 git clone https://github.com/FuTseYi/HKUST-ELPA.git
 cd HKUST-ELPA
-python3 -m http.server 8000
+python -m http.server 8000
 ```
 
-然后打开 `http://localhost:8000/`。本地预览可使用题库与记录功能；**正式投稿接口仅允许已配置的生产站点来源**，因此本地页面无法直接向线上 Worker 投稿。
+macOS / Linux 若没有 `python` 命令，可改用 `python3`。打开 `http://localhost:8000/`。也可直接打开 HTML 文件预览页面；涉及文件读取、下载及浏览器权限的验证应使用本地 HTTP 服务。
 
-核心自动化测试使用 Node.js；浏览器回归测试由 CI 安装 Playwright 并通过 Chromium 执行，见 [网站检查工作流](./.github/workflows/site-checks.yml)。
+本地页面可以练习、保存记录和预览投稿；**正式投稿仅允许已配置的生产站点来源**，本地预览不会获得生产 Turnstile 验证权限。
 
-## 题库维护与贡献
+### 自动化检查
 
-**社区贡献是资料持续更新的重要来源。** 参与不局限于编写代码：刚考完的同学可以提供题目回忆与经验；发现资料问题的同学可以帮助补充和更正；开发者也可以改进网站功能与文档。
+需要 **Node.js 22 或更新版本**。结构、语法与单元测试使用 Node 内置功能，不依赖浏览器安装：
 
-题目、场次记录和备考经验分别保存在 [`question-bank/`](./question-bank/README.md) 的结构化数据及文档中，维护稳定 ID，降低资料更新影响已有学习记录的风险。
+```bash
+npm run check
+npm test
+```
 
-- **反馈内容**：通过[站内分享](https://hkust-elpa.vercel.app/submit.html)补充考题与经验，或在 [Issues](https://github.com/FuTseYi/HKUST-ELPA/issues) 提出更正建议。
-- **改进项目**：欢迎通过 [Pull Requests](https://github.com/FuTseYi/HKUST-ELPA/pulls) 贡献页面改进、文档修订和测试。
-- **尊重来源**：保持原题、回忆、翻译与整理表述之间的区别；保留可信范围和原始链接，不凭空补全不确定的内容。
+浏览器回归需要安装锁定版本的 Playwright 及其 Chromium：
 
-项目追求**可阅读、可验证、可回滚、可长期维护**。具体来源见[资料来源页](https://hkust-elpa.vercel.app/sources.html)，技术细节见 [Worker 文档](./worker/README.md)。
+```bash
+npm ci
+npx playwright install chromium
+npm run test:browser
+```
+
+Linux CI 使用 `npx playwright install --with-deps chromium` 安装系统依赖。浏览器测试使用独立测试上下文和本地服务，覆盖 320–1280px 的八种宽度；外部星数、人机验证与投稿请求被隔离，**不会创建公开投稿**。真实 Turnstile、Worker 部署及原生文件夹选择器仍需单独验证。
+
+## 项目结构
+
+```text
+HKUST-ELPA/
+├── index.html / guide.html / practice.html / sources.html / submit.html
+├── site.css                       # 全站共享布局、导航、双语标签与页脚
+├── css/                           # 练习页、投稿页专用样式
+├── js/                            # 首页、指南、练习和投稿页逻辑
+├── github-stars.js                # 可选星数增强：GitHub API → Shields 备用
+├── submission-config.js           # 公开投稿端点与 Turnstile Site Key
+├── elpa_data.json                 # 空的初始记录文件，非个人备份
+├── assets/                        # 图片、图标和功能示意
+├── question-bank/                 # 稳定题目、场次、经验及来源文档
+├── scripts/                       # 校验、审核数据导入及 PR 文件白名单
+├── tests/                         # Worker、导入器、页面逻辑与浏览器回归
+├── worker/                        # 独立部署的 Cloudflare 投稿接口
+├── docs/                          # 投稿数据约定及维护说明
+├── package.json / package-lock.json # 统一检查命令与锁定的测试依赖
+└── .github/workflows/             # 网站校验、批准投稿后生成数据 PR
+```
+
+`output/`、`.playwright-cli/`、`node_modules/` 和本地密钥文件均不纳入版本控制。
+
+### 文件维护边界
+
+- **页面与代码分离**：HTML 保留语义内容及真实导航；交互在对应 `js/` 文件中，专用样式在 `css/`。保持经典脚本的加载顺序和现有事件绑定，未经迁移不要改成模块或异步加载。
+- **共享导航与页脚**：五个页面保留静态标记，直接打开文件也能导航。修改时同步五页，自动校验会检查导航入口、双语标签和页脚一致性。
+- **双语排版**：保留中文主体和简短英文标签；放得下时并排，空间不足时将英文放在下方。题目翻译与用户输入不自动改写。
+- **题库与记录兼容**：不重编号已发布题目，不改变既有 localStorage 键。提示小问笔记按位置关联，已发布小问不随意重排；需要调整时必须设计记录迁移。
+- **数据与来源分离**：结构化数据负责显示和关联；Markdown 负责来源、场次背景与不确定性，不是自动生成的数据副本。
+- **测试与生产分离**：不把测试投稿合并进题库，不将个人学习记录覆盖提交到 `elpa_data.json`，不在测试中调用真实投稿接口。
+
+## 技术架构与内容发布
+
+项目采用**原生静态前端 + Cloudflare Workers 投稿接口 + GitHub 审核协作**。练习、筛选、笔记与计时在浏览器内完成，无需用户账号、业务数据库或常驻应用服务器。
+
+| 组件 | 职责与边界 |
+| --- | --- |
+| 静态前端 | Vercel / GitHub Pages 托管相同文件，无构建依赖；学习记录按浏览器来源隔离。 |
+| GitHub 星数 | 优先读取 GitHub 官方接口，失败时使用 Shields；会话内缓存一小时。两者不可用时隐藏数字，仓库链接仍可用。 |
+| 投稿 Worker | 校验来源、Turnstile、频率、大小和字段，成功后只创建待处理的公开 Issue。 |
+| 审核工作流 | 仅仓库所有者为开放 Issue 添加 `submission:approved` 时执行，验证数据后生成独立 PR。 |
+| 结构化题库 | 常规、Fast Track 和不同校区使用稳定 ID；场次与补充问法独立关联。 |
+| 发布 | PR 人工复核、合并后随静态站点部署更新；Worker 不直接发布题目。 |
+
+### 投稿与审核
+
+1. 站内投稿通过 Worker 校验，保存为带 v2 结构化记录的公开 Issue；旧版 v1 待处理记录仍兼容。
+2. 维护者核对来源、隐私、重复经历、题干及小问。**考生回忆不等于学校确认的原题。**
+3. 仓库所有者添加批准标签，Actions 用受信任的仓库脚本生成数据 PR。
+4. PR 只允许修改题库、场次、经验和对应社区文档，不自动合并。
+
+相同题目保留原 ID；新的考试经历增加出现记录，仅补充问法或小问不增加考过次数。授权及完整文件白名单见 [审核说明](./question-bank/MODERATION.md)。
+
+### 安全与外部服务
+
+- 仓库中的 Worker 默认关闭投稿。生产启用、密钥、限流和 Turnstile 配置详见 [Worker 部署文档](./worker/README.md)。
+- GitHub / Turnstile 密钥只存放在 Worker Secrets；前端只包含公开端点与 Site Key。
+- 请求体上限为 24 KiB；配置的原生限流为每个边缘位置、每 IP 每 60 秒最多 3 次，不等同于全局配额。
+- 投稿会公开保存，包括尚未收录的内容。不要填写姓名、学号、联系方式或私人笔记。
+- UI 回归、Worker 单元测试和实际生产验证分别提供不同证据；本地测试通过不代表线上部署已更新。
+
+## 维护文档与贡献
+
+| 文档 | 内容 |
+| --- | --- |
+| [题库说明](./question-bank/README.md) | 数据文件分工、稳定 ID、题目范围与来源规范。 |
+| [审核维护说明](./question-bank/MODERATION.md) | v1 / v2 审核、生成 PR、数据文件白名单与发布边界。 |
+| [投稿数据规范](./docs/submission-v2-spec.md) | 字段、分类、相似问法、小问及计数规则。 |
+| [Worker 文档](./worker/README.md) | 独立部署、开关、密钥和生产验证。 |
+| [本次维护审查](./docs/maintenance-review-2026-10-17.md) | 整理范围、已修复问题、验证结果与后续维护边界。 |
+
+考前参考已有经验，考后欢迎通过[站内分享](https://hkust-elpa.vercel.app/submit.html)留下题目与心得。发现资料问题可提交 [Issue](https://github.com/FuTseYi/HKUST-ELPA/issues)，代码和文档改进欢迎提交 [Pull Request](https://github.com/FuTseYi/HKUST-ELPA/pulls)。尊重原作者权益，保留来源，不补造未记录的题干或小问。
 
 ## 声明与致谢
 
-HKUST-ELPA 是学生发起、开放协作的**非官方备考资源**，不代表香港科技大学或任何校区的官方立场。考试安排和语言要求应以学校当期通知为准；考生分享的题目不等于学校确认的真实题卡，也不能保证考试通过。
+HKUST-ELPA 不代表香港科技大学或任何校区的官方立场，也不保证实际考试题目或结果。考试安排和语言要求以学校当期通知为准。
 
-感谢分享考题、经验、笔记与改进建议的同学。对于来源标注、原作者权益或内容准确性问题，欢迎通过 GitHub Issues 沟通更正。
+感谢分享考题、经验、笔记与改进建议的同学。资料准确性、署名或权益问题，欢迎通过 GitHub Issues 沟通更正。
 
 **Built with Passion. Shared with Everyone.**
+
+Initiated by [Shine](https://github.com/FuTseYi) · 2026 Fall MPhil

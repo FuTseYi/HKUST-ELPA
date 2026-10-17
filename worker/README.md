@@ -9,7 +9,7 @@ It does **not** edit website files or publish a question. Maintainer review rema
 
 1. Create a Cloudflare Turnstile widget restricted to **futseyi.github.io** and **hkust-elpa.vercel.app**.
    Use action **elpa_submit**. Keep the Site Key public; keep the Secret private.
-2. Use Wrangler 4.36+ in `worker/`. The configured `namespace_id` is `11247601` (account-specific; already deployed).
+2. Use a Wrangler version supporting this `wrangler.jsonc` and the native Rate Limiting binding. The configured `namespace_id` is `11247601`; it is account-specific and must be checked when deploying to another account.
 3. Create the GitHub labels `submission:pending` and `submission:approved` in the repository before accepting submissions. The pending label is applied by the Worker when it creates an Issue. Then create a **fine-grained GitHub PAT** restricted to only
    `FuTseYi/HKUST-ELPA`, permission **Issues: Read and write**;
    no Contents/Actions/Admin permissions. Store it only as a Worker secret.
@@ -50,7 +50,8 @@ It does **not** edit website files or publish a question. Maintainer review rema
 - **Question:** `version: 2`, `kind: "question"`, `term` (e.g. `2026 Fall`),
   `examStage` (`start` / `mid` / `end`), bilingual `main: {en, cn}`,
   optional bilingual `subs: [{en, cn}]`, `source` (`firsthand` / `secondhand`),
-  and `turnstileToken`.
+  optional `campus` (`nansha` / `clear-water-bay`) and `track` (`regular` / `fast-track`),
+  optional linked-question `intent` and `alternatives`, and `turnstileToken`.
 - **Preparation advice:** `version: 2`, `kind: "advice"`, `phase`
   (`before` / `during` / `after`), `tags` (1–4 predefined taxonomy tags),
   optional `track` (`regular` / `fast-track`, defaults to `regular`),
@@ -65,7 +66,10 @@ contains readable Markdown and a base64url machine-readable marker
 same `submission:pending` review queue. Unapproved Issues are never added
 straight to the question bank.
 
-## Verified provisioned resources (2026-10-14)
+## Historical verification snapshot (2026-10-14)
+
+These notes record a previous deployment, not a live status check. The checked-in
+configuration stays closed; verify the actual account and both origins before a release.
 
 - Worker: `hkust-elpa-submissions`; endpoint `https://hkust-elpa-submissions.futseyi.workers.dev/submit`
 - Turnstile widget: `HKUST-ELPA Question Submissions`, hostnames `futseyi.github.io` and `hkust-elpa.vercel.app`
@@ -74,11 +78,10 @@ straight to the question bank.
 - Rate limiter: `SUBMISSION_LIMITER`, namespace `11247601`, 3 requests / 60 seconds per IP per Cloudflare location
 - Worker plaintext switch: production uses `SUBMISSION_MODE=public` and `SUBMISSIONS_DISABLED=false`; repository Wrangler defaults stay closed to prevent accidental public re-enablement.
 - GitHub token: configured as encrypted Worker Secret `GITHUB_TOKEN`; its value is never committed
-- Old Worker public endpoint disabled; historical script retained
 - GitHub repository is `FuTseYi/HKUST-ELPA`; moderation labels and Actions PR-creation permission have been configured by the owner
-- Existing `visit-counter` Worker is unaffected; keep all development branches after merges
+- Keep development branches after merges; this repository does not manage unrelated Workers.
 
-**Production status**: The GitHub Pages form completed real Turnstile-to-Issue testing (test Issue #13, closed); the owner-approved Issue-to-PR automation was separately verified (test Issue #9 / PR #10, closed). The Vercel form requires a final live-browser verification after its domain has been added to the widget and the Worker deployed. Never merge test questions into the bank. To stop submissions immediately, set `SUBMISSIONS_DISABLED=true` in Cloudflare.
+**Recorded verification**: GitHub Pages completed Turnstile-to-Issue testing (test Issue #13, closed); owner-approved Issue-to-PR automation was separately tested (test Issue #9 / PR #10, closed). This snapshot did not complete the Vercel browser check. Re-check both origins for a new release. Never merge test questions into the bank. To stop submissions immediately, set `SUBMISSIONS_DISABLED=true` in Cloudflare.
 
 
 ## Time-bounded live verification

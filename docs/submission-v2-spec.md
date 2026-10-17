@@ -49,7 +49,7 @@ Recommended rules: question en 8–1000 characters, cn 0–1000, follow-up en 1�
 
 ## Linked question and exam-occurrence counting
 
-- `linkedQuestionId` is optional for new questions. When present, `intent` is either `encounter` (one additional reported experience) or `supplement` (no new exam occurrence; must include at least one follow-up).
+- `linkedQuestionId` is optional for new questions. When present, `intent` is either `encounter` (one additional reported experience) or `supplement` (no new exam occurrence; must include alternative wording or at least one follow-up).
 - The Worker validates the payload; the importer checks that the ID actually exists in the selected campus/track bank **and** matches the canonical English text. Legacy v2 records without these fields are still treated as encounters.
 - Existing baseline student recollections contribute one historic occurrence, or the known sourced `records` count. For imported questions, the originating Issue is counted once, not both as a baseline and a new Issue.
 - Individual reviewed Issue numbers count once, regardless of the number of follow-ups or whether the same term/slot appears elsewhere. Human reviewers should decline duplicate retellings of the very same encounter.
@@ -82,7 +82,11 @@ Recommended rules: question en 8–1000 characters, cn 0–1000, follow-up en 1�
 
 Placeholders are hints, **not field labels**. Required status, accessibility labels and error messages must remain visible without placeholders.
 
-## Release and acceptance gates
+## Historical rollout and release acceptance
+
+The PR sequence below records the original v2 rollout plan. For routine maintenance,
+run `npm run check`, `npm test` and `npm run test:browser`; deployments still need the
+separate production verification described below.
 
 - **PR 1:** contract and taxonomy only; no production workflow change.
 - **PR 2:** v1/v2 importer and tested data storage; no public v2 form.
