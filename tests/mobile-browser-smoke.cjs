@@ -246,6 +246,22 @@ const serve=http.createServer((request,response)=>{
       }finally{await guide.close();}
 
       if(width===390){
+        // Copied question numbers must follow the same feedback-ranked order
+        // as the cards, not the original F-series storage order.
+        const numbering=await page.evaluate(()=>{
+          setExamChoice('track','fast-track');
+          let copied='';
+          Object.defineProperty(navigator,'clipboard',{configurable:true,value:{
+            writeText:text=>{copied=text;return Promise.resolve();}
+          }});
+          copyQuestion('F-2');
+          const displayed=document.querySelector('#q-F-2 .q-num').textContent;
+          delete navigator.clipboard;
+          setExamChoice('track','regular');
+          return {copied,displayed};
+        });
+        assert.equal(numbering.displayed,'1');
+        assert.match(numbering.copied,new RegExp('第 '+numbering.displayed+' 题'));
         const feedback=page.locator('#bankD .qcard .question-feedback').first();
         assert.match(await feedback.innerText(),/过往考过 \d+ 次/);
         const link=feedback.locator('a');
