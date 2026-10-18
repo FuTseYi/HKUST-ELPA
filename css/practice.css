@@ -660,6 +660,14 @@
   .elpa-choice-buttons button:focus-visible{outline:3px solid #e3b34b;outline-offset:2px}
   .elpa-choice-note{font-size:12px;color:#60758b;line-height:1.7;margin:12px 0 0}
   .page-practice section[hidden]{display:none!important}
+  .page-practice .toolbar[hidden]{display:none!important}
+  .category-empty{margin:0 0 22px;padding:20px;border:1px solid var(--line);border-radius:12px;background:#fff}
+  .category-empty h2{margin:0 0 8px;font-size:18px;color:var(--brand)}
+  .category-empty p{margin:6px 0;font-size:13px;color:var(--ink-soft);line-height:1.7}
+  .category-empty p[lang="en"]{font-size:12px}
+  .category-empty-actions{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:12px;font-size:13px}
+  .category-empty-actions a{padding:6px 0;font-weight:650}
+  #timerDrill:disabled{opacity:.45;cursor:not-allowed}
   @media(max-width:640px){.elpa-choices{padding:14px}.elpa-choice-row{gap:7px;flex-direction:column;align-items:stretch}.elpa-choice-row+.elpa-choice-row{margin-top:14px}.elpa-choice-buttons{width:100%}.elpa-choice-buttons button{flex:1 1 0;min-width:0;padding:8px 6px;font-size:12px}}
 
 

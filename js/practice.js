@@ -468,8 +468,12 @@ function renderTOC() {
   const selectedLabel=selectedOption&&selectedValue?selectedOption.text:sessionLabel;
   const latest=activeLatestSession();
   const selectedIsCurrent=!!(selectedValue&&latest&&latest.term===selectedTerm&&latest.stage===selectedStage);
-  document.getElementById('sec-bankD').hidden=!!selectedValue&&!selectedIsCurrent;
-  document.getElementById('sec-bankA').hidden=!!selectedValue&&selectedIsCurrent;
+  document.getElementById('sec-bankD').hidden=!count||(!!selectedValue&&!selectedIsCurrent);
+  document.getElementById('sec-bankA').hidden=!count||(!!selectedValue&&selectedIsCurrent);
+  document.getElementById('categoryEmpty').hidden=count>0;
+  document.getElementById('categoryEmptyShare').href='./submit.html?campus='+activeCampus+'&track='+activeTrack;
+  document.querySelector('.toolbar').hidden=!count;
+  document.getElementById('toc').hidden=!count;
   document.getElementById('currentBankTitle').textContent=selectedIsCurrent?selectedLabel:sessionLabel;
   document.getElementById('pastBankTitle').textContent=selectedValue&&!selectedIsCurrent?selectedLabel:'过往题库';
   document.getElementById('pagerFall').setAttribute('aria-label',(selectedIsCurrent?selectedLabel:sessionLabel)+'分页');
@@ -908,6 +912,7 @@ function applyFilters(reset=false){
     total+=matches.length;renderPager(kind,matches.length,pages);
   }
   document.getElementById('matchCount').textContent=String(total);
+  document.getElementById('timerDrill').disabled=total===0;
   document.getElementById('emptyState').style.display=total||!allPracticeIds().length?'none':'block';
   document.getElementById('emptyKeyword').textContent=kw||statusFilter.options[statusFilter.selectedIndex].text;
 }

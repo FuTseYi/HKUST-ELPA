@@ -347,8 +347,8 @@ test('homepage explains the full learning workflow without a repeated oversized 
  assert.doesNotMatch(practice,/currentBankTitle'\)\.textContent=.*最新学期题库/);
  assert.match(practice,/id="pastBankTitle">过往题库<\/h2>/);
  assert.match(practice,/pastBankTitle'\)\.textContent=selectedValue&&!selectedIsCurrent\?selectedLabel:'过往题库'/);
- assert.match(practice,/sec-bankD'\)\.hidden=!!selectedValue&&!selectedIsCurrent/);
- assert.match(practice,/sec-bankA'\)\.hidden=!!selectedValue&&selectedIsCurrent/);
+ assert.match(practice,/sec-bankD'\)\.hidden=!count\|\|\(!!selectedValue&&!selectedIsCurrent\)/);
+ assert.match(practice,/sec-bankA'\)\.hidden=!count\|\|\(!!selectedValue&&selectedIsCurrent\)/);
  assert.match(practice,/const items=selectedValue\?/);
  assert.match(practice,/\.page-practice \.to-top\{[\s\S]*?display:inline-grid!important/);
  assert.match(practice,/\.page-practice \.practice-launcher\{[\s\S]*?bottom:calc\(66px/);

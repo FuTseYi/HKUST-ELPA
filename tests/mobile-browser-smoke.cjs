@@ -246,6 +246,29 @@ const serve=http.createServer((request,response)=>{
       }finally{await guide.close();}
 
       if(width===390){
+        const emptyCategory=await newPage({viewport:{width:390,height:844}});
+        try{
+          await emptyCategory.goto(new URL('/practice.html?campus=clear-water-bay',host).href,{waitUntil:'load'});
+          for(const track of ['regular','fast-track']){
+            await emptyCategory.locator('[data-track="'+track+'"]').click();
+            assert.equal(await emptyCategory.locator('#categoryEmpty').isVisible(),true);
+            for(const selector of ['#toc','#sec-bankD','#sec-bankA','.toolbar'])
+              assert.equal(await emptyCategory.locator(selector).isVisible(),false,'Empty category hides '+selector);
+            assert.equal(await emptyCategory.locator('#timerDrill').isDisabled(),true);
+            const share=new URL(await emptyCategory.locator('#categoryEmptyShare').getAttribute('href'),host);
+            assert.equal(share.searchParams.get('campus'),'clear-water-bay');
+            assert.equal(share.searchParams.get('track'),track);
+          }
+          await emptyCategory.locator('[data-campus="nansha"]').click();
+          assert.equal(await emptyCategory.locator('#categoryEmpty').isVisible(),false);
+          assert.equal(await emptyCategory.locator('.toolbar').isVisible(),true);
+          assert.equal(await emptyCategory.locator('#timerDrill').isEnabled(),true);
+          await emptyCategory.locator('#searchInput').fill('no-matching-question-for-draw');
+          assert.equal(await emptyCategory.locator('#emptyState').isVisible(),true);
+          assert.equal(await emptyCategory.locator('#timerDrill').isDisabled(),true);
+          await emptyCategory.locator('#searchClear').click();
+          assert.equal(await emptyCategory.locator('#timerDrill').isEnabled(),true);
+        }finally{await emptyCategory.close();}
         const preview=await newPage({viewport:{width:390,height:844}});
         try{
           await preview.goto(new URL('/submit.html?kind=advice',host).href,{waitUntil:'load'});
