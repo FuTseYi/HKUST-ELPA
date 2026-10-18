@@ -160,6 +160,7 @@ body { margin:0; }
 }
 @media(max-width:360px){.elpa-home-journey strong{font-size:12.5px}.elpa-home-journey small{font-size:10.5px}.elpa-demo-tabs span{padding:5px 7px}.elpa-home-demo{padding:15px}}
 .elpa-subhero{display:flex;align-items:center;min-height:272px;padding:36px 24px;background:linear-gradient(100deg,#062a50,#07538c);color:#fff}
+.elpa-home .elpa-subhero{background:linear-gradient(95deg,rgba(0,28,58,.92),rgba(0,49,91,.8) 45%,rgba(0,47,88,.5)),url('./assets/images/Administration-Building-14-1536x864.jpg') center 58%/cover no-repeat}
 .elpa-subhero-inner{width:100%;max-width:1132px;margin:0 auto}
 .elpa-subhero h1{font-size:36px;line-height:1.25;font-weight:800;letter-spacing:-.025em;margin:14px 0 10px}
 .elpa-subhero h1 em{font-style:normal;color:#f9d780}
