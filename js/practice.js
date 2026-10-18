@@ -1320,7 +1320,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
   ];
   for (const section of sections) {
     md += '\n## ' + section.name + '\n\n';
-    for (const [i, id] of section.ids.entries()) {
+    for (const [i, id] of feedbackRanked(section.ids).entries()) {
       const it = questionById(id);
       const st = statuses[id] || 'new';
       const stLabel = { new: '未练 New', doing: '练习中 Doing', done: '已掌握 Done' }[st];
@@ -1352,7 +1352,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-  setTip('📤 已导出全部题目与笔记为 Markdown 文件', 'ok');
+  setTip('📤 已导出当前类别的全部题目与笔记为 Markdown 文件（不受搜索和筛选影响）', 'ok');
 });
 
 /* ============ 搜索：清空 + 计数 ============ */

@@ -282,6 +282,19 @@ const serve=http.createServer((request,response)=>{
         assert.match(numbering.copied,new RegExp('第 '+numbering.displayed+' 题'));
         assert.equal(numbering.session,'场次待核实');
         assert.match(numbering.source,/英文根据中文回忆整理/);
+        const exportPage=await newPage({viewport:{width:390,height:844}});
+        try{
+          await exportPage.goto(new URL('/practice.html?track=fast-track',host).href,{waitUntil:'load'});
+          const questions=await exportPage.locator('#bankD .q-title > .en,#bankPast .q-title > .en').allTextContents();
+          await exportPage.locator('#searchInput').fill('no-matching-question-for-export');
+          await exportPage.locator('#recordsMenuBtn').click();
+          const download=exportPage.waitForEvent('download');
+          await exportPage.locator('#recordsExportBtn').click();
+          const markdown=fs.readFileSync(await (await download).path(),'utf8');
+          const exported=markdown.split(/\r?\n/).filter(line=>/^### \d+\. /.test(line)).map(line=>line.replace(/^### \d+\. /,''));
+          assert.ok(questions.length>0);
+          assert.deepEqual(exported,questions,'Export follows displayed ranking and includes the whole category despite filters');
+        }finally{await exportPage.close();}
         const feedback=page.locator('#bankD .qcard .question-feedback').first();
         assert.match(await feedback.innerText(),/过往考过 \d+ 次/);
         const link=feedback.locator('a');
