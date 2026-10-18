@@ -778,6 +778,7 @@
   .page-practice .timer-actions{gap:8px}
   .page-practice .timer-btn{font-size:13px;min-height:40px;padding:8px;border-radius:9px}
   .page-practice .timer-draw{display:block;width:100%;margin-top:8px}
+  .timer-preset-note{margin:6px 0;font-size:11px;line-height:1.5;text-align:center;color:var(--ink-soft)}
   /* Clear predictable card geometry at every width; no second contribution toolbar. */
   .page-practice .qcard .q-top{display:grid;grid-template-columns:36px minmax(0,1fr);column-gap:11px;row-gap:9px}
   .page-practice .qcard .q-num{grid-column:1;grid-row:1}
