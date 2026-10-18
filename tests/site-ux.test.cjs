@@ -208,7 +208,7 @@ test('footer is concise, community-oriented and identical across five pages',()=
  });
  for(const f of footers){
    assert.equal(f,footers[0],'Footer must match across all pages');
-   for(const label of ['Built with Passion. Shared with Everyone.','为爱发电 · 开源共建 · 互帮互助','Built with GitHub · Vercel · Cloudflare','Initiated by','2026 Fall MPhil'])
+   for(const label of ['Built with Passion. Shared with Everyone.','为爱发电 · 开源共建 · 互帮互助','Built with GitHub · Vercel · Cloudflare','Initiated by','FuTseYi'])
      assert.ok(f.includes(label),'Footer missing '+label);
    assert.match(f,/href="\.\/submit\.html">分享考题与经验 <span[^>]*lang="en">Share questions & tips<\/span><\/a>/);
    assert.match(f,/>参与开源共建 <span[^>]*lang="en">Contribute on GitHub<\/span><\/a>/);

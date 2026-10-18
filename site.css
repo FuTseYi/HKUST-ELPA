@@ -229,7 +229,6 @@ body { margin:0; }
 .elpa-footer-byline{display:flex;align-items:center;justify-content:center;gap:9px;font-size:11.5px;line-height:1.6;color:#afc3d7}
 .elpa-footer-credit-label{font-size:13px;font-weight:650;letter-spacing:.025em;color:#afc3d7}
 .elpa-footer-byline a{font-size:13px;font-weight:650;letter-spacing:.025em;color:#f0d9a3}
-.elpa-footer-credit-cohort{padding-left:10px;border-left:1px solid rgba(192,215,233,.3);font-size:13px;font-weight:650;letter-spacing:.025em;white-space:nowrap}
 @media(max-width:560px){.elpa-footer{padding:25px 16px 20px}.elpa-footer-slogan{font-size:clamp(14px,4vw,17px)}.elpa-footer-actions{gap:10px 21px}}
 /* Practice page controls are layered over its existing functional styles. */
 .page-practice .campus-hero {min-height:240px; padding:35px 24px 34px;}

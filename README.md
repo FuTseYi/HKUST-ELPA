@@ -155,6 +155,6 @@ HKUST-ELPA 不代表香港科技大学或任何校区的官方立场，也不保
 
 **Built with Passion. Shared with Everyone.**
 
-Initiated by [Shine](https://github.com/FuTseYi) · 2026 Fall MPhil
+Initiated by [FuTseYi](https://github.com/FuTseYi)
 
-<sub>部署与托管资源由发起人无偿支持 · Infrastructure sponsored by the initiator</sub>
+<sub>部署与托管资源由发起人支持 · Infrastructure sponsored by the initiator</sub>
