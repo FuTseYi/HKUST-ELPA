@@ -285,6 +285,56 @@ const serve=http.createServer((request,response)=>{
           await preview.locator('#advicePhase').selectOption('after');
           assert.equal(await preview.locator('#previewPanel').isVisible(),false,'Changing metadata invalidates the old preview');
         }finally{await preview.close();}
+        const draft=await newPage({viewport:{width:390,height:844}});
+        try{
+          // Verification and the success response are local fixtures; no public submission is made.
+          await draft.addInitScript(()=>{
+            window.turnstile={render(target,options){queueMicrotask(options.callback);return 'draft-fixture';},
+              getResponse(){return 'local-draft-test';},reset(){}};
+          });
+          await draft.route('https://hkust-elpa-submissions.futseyi.workers.dev/**',route=>route.fulfill({
+            status:200,contentType:'application/json',body:JSON.stringify({ok:true})
+          }));
+          await draft.goto(new URL('/submit.html?question=D-1&intent=supplement',host).href,{waitUntil:'load'});
+          await draft.locator('#submissionCampus').selectOption('nansha');
+          await draft.locator('#submissionSlot').selectOption({index:1});
+          await draft.locator('#supplementEn').fill('Alternative wording kept in the draft');
+          await draft.locator('#addFollowup').click();
+          await draft.locator('#followupList [data-lang="en"]').first().fill('First draft follow-up');
+          await draft.locator('#addFollowup').click();
+          await draft.locator('#followupList [data-lang="en"]').last().fill('Second draft follow-up');
+          await draft.locator('#followupList .move-up').last().click();
+          await draft.locator('#tabAdvice').click();
+          await draft.locator('#adviceTags input').first().check();
+          await draft.locator('#adviceTitle').fill('Recoverable draft title');
+          await draft.locator('#adviceBody').fill('Recoverable draft content that is only used by the browser test.');
+          await draft.reload();
+          assert.equal(await draft.locator('#tabAdvice').getAttribute('aria-pressed'),'true');
+          assert.equal(await draft.locator('#adviceTitle').inputValue(),'Recoverable draft title');
+          assert.equal(await draft.locator('#adviceTags input').first().isChecked(),true);
+          assert.match(await draft.locator('#submissionDraftStatus').innerText(),/Draft restored/);
+          await draft.locator('#tabQuestion').click();
+          assert.equal(await draft.locator('#linkedQuestion').isVisible(),true);
+          assert.equal(await draft.locator('input[name="contributionIntent"][value="supplement"]').isChecked(),true);
+          assert.equal(await draft.locator('#supplementEn').inputValue(),'Alternative wording kept in the draft');
+          assert.deepEqual(await draft.locator('#followupList [data-lang="en"]').evaluateAll(els=>els.map(el=>el.value)),
+            ['Second draft follow-up','First draft follow-up']);
+          const draftUrl=draft.url();
+          await draft.goto(new URL('/submit.html?kind=advice',host).href,{waitUntil:'load'});
+          assert.equal(await draft.locator('#adviceBody').inputValue(),'','Different contribution entries do not share drafts');
+          await draft.goto(draftUrl,{waitUntil:'load'});
+          assert.equal(await draft.locator('#supplementEn').inputValue(),'Alternative wording kept in the draft');
+          await draft.goto(new URL('/guide.html',host).href,{waitUntil:'load'});
+          await draft.goBack({waitUntil:'load'});
+          assert.equal(await draft.locator('#supplementEn').inputValue(),'Alternative wording kept in the draft');
+          await draft.locator('#tabAdvice').click();
+          await draft.locator('#previewButton').click();
+          await draft.locator('#submissionButton').click();
+          await draft.waitForFunction(()=>document.getElementById('submissionMessage').dataset.state==='success');
+          assert.equal(await draft.evaluate(()=>sessionStorage.getItem('elpa-submission-draft-v1:'+location.search)),null,'Successful submission clears this draft');
+          await draft.reload();
+          assert.equal(await draft.locator('#adviceTitle').inputValue(),'');
+        }finally{await draft.close();}
         // Copied question numbers must follow the same feedback-ranked order
         // as the cards, not the original F-series storage order.
         const numbering=await page.evaluate(()=>{

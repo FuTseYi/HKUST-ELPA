@@ -334,6 +334,8 @@ form.addEventListener('submit',async event=>{
     get('submissionSlot').value='';
     get('previewPanel').hidden=true;
     setKind(kind);
+    try{sessionStorage.removeItem(draftKey);}catch{}
+    draftNotice('投稿成功，本页暂存草稿已清除。 / Submitted. This draft has been cleared.');
     say('分享已提交，待核对与整理。 / Submitted! Contributions are reviewed before inclusion.','success');
     if(/^https:\/\/github\.com\/FuTseYi\/HKUST-ELPA\/issues\/\d+$/.test(result.issueUrl||'')){
       const a=document.createElement('a');a.href=result.issueUrl;a.target='_blank';
@@ -346,4 +348,50 @@ form.addEventListener('submit',async event=>{
   }
 });
 setKind(new URLSearchParams(location.search).get('kind')==='advice'?'advice':'question');
+/* Keep unfinished work in this tab, separately for each contribution entry. */
+const draftKey='elpa-submission-draft-v1:'+location.search;
+const draftFields=['submissionCampus','submissionTrack','submissionYear','submissionSlot','submissionSource',
+  'mainEn','mainCn','supplementEn','supplementCn','adviceTrack','advicePhase','adviceTitle','adviceBody'];
+function draftNotice(text){
+  const status=get('submissionDraftStatus');
+  if(status.textContent!==text)status.textContent=text;
+}
+function saveDraft(){
+  const fields=Object.fromEntries(draftFields.map(id=>[id,get(id).value]));
+  const subs=[...followups.children].map(el=>({
+    en:el.querySelector('[data-lang="en"]').value,cn:el.querySelector('[data-lang="cn"]').value
+  }));
+  const data={fields,subs,kind,linkedId,tags:[...list.querySelectorAll('input:checked')].map(el=>el.value),
+    intent:form.querySelector('input[name="contributionIntent"]:checked').value};
+  try{
+    sessionStorage.setItem(draftKey,JSON.stringify(data));
+    draftNotice('草稿已暂存于当前标签页，尚未提交。 / Draft saved in this tab. Not submitted.');
+  }catch{
+    draftNotice('当前浏览器无法暂存草稿，离开前请自行保存内容。 / Draft storage is unavailable. Copy your work before leaving.');
+  }
+}
+function restoreDraft(){
+  try{
+    const saved=sessionStorage.getItem(draftKey);
+    if(!saved)return;
+    const data=JSON.parse(saved);
+    for(const id of draftFields)if(typeof data.fields?.[id]==='string')get(id).value=data.fields[id];
+    for(const sub of data.subs||[])addFollowup(sub.en,sub.cn);
+    for(const tag of list.querySelectorAll('input'))tag.checked=(data.tags||[]).includes(tag.value);
+    if(data.linkedId){const entry=findQuestion(data.linkedId);if(entry)linkQuestion(entry);}
+    const intent=form.querySelector('input[name="contributionIntent"][value="'+(data.intent==='supplement'?'supplement':'encounter')+'"]');
+    intent.checked=true;
+    setKind(data.kind==='advice'?'advice':'question');
+    syncContributionIntent();
+    draftNotice('已恢复当前标签页的草稿，请核对后预览并提交。 / Draft restored. Review and preview it before submitting.');
+  }catch{
+    draftNotice('草稿无法恢复，请重新填写。 / The draft could not be restored. Please fill in the form again.');
+  }
+}
+restoreDraft();
+form.addEventListener('input',saveDraft);
+form.addEventListener('change',saveDraft);
+form.addEventListener('click',event=>{
+  if(event.target.closest('.contrib-tab,#addFollowup,.contrib-follow-controls button,.contrib-match,#unlinkQuestion'))saveDraft();
+});
 })();
