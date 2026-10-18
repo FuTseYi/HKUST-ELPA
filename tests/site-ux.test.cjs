@@ -220,8 +220,8 @@ test('footer is concise, community-oriented and identical across five pages',()=
  assert.equal((read('practice.html').match(/id="exportBtn"/g)||[]).length,1);
 });
 
-test('internal pages share one compact banner and the practice brand uses the site palette',()=>{
- const pages=['guide.html','practice.html','sources.html','submit.html'];
+test('all pages share one compact banner and the practice brand uses the site palette',()=>{
+ const pages=['index.html','guide.html','practice.html','sources.html','submit.html'];
  for(const page of pages){
    const html=fs.readFileSync(path.resolve(__dirname,'..',page),'utf8');
    assert.match(html,/class="[^"]*elpa-subhero/);

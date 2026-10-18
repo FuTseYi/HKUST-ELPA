@@ -29,14 +29,8 @@ body { margin:0; }
 .elpa-home-help summary>.elpa-en-inline{margin-left:4px}
 .elpa-footer-action .elpa-en-inline{font-size:10px}
 .timer-tab .elpa-en-inline,.timer-btn .elpa-en-inline,.contrib-button .elpa-en-inline{display:block}
-.elpa-hero {position:relative; isolation:isolate; min-height:470px; display:flex; align-items:center; color:#fff; background:linear-gradient(95deg,rgba(0,28,58,.91),rgba(0,49,91,.78) 40%,rgba(0,47,88,.25) 85%),url('./assets/images/Administration-Building-14-1536x864.jpg') center 58%/cover no-repeat;}
-.elpa-hero::after { content:""; position:absolute; bottom:0; left:0; right:0; height:5px; background:linear-gradient(to right,#f4c65a 0%,#f4c65a 23%,transparent 23%); }
-.elpa-hero-inner { width:min(1180px,calc(100% - 48px)); margin:0 auto; padding:68px 0 78px; }
 .elpa-eyebrow {display:inline-flex; align-items:center; gap:9px; font-size:11px; text-transform:uppercase; letter-spacing:.13em; font-weight:750; padding:6px 14px; border:1px solid rgba(255,255,255,.45); border-radius:999px; background:rgba(0,38,78,.2);}
 .elpa-eyebrow::before {content:""; height:7px; width:7px; border-radius:50%; background:var(--site-gold);}
-.elpa-hero h1 {font-size:clamp(38px,5vw,61px); letter-spacing:-.035em; line-height:1.15; margin:18px 0 14px; font-weight:850;}
-.elpa-hero h1 em {font-style:normal; color:#f9d780;}
-.elpa-hero p {max-width:660px; font-size:16px; line-height:1.95; color:rgba(255,255,255,.87); margin:0;}
 .elpa-actions {display:flex; flex-wrap:wrap; gap:12px; margin-top:30px;}
 .elpa-button {display:inline-flex; align-items:center; justify-content:center; gap:11px; min-height:44px; border-radius:999px; padding:10px 21px; text-decoration:none; font-weight:750; font-size:13px; transition:.2s;}
 .elpa-button.primary {background:var(--site-gold); color:#183049;}
@@ -165,10 +159,15 @@ body { margin:0; }
  .elpa-home-more-card{padding:21px 20px}
 }
 @media(max-width:360px){.elpa-home-journey strong{font-size:12.5px}.elpa-home-journey small{font-size:10.5px}.elpa-demo-tabs span{padding:5px 7px}.elpa-home-demo{padding:15px}}
-.elpa-subhero {background:linear-gradient(100deg,#062a50,#07538c); color:#fff; padding:54px 24px 48px; border-bottom:0;}
-.elpa-subhero-inner {max-width:1180px; margin:0 auto;}
-.elpa-subhero h1 {font-size:clamp(28px,4vw,43px); margin:13px 0 8px;}
-.elpa-subhero p {color:#dce8f4; max-width:790px; margin:0; font-size:14px;}
+.elpa-subhero{display:flex;align-items:center;min-height:272px;padding:36px 24px;background:linear-gradient(100deg,#062a50,#07538c);color:#fff}
+.elpa-subhero-inner{width:100%;max-width:1132px;margin:0 auto}
+.elpa-subhero h1{font-size:36px;line-height:1.25;font-weight:800;letter-spacing:-.025em;margin:14px 0 10px}
+.elpa-subhero h1 em{font-style:normal;color:#f9d780}
+.elpa-subhero h1 .elpa-en-sub{font-size:16px;line-height:1.5;margin-top:5px}
+.elpa-subhero p{color:#dce8f4;max-width:790px;margin:0;font-size:14px;line-height:1.7}
+.elpa-home-start{margin-bottom:32px}
+.elpa-home-start .elpa-actions{margin-top:0}
+.elpa-home-start .elpa-home-hero-note{margin:12px 0 0;font-size:12px;color:var(--site-muted)}
 .elpa-flow {display:grid; gap:14px; margin-top:20px;}
 .elpa-flow-step {padding:22px 25px; background:#fff; border:1px solid var(--site-line); border-left:4px solid var(--site-blue); border-radius:12px;}
 .elpa-flow-step h3 {margin:0 0 8px; color:var(--site-navy); font-size:16px;}
@@ -234,12 +233,6 @@ body { margin:0; }
 .elpa-footer-byline a{font-size:13px;font-weight:650;letter-spacing:.025em;color:#f0d9a3}
 @media(max-width:560px){.elpa-footer{padding:25px 16px 20px}.elpa-footer-slogan{font-size:clamp(14px,4vw,17px)}.elpa-footer-actions{gap:10px 21px}}
 /* Practice page controls are layered over its existing functional styles. */
-.page-practice .campus-hero {min-height:240px; padding:35px 24px 34px;}
-.page-practice .campus-hero h1 {font-size:clamp(29px,4vw,39px);}
-.page-practice .campus-hero .hero-lead {font-size:14px; margin-top:8px;}
-.page-practice .campus-hero .hero-description {font-size:12px; margin-top:6px;}
-.page-practice .campus-hero .hero-actions {margin-top:18px;}
-.page-practice .hero-caption {bottom:12px;}
 .bank-pagination {display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:7px; margin:21px auto 34px; padding:7px; color:var(--site-muted);}
 .bank-pagination button {min-width:36px; min-height:36px; padding:6px 12px; background:#fff; border:1px solid #d6e2ed; border-radius:10px; color:var(--site-navy); font-size:13px; font-weight:700; cursor:pointer;}
 .bank-pagination button:hover:not(:disabled) {background:#eaf2fa; border-color:#a8cae8;}
@@ -256,13 +249,11 @@ body { margin:0; }
  .elpa-nav-github {margin-left:auto;font-size:11px;}
  .elpa-nav-links {order:3;flex-basis:100%;overflow:auto; margin:0;justify-content:space-between;gap:0;}
  .elpa-nav-links a {padding:8px 10px 10px;font-size:12px;white-space:nowrap;}
- .elpa-hero {min-height:450px;}
- .elpa-hero-inner {padding:58px 0 60px;}
  .elpa-main {padding:34px 16px 58px;}
- .elpa-subhero {min-height:224px;padding:40px 17px 35px;}
- .page-practice .campus-hero {min-height:220px;padding:27px 15px 30px;}
- .page-practice .campus-hero h1 {font-size:28px;}
- .page-practice .campus-hero .hero-actions {gap:8px;}
+ .elpa-subhero{min-height:272px;padding:30px 20px;}
+ .elpa-subhero h1{font-size:28px}
+ .elpa-subhero h1 .elpa-en-sub{font-size:14px}
+ .elpa-subhero p{font-size:13px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;} .elpa-button {transition:none;}}
 
@@ -359,7 +350,6 @@ body { margin:0; }
 ::view-transition-new(root){animation:elpa-reveal .13s ease-out}
 .elpa-nav-links a{border-bottom-width:2px;}
 .elpa-nav-links a.active{background:transparent;border-bottom-color:var(--site-gold);}
-.elpa-hero::after,.page-practice .campus-hero::after{display:none;content:none;}
 .elpa-subhero{border-bottom:0;}
 .elpa-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:stretch;margin-top:28px;}
 .elpa-cta{
@@ -374,22 +364,12 @@ body { margin:0; }
 .elpa-cta-secondary{background:rgba(7,37,70,.2);border-color:rgba(255,255,255,.68);color:#fff!important;}
 .elpa-cta-secondary:hover{background:rgba(255,255,255,.16);transform:translateY(-1px);}
 .elpa-cta:focus-visible{outline:3px solid #fff;outline-offset:3px;}
-.page-practice .campus-hero .elpa-actions{margin-top:22px;}
-.page-practice .campus-hero{min-height:276px;padding:38px 24px 44px;}
-.page-practice .campus-hero.elpa-subhero{display:flex;align-items:center;justify-content:flex-start;min-height:252px;padding:54px 24px 48px;background:linear-gradient(100deg,#062a50,#07538c);text-align:left}
-.page-practice .campus-hero.elpa-subhero .hero-inner{width:100%;max-width:1180px}
-.page-practice .campus-hero.elpa-subhero h1{margin:13px 0 8px;font-size:clamp(28px,4vw,43px);line-height:1.2}
-.page-practice .campus-hero.elpa-subhero .hero-eyebrow{margin:0}
-.page-practice .campus-hero.elpa-subhero .hero-description{max-width:790px;margin:0;color:#dce8f4;font-size:14px;line-height:1.7;opacity:1}
-.page-practice .campus-hero.elpa-subhero .elpa-actions{margin-top:18px}
+.elpa-home-start .elpa-cta-secondary{background:#fff;border-color:var(--site-blue);color:var(--site-blue)!important}
+.elpa-home-start .elpa-cta-secondary:hover{background:#eaf2fa}
+.elpa-home-start .elpa-cta:focus-visible{outline-color:var(--site-blue)}
 @media(max-width:650px){
   .elpa-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:25px;width:100%;}
   .elpa-cta{min-width:0;padding:11px 9px;min-height:46px;font-size:13px;white-space:nowrap;}
-  .page-practice .campus-hero{min-height:265px;padding:34px 19px 42px;}
-  .page-practice .campus-hero.elpa-subhero{min-height:224px;padding:40px 17px 35px;background:linear-gradient(100deg,#062a50,#07538c)}
-  .page-practice .campus-hero.elpa-subhero h1{font-size:28px}
-  .page-practice .campus-hero.elpa-subhero .hero-description{font-size:13px}
-  .page-practice .campus-hero .elpa-actions{margin-top:20px;}
 }
 @media(max-width:360px){.elpa-cta{font-size:12px;padding-inline:6px;}}
 @media(prefers-reduced-motion:reduce){
@@ -400,18 +380,9 @@ body { margin:0; }
   .contrib-actions a::after,.question-feedback a::after{transition:none;}
 }
 
-/* Compact homepage banner; shared banners on other pages keep their dimensions. */
-.elpa-home .elpa-hero{min-height:360px;background-image:linear-gradient(95deg,rgba(0,28,58,.92),rgba(0,49,91,.8) 45%,rgba(0,47,88,.5)),url('./assets/images/Administration-Building-14-1536x864.jpg')}
-.elpa-home .elpa-hero-inner{max-width:1132px;padding:46px 0}
-.elpa-home .elpa-hero h1{font-size:clamp(28px,3.8vw,46px);line-height:1.3}
-.elpa-home .elpa-hero p{max-width:580px;font-size:15px;line-height:1.8}
-.elpa-home .elpa-hero .elpa-home-hero-note{margin-top:16px;font-size:12px;color:#e0e9f2}
-.elpa-home .elpa-eyebrow{font-size:12px;letter-spacing:.04em}
+/* Homepage content below the shared banner. */
 .elpa-home .elpa-heading{font-size:clamp(23px,2.6vw,30px)}
 @media(max-width:650px){
- .elpa-home .elpa-hero{min-height:0}
- .elpa-home .elpa-hero-inner{width:calc(100% - 40px);padding:32px 0}
- .elpa-home .elpa-hero h1{font-size:clamp(25px,6.4vw,36px);margin:16px 0 12px}
  .elpa-home .elpa-actions{grid-template-columns:1fr;margin-top:20px;gap:8px}
  .elpa-home .elpa-cta{min-height:46px;font-size:14px;white-space:normal}
  .elpa-home-main{padding-left:20px;padding-right:20px}
