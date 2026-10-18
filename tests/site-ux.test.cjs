@@ -417,7 +417,7 @@ test('official source links remain separate from community references',()=>{
  const sources=fs.readFileSync(path.join(__dirname,'../sources.html'),'utf8');
  assert.match(sources,/id="official-sources"/);
  assert.match(sources,/id="community-sources"/);
- for(const target of ['https://elpa.hkust-gz.edu.cn/','https://fytgs.hkust-gz.edu.cn/handbooks/handbook-for-research-postgraduate-studies','https://cle.hkust.edu.hk/elpa','https://cle.hkust.edu.hk/sites/default/files/ELPA-Speaking-Scale-Student-Version.pdf'])assert.ok(sources.includes(target),target);
+ for(const target of ['https://elpa.hkust-gz.edu.cn/','https://fytgs.hkust-gz.edu.cn/handbooks/handbook-for-research-postgraduate-studies','https://cle.hkust.edu.hk/elpa','https://cle.hkust.edu.hk/sites/default/files/2026-08/ELPA-Speaking-Scale-Student-Version.pdf'])assert.ok(sources.includes(target),target);
  assert.ok(sources.indexOf('id="official-sources"')<sources.indexOf('id="community-sources"'));
  assert.equal((sources.match(/class="elpa-resource-tag"/g)||[]).length,4);
 });
