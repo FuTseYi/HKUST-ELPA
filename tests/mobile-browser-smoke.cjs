@@ -246,6 +246,22 @@ const serve=http.createServer((request,response)=>{
       }finally{await guide.close();}
 
       if(width===390){
+        const preview=await newPage({viewport:{width:390,height:844}});
+        try{
+          await preview.goto(new URL('/submit.html?kind=advice',host).href,{waitUntil:'load'});
+          await preview.locator('#adviceTags input').first().check();
+          await preview.locator('#adviceTitle').fill('Preview regression');
+          await preview.locator('#adviceBody').fill('Original advice content for the local preview regression.');
+          await preview.locator('#previewButton').click();
+          assert.equal(await preview.locator('#previewPanel').isVisible(),true);
+          await preview.locator('#adviceBody').fill('Updated advice content for the local preview regression.');
+          assert.equal(await preview.locator('#previewPanel').isVisible(),false,'Editing content invalidates the old preview');
+          assert.match(await preview.locator('#submissionMessage').innerText(),/Please preview again/);
+          await preview.locator('#previewButton').click();
+          assert.match(await preview.locator('#previewPanel').innerText(),/Updated advice content/);
+          await preview.locator('#advicePhase').selectOption('after');
+          assert.equal(await preview.locator('#previewPanel').isVisible(),false,'Changing metadata invalidates the old preview');
+        }finally{await preview.close();}
         // Copied question numbers must follow the same feedback-ranked order
         // as the cards, not the original F-series storage order.
         const numbering=await page.evaluate(()=>{

@@ -16,6 +16,14 @@ const ready=Boolean(taxonomy&&config.apiEndpoint&&config.turnstileSiteKey&&
 const get=id=>document.getElementById(id);
 const trimmed=id=>get(id).value.trim();
 function say(text,state='info'){message.textContent=text;message.dataset.state=state;}
+function invalidatePreview(){
+  const preview=get('previewPanel');
+  if(preview.hidden)return;
+  preview.hidden=true;
+  say('内容已修改，请重新预览。 / Content changed. Please preview again.');
+}
+form.addEventListener('input',invalidatePreview);
+form.addEventListener('change',invalidatePreview);
 function addText(parent,tag,text,cls){
   const el=document.createElement(tag);el.textContent=text;
   if(cls)el.className=cls;parent.append(el);return el;
@@ -61,6 +69,7 @@ function refreshFollowups(){
 }
 function addFollowup(en='',cn=''){
   if(followups.children.length>=20)return;
+  invalidatePreview();
   const wrapper=document.createElement('div');wrapper.className='contrib-follow';
   const header=document.createElement('div');header.className='contrib-follow-header';
   const title=addText(header,'strong','小问','follow-title');
@@ -72,7 +81,7 @@ function addFollowup(en='',cn=''){
       if(cls==='remove'){wrapper.remove();}
       else if(cls==='move-up'&&wrapper.previousElementSibling)followups.insertBefore(wrapper,wrapper.previousElementSibling);
       else if(cls==='move-down'&&wrapper.nextElementSibling)followups.insertBefore(wrapper.nextElementSibling,wrapper);
-      refreshFollowups();get('previewPanel').hidden=true;
+      refreshFollowups();invalidatePreview();
     });actions.append(b);
   }
   header.append(actions);wrapper.append(header);
@@ -128,6 +137,7 @@ function findQuestion(id){
   return entry?{id,en:entry.en,cn:entry.cn||''}:null;
 }
 function clearLink(){
+  invalidatePreview();
   linkedId=null;
   get('mainEn').readOnly=false;get('mainCn').readOnly=false;
   get('mainEnField').classList.remove('linked-hidden');
@@ -139,6 +149,7 @@ function clearLink(){
   renderSuggestions();
 }
 function linkQuestion(entry){
+  invalidatePreview();
   linkedId=entry.id;
   get('mainEn').value=entry.en;
   get('mainCn').value=entry.cn||'';
