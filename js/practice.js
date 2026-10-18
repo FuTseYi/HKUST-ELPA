@@ -1312,7 +1312,12 @@ document.addEventListener('click',e=>{
   }
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){recordsPanel.hidden=true;recordsButton.setAttribute('aria-expanded','false');}
+  if(e.key==='Escape'&&!recordsPanel.hidden){
+    const focusInside=recordsPanel.contains(document.activeElement);
+    recordsPanel.hidden=true;
+    recordsButton.setAttribute('aria-expanded','false');
+    if(focusInside)recordsButton.focus();
+  }
 });
 /* ============ 导出全部笔记（Markdown 下载） ============ */
 document.getElementById('exportBtn').addEventListener('click', () => {

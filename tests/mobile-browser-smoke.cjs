@@ -305,6 +305,11 @@ const serve=http.createServer((request,response)=>{
         assert.match(numbering.copied,new RegExp('第 '+numbering.displayed+' 题'));
         assert.equal(numbering.session,'场次待核实');
         assert.match(numbering.source,/英文根据中文回忆整理/);
+        await page.locator('#recordsMenuBtn').click();
+        await page.locator('#recordsBackupBtn').focus();
+        await page.keyboard.press('Escape');
+        assert.equal(await page.locator('#recordsMenu').isVisible(),false);
+        assert.equal(await page.evaluate(()=>document.activeElement.id),'recordsMenuBtn','Escape restores focus to the records toggle');
         const exportPage=await newPage({viewport:{width:390,height:844}});
         try{
           await exportPage.goto(new URL('/practice.html?track=fast-track',host).href,{waitUntil:'load'});
