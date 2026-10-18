@@ -277,8 +277,8 @@ body { margin:0; }
  .elpa-nav-actions .elpa-nav-github {margin-left:0;min-height:38px;border:1px solid #d8e2ec;border-radius:10px;box-shadow:none;background:#fff;padding:7px 10px;gap:6px;display:inline-flex;align-items:center;justify-content:center;flex:none;text-decoration:none;color:var(--site-navy);}
 .elpa-nav-github img {width:20px;height:20px;display:block;}
 .elpa-nav-github:hover {border-color:#d6b354;background:#fff9eb;}
-.elpa-star-icon{color:#a87510;flex:none;transform-origin:center;animation:elpa-star-breathe 3.2s ease-in-out infinite}
-@keyframes elpa-star-breathe{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.16);opacity:1}}
+.elpa-star-icon{color:#a87510;flex:none;transform-origin:center;animation:elpa-star-breathe 2.4s ease-in-out infinite}
+@keyframes elpa-star-breathe{0%,100%{transform:scale(.95);opacity:.6;fill:transparent;filter:drop-shadow(0 0 0 transparent)}50%{transform:scale(1.35);opacity:1;fill:var(--site-gold);filter:drop-shadow(0 0 4px rgba(244,198,90,.85))}}
 .elpa-nav-github:hover .elpa-star-icon,.elpa-nav-github:focus-visible .elpa-star-icon{animation:none;transform:scale(1.12);opacity:1;fill:var(--site-gold)}
 @media(prefers-reduced-motion:reduce){.elpa-star-icon{animation:none;transform:none!important;opacity:1}}
 .elpa-nav-github .elpa-star-count{width:auto;height:20px;padding-left:5px;border-left:1px solid #d8e2ec}
