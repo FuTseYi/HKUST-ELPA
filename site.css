@@ -168,7 +168,8 @@ body { margin:0; }
 .elpa-subhero p{color:#dce8f4;max-width:790px;margin:0;font-size:14px;line-height:1.7}
 .elpa-home-start{margin-bottom:32px}
 .elpa-home-start .elpa-actions{margin-top:0}
-.elpa-home-start .elpa-home-hero-note{margin:12px 0 0;font-size:12px;color:var(--site-muted)}
+.elpa-home-tools{display:inline-flex;align-items:center;gap:12px;max-width:100%;margin-top:16px;padding:4px 0;font-size:13px;font-weight:600;text-decoration:none}
+.elpa-home-tools small{display:block;margin-top:4px;font-size:11px;font-weight:500;line-height:1.3}
 .elpa-flow {display:grid; gap:14px; margin-top:20px;}
 .elpa-flow-step {padding:22px 25px; background:#fff; border:1px solid var(--site-line); border-left:4px solid var(--site-blue); border-radius:12px;}
 .elpa-flow-step h3 {margin:0 0 8px; color:var(--site-navy); font-size:16px;}
@@ -193,6 +194,7 @@ body { margin:0; }
 .elpa-supplement-links li>span{display:inline-block;margin-left:12px;font-size:12px;color:var(--site-muted)}
 @media(max-width:800px){.elpa-resource{grid-template-columns:1fr;gap:4px;padding:13px 0}}
 .elpa-cta::after,
+.elpa-home-tools::after,
 
 .elpa-guide-practice::after,
 .elpa-resource a::after,
@@ -205,6 +207,8 @@ body { margin:0; }
   transform:rotate(45deg);transition:transform .16s ease;
 }
 .elpa-cta:hover::after,
+.elpa-home-tools:hover::after,
+.elpa-home-tools:focus-visible::after,
 
 .elpa-guide-practice:hover::after,
 .elpa-resource a:hover::after,
@@ -377,6 +381,7 @@ body { margin:0; }
   ::view-transition-old(root),::view-transition-new(root){animation:none;}
   .elpa-cta{transition:none;transform:none!important;}
   .elpa-cta::after,.elpa-guide-practice::after,
+  .elpa-home-tools::after,
   .elpa-resource a::after,.elpa-footer-action::after,.elpa-advice-section .elpa-desc a::after,
   .contrib-actions a::after,.question-feedback a::after{transition:none;}
 }
@@ -439,5 +444,4 @@ body { margin:0; }
  .elpa-home .elpa-cta::after{width:6px;height:6px}
  .elpa-nav-links a{line-height:1.25}
  .elpa-nav-links a small{font-size:9px}
- .elpa-home-hero-note .elpa-en-summary{font-size:11px}
 }
