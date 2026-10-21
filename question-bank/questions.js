@@ -237,7 +237,8 @@ BANKS.D = {
     { num:9, term:'2026 Fall', en:'What was your first impression of HKUST(GZ) when you arrived?', cn:'你刚来到香港科技大学（广州）时，对学校的第一印象是什么？', subs:[] },
     { num:10, term:'2026 Fall', en:'How could you use the unique platform of HKUST(GZ) to achieve your personal goals?', cn:'你会如何利用香港科技大学（广州）的独特平台实现个人目标？', subs:[] },
     { num:11, term:'2026 Fall', en:'What place at HKUST(GZ) would you most like to visit or experience, and why?', cn:'在香港科技大学（广州），你最想参观或体验哪个地方？为什么？', subs:[] },
-    { num:12, term:'2026 Fall', en:'What kind of skills do you hope to develop at HKUST(GZ)?', cn:'你希望在香港科技大学（广州）培养哪些技能？', subs:[] }
+    { num:12, term:'2026 Fall', en:'What kind of skills do you hope to develop at HKUST(GZ)?', cn:'你希望在香港科技大学（广州）培养哪些技能？', subs:[] },
+    {"num":1000013,"en":"TEST ONLY - HKUST-ELPA browser submission verification. DO NOT PUBLISH.","cn":"2026 Fall｜社区投稿（考生亲历；非官方核实原题）","recallTag":"考生英文回忆，非官方原题","subs":[]}
   ]
 };
 
