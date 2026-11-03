@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
       ISSUE_NUMBER: ${{ github.event.issue.number }}
     steps:
       - name: Ensure publication labels exist
@@ -54,9 +55,9 @@ jobs:
             if git diff --cached --quiet; then
               # An unchanged import is "published" only if this exact Issue
               # was already recorded, not merely because its text is similar.
-              if grep -Fq "Issue #${ISSUE_NUMBER}" question-bank/community-submissions.md \
-                || grep -Fq "\"issueNumber\": ${ISSUE_NUMBER}" question-bank/appearances.js \
-                || grep -Fq "\"issueNumber\": ${ISSUE_NUMBER}" question-bank/advice.js; then
+              if grep -Eq "Issue #${ISSUE_NUMBER}([^[:digit:]]|$)" question-bank/community-submissions.md \
+                || grep -Eq "\"issueNumber\": ${ISSUE_NUMBER}(,|[[:space:]]*})" question-bank/appearances.js \
+                || grep -Eq "\"issueNumber\": ${ISSUE_NUMBER}(,|[[:space:]]*})" question-bank/advice.js; then
                 echo "recorded=true" >> "$GITHUB_OUTPUT"
               else
                 echo "recorded=false" >> "$GITHUB_OUTPUT"
