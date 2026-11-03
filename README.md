@@ -87,12 +87,12 @@ HKUST-ELPA/
 ├── elpa_data.json                 # 空的初始记录文件，非个人备份
 ├── assets/                        # 按 images/、icons/、demos/ 统一管理静态素材
 ├── question-bank/                 # 稳定题目、场次、经验及来源文档
-├── scripts/                       # 校验、审核数据导入及 PR 文件白名单
+├── scripts/                       # 校验、投稿数据导入及发布文件白名单
 ├── tests/                         # Worker、导入器、页面逻辑与浏览器回归
 ├── worker/                        # 独立部署的 Cloudflare 投稿接口
 ├── docs/                          # 投稿数据约定及维护说明
 ├── package.json / package-lock.json # 统一检查命令与锁定的测试依赖
-└── .github/workflows/             # 网站校验、批准投稿后生成数据 PR
+└── .github/workflows/             # 网站校验、Completed 后自动审核发布
 ```
 
 `output/`、`.playwright-cli/`、`node_modules/` 和本地密钥文件均不纳入版本控制。
