@@ -23,3 +23,15 @@ test('generated layout replaces drift instead of adding another independent copy
   assert.notEqual(tampered,html);
   assert.equal(renderPage('guide',tampered),html);
 });
+
+test('practice palette aliases reuse the global design tokens',()=>{
+  const site=read('site.css'),practice=read('css/practice.css');
+  for(const [local,global] of [
+    ['bg','site-bg'],['ink','site-ink'],['line','site-line'],
+    ['brand','site-navy'],['brand-2','site-blue']
+  ]){
+    assert.ok(site.includes('--'+global+':'),'Missing shared token: '+global);
+    assert.ok(practice.includes('--'+local+': var(--'+global+');'),
+      'Local palette must reuse '+global);
+  }
+});
