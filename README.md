@@ -124,9 +124,9 @@ HKUST-ELPA/
 1. 站内投稿通过 Worker 校验，保存为带 v2 结构化记录的公开 Issue；旧版 v1 待处理记录仍兼容。
 2. 维护者核对来源、隐私、重复经历、题干及小问。**考生回忆不等于学校确认的原题。**
 3. 仓库所有者选择 **Close as completed** 批准投稿；**Close as not planned / duplicate** 则不收录。
-4. Actions 仅允许修改题库相关文件，完成数据验证和单元测试后自动推送 `main`。部署是否成功须查看 Vercel。
+4. Actions 仅允许修改题库相关文件，完成数据验证和单元测试后自动推送 `main`。`submission:published` 表示已收录进 Git 仓库，`submission:failed` 表示入库失败；实际部署成功仍以 Vercel 为准。
 
-相同题目保留原 ID；新的考试经历增加出现记录，仅补充问法或小问不增加考过次数。失败时在原 Issue 提示工作流记录，可修复后重新运行。授权及文件白名单见 [审核说明](./question-bank/MODERATION.md)。
+相同题目保留原 ID；新的考试经历增加出现记录，仅补充问法或小问不增加考过次数。`submission:pending` 在关闭后移除、重新打开后恢复；失败时在原 Issue 提示工作流记录，可修复后重新运行。授权及文件白名单见 [审核说明](./question-bank/MODERATION.md)。
 
 ### 安全与外部服务
 
