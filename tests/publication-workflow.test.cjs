@@ -91,3 +91,11 @@ test('matching existing v1 question without its Issue is not considered publishe
   assert.match(result.first,/recorded=false/);
   assert.match(result.second,/recorded=false/);
 });
+
+test('one importer entrypoint handles legacy and structured Issues',()=>{
+  const importSource=fs.readFileSync(path.join(__dirname,'../scripts/import-completed-submission.cjs'),'utf8');
+  assert.match(importSource,/function importV2\(event\)/);
+  assert.match(importSource,/elpa-submission-v1:/);
+  assert.match(importSource,/elpa-submission-v2:/);
+  assert.ok(!fs.existsSync(path.join(__dirname,'../scripts/import-v2-submission.cjs')));
+});
