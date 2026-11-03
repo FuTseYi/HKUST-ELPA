@@ -6,6 +6,10 @@ on:
 
 # A completed closure by the repository owner is the single approval signal.
 # Other close reasons, including duplicate and not_planned, do not publish.
+concurrency:
+  group: elpa-question-bank-publication
+  queue: max
+
 permissions:
   contents: write
   issues: write
@@ -28,11 +32,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Install locked browser test dependencies
-        run: |
-          npm ci
-          npx playwright install --with-deps chromium
-      - name: Import, validate, and publish with optimistic retries
+      - name: Import, validate, and publish
         id: publish
         env:
           GH_TOKEN: ${{ github.token }}
@@ -42,9 +42,12 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for attempt in 1 2 3 4 5 6 7 8; do
+          # Serialization protects other submissions; retries cover unrelated main updates.
+          for attempt in 1 2 3; do
             git fetch origin main
             git checkout -B submission-publication origin/main
+            git reset --hard origin/main
+            git clean -fd -- question-bank/
             # The importer reads untrusted issue content strictly as data.
             # Never interpolate an Issue field into a command.
             node scripts/import-completed-submission.cjs
@@ -57,28 +60,17 @@ jobs:
             node scripts/check-submission-diff.cjs
             npm run check
             npm test
-            npm run test:browser
             git commit -m "docs: publish reviewed ELPA issue #${ISSUE_NUMBER}"
             if git push origin HEAD:main; then
               echo "published=true" >> "$GITHUB_OUTPUT"
               echo "Published Issue #${ISSUE_NUMBER} to main"
               exit 0
             fi
-            echo "main moved during publication; retrying against latest data (${attempt}/8)"
+            echo "main moved during publication; retrying against latest data (${attempt}/3)"
             sleep 2
           done
           echo "Unable to publish after concurrent updates" >&2
           exit 1
-      - name: Request production deployment if a deploy hook is configured
-        if: steps.publish.outputs.published == 'true'
-        env:
-          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
-        run: |
-          if [ -n "$VERCEL_DEPLOY_HOOK_URL" ]; then
-            curl --fail --show-error --silent --retry 3 --request POST "$VERCEL_DEPLOY_HOOK_URL"
-          else
-            echo "::notice::Main updated. Verify the Vercel Git integration deployed this commit, or configure VERCEL_DEPLOY_HOOK_URL."
-          fi
       - name: Report publication failure
         if: failure()
         env:

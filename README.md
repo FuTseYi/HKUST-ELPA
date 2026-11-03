@@ -117,14 +117,14 @@ HKUST-ELPA/
 | 投稿 Worker | 校验来源、Turnstile、频率、大小和字段，成功后只创建待处理的公开 Issue。 |
 | 审核工作流 | 仓库所有者将 Issue 关闭为 Completed 后执行，自动验证数据与测试并提交至 `main`。 |
 | 结构化题库 | 常规、Fast Track 和不同校区使用稳定 ID；场次与补充问法独立关联。 |
-| 发布 | 导入成功并通过测试后推送 `main`，由 Vercel Git 集成或可选部署 Hook 部署；Worker 不直接发布题目。 |
+| 发布 | 导入成功并通过测试后推送 `main`，由 Vercel Git 集成部署；Worker 不直接发布题目。 |
 
 ### 投稿与审核
 
 1. 站内投稿通过 Worker 校验，保存为带 v2 结构化记录的公开 Issue；旧版 v1 待处理记录仍兼容。
 2. 维护者核对来源、隐私、重复经历、题干及小问。**考生回忆不等于学校确认的原题。**
 3. 仓库所有者选择 **Close as completed** 批准投稿；**Close as not planned / duplicate** 则不收录。
-4. Actions 仅允许修改题库相关文件，完成数据验证、单元测试与浏览器测试后自动推送 `main`。部署是否成功须查看 Vercel。
+4. Actions 仅允许修改题库相关文件，完成数据验证和单元测试后自动推送 `main`。部署是否成功须查看 Vercel。
 
 相同题目保留原 ID；新的考试经历增加出现记录，仅补充问法或小问不增加考过次数。失败时在原 Issue 提示工作流记录，可修复后重新运行。授权及文件白名单见 [审核说明](./question-bank/MODERATION.md)。
 
