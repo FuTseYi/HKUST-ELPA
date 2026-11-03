@@ -19,7 +19,7 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 | 首页 | 首次使用路线、功能入口及可展开的操作说明。 |
 | 指南与经验 | 分别查看常规 ELPA / Fast Track 流程，通过顶部入口阅读或分享考生经验。 |
 | 题库练习 | 按 GZ / HK 校区、考试类型、场次、关键词和练习状态筛选。英文题干优先，中文、相似问法及提示小问按需展开。 |
-| 社区分享 | 无需注册，可提交回忆题、提示小问、不同问法或备考经验。投稿公开保存，复核后才考虑收录。 |
+| 社区分享 | 无需注册，可提交回忆题、提示小问、不同问法或备考经验。投稿公开保存，由维护者核实后，选择 Close as completed 自动收录。 |
 | 资料来源 | 区分学校说明与学生整理资料，保留参考链接和内容限制。 |
 
 ![考试指南、抽题计时、笔记进度与考题经验分享的四宫格演示](./assets/demos/feature-grid.gif)
@@ -115,18 +115,18 @@ HKUST-ELPA/
 | 静态前端 | Vercel / GitHub Pages 托管相同文件，无构建依赖；学习记录按浏览器来源隔离。 |
 | GitHub 星数 | HTML 直接嵌入 Shields 数字徽章，无自定义请求和缓存脚本；加载失败时隐藏数字，仓库链接仍可用。 |
 | 投稿 Worker | 校验来源、Turnstile、频率、大小和字段，成功后只创建待处理的公开 Issue。 |
-| 审核工作流 | 仅仓库所有者为开放 Issue 添加 `submission:approved` 时执行，验证数据后生成独立 PR。 |
+| 审核工作流 | 仓库所有者将 Issue 关闭为 Completed 后执行，自动验证数据与测试并提交至 `main`。 |
 | 结构化题库 | 常规、Fast Track 和不同校区使用稳定 ID；场次与补充问法独立关联。 |
-| 发布 | PR 人工复核、合并后随静态站点部署更新；Worker 不直接发布题目。 |
+| 发布 | 导入成功并通过测试后推送 `main`，由 Vercel Git 集成或可选部署 Hook 部署；Worker 不直接发布题目。 |
 
 ### 投稿与审核
 
 1. 站内投稿通过 Worker 校验，保存为带 v2 结构化记录的公开 Issue；旧版 v1 待处理记录仍兼容。
 2. 维护者核对来源、隐私、重复经历、题干及小问。**考生回忆不等于学校确认的原题。**
-3. 仓库所有者添加批准标签，Actions 用受信任的仓库脚本生成数据 PR。
-4. PR 只允许修改题库、场次、经验和对应社区文档，不自动合并。
+3. 仓库所有者选择 **Close as completed** 批准投稿；**Close as not planned / duplicate** 则不收录。
+4. Actions 仅允许修改题库相关文件，完成数据验证、单元测试与浏览器测试后自动推送 `main`。部署是否成功须查看 Vercel。
 
-相同题目保留原 ID；新的考试经历增加出现记录，仅补充问法或小问不增加考过次数。授权及完整文件白名单见 [审核说明](./question-bank/MODERATION.md)。
+相同题目保留原 ID；新的考试经历增加出现记录，仅补充问法或小问不增加考过次数。失败时在原 Issue 提示工作流记录，可修复后重新运行。授权及文件白名单见 [审核说明](./question-bank/MODERATION.md)。
 
 ### 安全与外部服务
 
@@ -141,7 +141,7 @@ HKUST-ELPA/
 | 文档 | 内容 |
 | --- | --- |
 | [题库说明](./question-bank/README.md) | 数据文件分工、稳定 ID、题目范围与来源规范。 |
-| [审核维护说明](./question-bank/MODERATION.md) | v1 / v2 审核、生成 PR、数据文件白名单与发布边界。 |
+| [审核维护说明](./question-bank/MODERATION.md) | v1 / v2 审核、Completed 自动发布、数据文件白名单与发布边界。 |
 | [投稿数据规范](./docs/submission-v2-spec.md) | 字段、分类、相似问法、小问及计数规则。 |
 | [Worker 文档](./worker/README.md) | 独立部署、开关、密钥和生产验证。 |
 
