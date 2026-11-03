@@ -1,53 +1,35 @@
 # Community submission moderation
 
-The front end and Cloudflare Worker never change published question-bank data.
-The Worker creates a public Issue with a readable summary and machine-readable
-`elpa-submission-v2` marker. Older `elpa-submission-v1` records remain supported.
+Community reports are untrusted input. A Cloudflare Worker creates a public GitHub Issue with a structured `elpa-submission-v2` marker; legacy `v1` reports remain supported. Neither the Worker nor the website directly modifies the published question bank.
 
-## Maintainer-only process
+## One-click owner review
 
-1. Review the Issue: reliability, privacy, duplicate and wording.
-2. To reject, close the Issue; leave `submission:approved` absent.
-3. To approve, add `submission:approved` **yourself** as repository owner
-   (`FuTseYi`) while the Issue is open.
-4. The `issues:labeled` workflow reads the event JSON **as data**, validates
-   its fields, checks exact duplicates, and writes **only**
-   the files allowed by `scripts/check-submission-diff.cjs`:
-   - `question-bank/questions.js` — regular GZ questions;
-   - `question-bank/fast-track.js` — GZ Fast Track and HK campus banks;
-   - `question-bank/appearances.js` — session reports, alternative wording and follow-ups;
-   - `question-bank/advice.js` — reviewed preparation advice;
-   - `question-bank/community-submissions.md` and `question-bank/community-advice.md` — review/source records.
-5. It creates a PR against `main`. Check the diffs, source qualifiers and
-   site-checks; merge manually. It does **not** auto-merge or add unapproved
-   content to the website.
+1. Open the public Issue, check provenance, privacy, existing question links, wording and duplicates.
+2. **Close as completed** (repository owner `FuTseYi` only) to approve the report for automatic publication.
+3. **Close as not planned** to reject; **Close as duplicate** to discard a redundant report. Neither publishes data.
+4. Leave the Issue **Open** when more review is needed.
 
-To use this workflow, create the `submission:approved` repository label and
-enable **Settings → Actions → General → Workflow permissions →
-Allow GitHub Actions to create and approve pull requests** if disabled.
+The `issues: closed` workflow checks the trusted GitHub sender and `state_reason=completed`. It decodes the Issue marker **as data**, validates it, reuses canonical IDs, updates only the allowlisted `question-bank/` files, and runs site checks, unit tests and browser smoke tests before pushing a commit to `main`. The Vercel Git integration should deploy updates to `main`; an optional repository secret `VERCEL_DEPLOY_HOOK_URL` can explicitly request a deployment. Always verify the production deployment.
 
-Limitations:
-- Exact normalized duplicate detection only. Similar wording still needs review.
-- No automatic translation or fabricated follow-up questions.
-- New v2 question IDs are `<bank>-(1000000 + issue number)`, using `D` (GZ Regular),
-  `F` (GZ Fast Track), `H` (HK Regular) or `T` (HK Fast Track). Legacy v1 creates D IDs.
-  An exact existing question keeps its ID and v2 records its reported session.
-- `intent=encounter` counts an exam experience; `intent=supplement` adds alternative
-  wording or follow-ups without increasing the encounter count. Keep published
-  follow-up order stable to preserve positional note keys.
-- GitHub `GITHUB_TOKEN`-created PRs may not trigger separate
-  `pull_request` workflows. Check the PR manually and run the normal site CI
-  against any human-updated branch before merging.
-- No personally identifiable details should be copied into public questions.
+**Completed means approved, not necessarily published.** A failed workflow leaves the Issue closed and posts a run link for diagnosis; after fixing the cause, rerun the failed workflow. For a completed Issue with no new changes, the importer exits without writing or publishing. Never use closure as a bypass for validating a submission.
 
-## Release policy
+## Safety boundaries
 
-The Cloudflare Worker must remain closed until a repository-scoped GitHub token,
-Turnstile verification, both `submission:pending` and `submission:approved`
-labels, and permission for Actions to create PRs are available.
-Set `SUBMISSIONS_DISABLED=false` **only after** the full workflow has been
-verified. Missing or misspelled values are treated as disabled.
+- Only GitHub's authenticated owner closure event is accepted; comments, labels, reopen and any other close reason never approve.
+- Input is read from the event payload, never evaluated as code. Exact duplicate detection does not replace reviewing similar wording.
+- No automated translations, invented follow-up questions, or personal details in published data.
+- New v2 question IDs are `<bank>-(1000000 + issue number)`: D (GZ Regular), F (GZ Fast Track), H (HK Regular), T (HK Fast Track). Existing questions retain their ID. Legacy v1 imports to D.
+- `intent=encounter` records a new exam experience; `intent=supplement` adds alternative wording or follow-ups without increasing encounter counts. Do not reorder published follow-ups: old notes refer to their positions.
+- Changes are strictly limited by `scripts/check-submission-diff.cjs` to `questions.js`, `fast-track.js`, `appearances.js`, `advice.js`, `community-submissions.md`, and `community-advice.md` inside `question-bank/`.
+- The workflow retries publication against a fresh `main` checkout if another commit races it. Each Issue is imported idempotently. Do not force-push.
+- GitHub's `GITHUB_TOKEN` pushes do not trigger ordinary GitHub Actions `push` workflows. The submission workflow runs checks itself. Verify that Vercel received the new production commit, or set a Vercel deploy hook secret.
+- A manually reopened Issue does not undo a published item. Correct already-published data through a reviewed repository change.
+- The workflow requires Actions to have `contents: write` on `main`. If branch protection prohibits bot pushes, change the protection/permissions deliberately; do not bypass them by removing validation.
 
-For a new question, review the generated PR diff, provenance and any similar
-questions. Do not merge a PR generated from a synthetic test report.
-Do not delete implementation branches after PR merges.
+## Operational setup
+
+- Create the `submission:pending` label for incoming Issues. The former `submission:approved` label is not used by the workflow and can be deleted when no longer needed.
+- Keep Worker secrets only in Cloudflare and deployment-hook URLs only in GitHub Actions secrets.
+- Keep the Worker disabled until its scoped GitHub Issues token, Turnstile, rate limiting and actual production origins are verified.
+- Confirm the repository's Actions write permissions, and that Vercel production deployments track `main`.
+- A rejection or duplicate closure must not silently publish; check the Actions run and live website after the first successful completed closure.
