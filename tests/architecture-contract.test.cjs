@@ -47,3 +47,12 @@ test('published routes and owner-approved Issue publication remain available', (
   assert.match(workflow, /state_reason == 'completed'/);
   assert.match(workflow, /github\.event\.sender\.login == 'FuTseYi'/);
 });
+
+test('practice session remains a separate, loaded module', () => {
+  const html=read('practice.html');
+  assert.match(html, /<script src="\.\/js\/practice\.js"><\/script>[\s\S]*?<script src="\.\/js\/practice-session\.js"><\/script>/);
+  const session=read('js/practice-session.js');
+  assert.match(session, /function tickTimer\(/);
+  assert.match(session, /function drawPractice\(/);
+  assert.ok(!read('js/practice.js').includes('function tickTimer('));
+});

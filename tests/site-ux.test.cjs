@@ -100,9 +100,7 @@ test('one exercise entry and predictable compact question card',()=>{
  assert.match(practice,/env\(safe-area-inset-bottom,0px\)/);
 });
 function newTimerFixture(){
- const code=section(practice,
-   '/* ============ Unified practice dock: random draw + one stable timer ============ */',
-   '/* Existing backup and export handlers are accessed from a single menu. */');
+ const code=fs.readFileSync(path.join(__dirname,'../js/practice-session.js'),'utf8');
  const elements=new Map(),listeners=new Map();
  const cls=()=>{const store=new Set();return {
    add:(...names)=>names.forEach(name=>store.add(name)),
