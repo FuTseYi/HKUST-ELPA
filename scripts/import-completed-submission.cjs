@@ -1,4 +1,4 @@
-/* Import a maintainer-approved GitHub Issue to a data-only PR.
+/* Import an owner-completed GitHub Issue to reviewed question-bank data.
  * Inputs are read from the event JSON file (never interpolated into shell).
  * Run against the trusted repository checkout only.
  */
@@ -10,7 +10,7 @@ const eventFile=process.env.GITHUB_EVENT_PATH || process.argv[2];
 if(!eventFile)throw Error('GitHub event payload required');
 const event=JSON.parse(fs.readFileSync(eventFile,'utf8'));
 const issue=event.issue||{};
-/* v2 is additive: original v1 approval semantics and IDs are preserved. */
+/* v2 is additive: v1 data format and stable IDs remain compatible. */
 if(/^<!-- elpa-submission-v2:[A-Za-z0-9_-]+ -->\s*$/m.test(issue.body||'')){
   require('./import-v2-submission.cjs')(event);
   process.exit(0);

@@ -53,14 +53,14 @@ Recommended rules: question en 8–1000 characters, cn 0–1000, follow-up en 1�
 - The Worker validates the payload; the importer checks that the ID actually exists in the selected campus/track bank **and** matches the canonical English text. Legacy v2 records without these fields are still treated as encounters.
 - Existing baseline student recollections contribute one historic occurrence, or the known sourced `records` count. For imported questions, the originating Issue is counted once, not both as a baseline and a new Issue.
 - Individual reviewed Issue numbers count once, regardless of the number of follow-ups or whether the same term/slot appears elsewhere. Human reviewers should decline duplicate retellings of the very same encounter.
-- Follow-up supplements are stored as reviewed appearance metadata and displayed on the question card after merging the approved PR. No new account, database, or high-frequency filter is introduced.
+- Follow-up supplements are stored as reviewed appearance metadata and displayed on the question card after owner-completed publication. No new account, database, or high-frequency filter is introduced.
 
 ## Approval and archive rules
 
 1. Strict two-origin CORS, source-matching Turnstile hostname/action, per-edge rate limiter, secrets and kill switch remain unchanged.
 2. A **public** GitHub Issue stores human-readable fields plus `elpa-submission-v2:<base64url>` structured payload. Do not expose tokens, IPs or credentials.
 3. Maintain backwards compatibility with `elpa-submission-v1`; old pending Issues must remain approvable.
-4. Import approved v2 reports by trusted repository code only. Only the owner can trigger label-based approval. Generation of a data PR must **not** automatically merge it.
+4. Import v2 reports with trusted repository code only after the owner closes the Issue **as completed**. Other close reasons never publish. Validate imported data, run tests, and update `main` automatically; a completed Issue alone does not certify successful deployment.
 5. A new question receives a stable ID. An exact existing question reported in another term/slot should **record that appearance** and retain the existing ID, not create a duplicate card or discard the term. More ambiguous similarity remains for maintainer review.
 6. Existing learning records use stable question IDs and positional follow-up note keys. **Do not reorder existing published follow-ups** without an explicit note-key migration. New questions may use the contributor's order.
 7. Each approved advice report becomes one separately indexed article with its phase and standard tags. The raw text language is preserved; UI tag labels can be localized.
@@ -82,15 +82,8 @@ Recommended rules: question en 8–1000 characters, cn 0–1000, follow-up en 1�
 
 Placeholders are hints, **not field labels**. Required status, accessibility labels and error messages must remain visible without placeholders.
 
-## Historical rollout and release acceptance
+## Release acceptance
 
-The PR sequence below records the original v2 rollout plan. For routine maintenance,
-run `npm run check`, `npm test` and `npm run test:browser`; deployments still need the
-separate production verification described below.
+Run `npm run check`, `npm test` and `npm run test:browser` on new code. The completed-Issue workflow runs these checks again on every imported submission and retries against fresh `main` if concurrent writes race. Its bot-authored push to `main` does not trigger ordinary GitHub Actions push runs; verify production deployment through the Vercel Git integration or a configured deploy hook. The operational review and recovery guide is [MODERATION.md](../question-bank/MODERATION.md).
 
-- **PR 1:** contract and taxonomy only; no production workflow change.
-- **PR 2:** v1/v2 importer and tested data storage; no public v2 form.
-- **PR 3:** v2 Worker acceptance deployed only after validation; retain v1 compatibility and active public switches.
-- **PR 4:** form and practice/guide UI update after Worker deploy; exercise responsive and keyboard access.
-- **Final smoke:** both domains × question/advice submissions (synthetic), verify actual Issues, owner approval-to-PR for both types, no auto-merge; close synthetic Issues/PRs without merging data; retain all development branches.
-- CI tests optional translations, linked-ID validation, supplement-only counting, dynamic followups, taxonomy, size, CORS, Turnstile, v1 imports, multi-term deduplication, rendering and notebook backup/restore.
+Regression coverage includes optional translations, linked-ID validation, supplement-only counting, dynamic follow-ups, taxonomy, payload size, CORS, Turnstile, v1 imports, multiple terms, rendering and notebook backup/restore.

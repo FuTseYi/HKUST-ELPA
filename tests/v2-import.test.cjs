@@ -3,7 +3,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {spawnSync}=require('node:child_process');
 const {checkSubmissionFiles}=require('../scripts/check-submission-diff.cjs');
-const importer=path.resolve(__dirname,'../scripts/import-approved-submission.cjs');
+const importer=path.resolve(__dirname,'../scripts/import-completed-submission.cjs');
 const bank=path.resolve(__dirname,'../question-bank/questions.js');
 function fixture(){
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-v2-'));
