@@ -80,14 +80,15 @@ Linux CI 使用 `npx playwright install --with-deps chromium` 安装系统依赖
 ```text
 HKUST-ELPA/
 ├── index.html / guide.html / practice.html / sources.html / submit.html
-├── site.css                       # 全站共享布局、导航、双语标签与页脚
+├── site.css                       # 全站共享样式与设计变量
+├── site-parts/                   # 导航与页脚的唯一编辑来源
 ├── css/                           # 练习页、投稿页专用样式
 ├── js/                            # 首页、指南、练习和投稿页逻辑
 ├── submission-config.js           # 公开投稿端点与 Turnstile Site Key
 ├── elpa_data.json                 # 空的初始记录文件，非个人备份
 ├── assets/                        # 按 images/、icons/、demos/ 统一管理静态素材
 ├── question-bank/                 # 稳定题目、场次、经验及来源文档
-├── scripts/                       # 校验、投稿数据导入及发布文件白名单
+├── scripts/                       # 布局同步、校验、投稿导入及发布白名单
 ├── tests/                         # Worker、导入器、页面逻辑与浏览器回归
 ├── worker/                        # 独立部署的 Cloudflare 投稿接口
 ├── docs/                          # 投稿数据约定及维护说明
@@ -100,7 +101,7 @@ HKUST-ELPA/
 ### 文件维护边界
 
 - **页面与代码分离**：HTML 保留语义内容及真实导航；交互在对应 `js/` 文件中，专用样式在 `css/`。保持经典脚本的加载顺序和现有事件绑定，未经迁移不要改成模块或异步加载。
-- **共享导航与页脚**：五个页面保留静态标记，直接打开文件也能导航。修改时同步五页，自动校验会检查导航入口、双语标签和页脚一致性。
+- **共享导航与页脚**：只编辑 `site-parts/nav.html` 和 `site-parts/footer.html`，运行 `npm run sync:layout` 自动同步五个静态页面，再运行 `npm run check` 验证。生成后的 HTML 提交到仓库，直接打开文件以及无构建的双平台部署仍然可用。
 - **双语排版**：保留中文主体和简短英文标签；放得下时并排，空间不足时将英文放在下方。题目翻译与用户输入不自动改写。
 - **题库与记录兼容**：不重编号已发布题目，不改变既有 localStorage 键。提示小问笔记按位置关联，已发布小问不随意重排；需要调整时必须设计记录迁移。
 - **数据与来源分离**：结构化数据负责显示和关联；Markdown 负责来源、场次背景与不确定性，不是自动生成的数据副本。

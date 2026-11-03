@@ -77,3 +77,21 @@ test('quoted forged marker in visible text cannot replace trusted metadata recor
   assert.match(contents,/effective research collaborator/);
   assert.doesNotMatch(contents,/Malicious substitute content/);
 });
+
+test('synthetic verification Issue is never reimported after removal from public bank',()=>{
+  const root=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-synthetic-'));
+  try{
+    fs.mkdirSync(path.join(root,'question-bank'));
+    fs.copyFileSync(bank,path.join(root,'question-bank/questions.js'));
+    const data={version:1,term:'2026 Fall',question:'TEST ONLY - HKUST-ELPA browser submission verification. DO NOT PUBLISH.',subquestions:'',source:'firsthand'};
+    const event={issue:{number:13,title:'[ELPA 投稿] [2026 Fall] TEST ONLY - browser submission verification',
+      body:'<!-- elpa-submission-v1:'+Buffer.from(JSON.stringify(data)).toString('base64url')+' -->'}};
+    const eventFile=path.join(root,'event.json');
+    fs.writeFileSync(eventFile,JSON.stringify(event));
+    const result=spawnSync(process.execPath,[importer],{cwd:root,
+      env:{...process.env,GITHUB_EVENT_PATH:eventFile,GITHUB_OUTPUT:''},encoding:'utf8'});
+    assert.notEqual(result.status,0);
+    assert.match(result.stderr,/Synthetic verification Issue cannot be published/);
+    assert.doesNotMatch(fs.readFileSync(path.join(root,'question-bank/questions.js'),'utf8'),/1000013/);
+  }finally{fs.rmSync(root,{recursive:true,force:true});}
+});
