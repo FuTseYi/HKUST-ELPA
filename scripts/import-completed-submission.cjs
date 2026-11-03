@@ -107,31 +107,32 @@ const output=(status, recorded=true)=>{
   if(process.env.GITHUB_OUTPUT)
     fs.appendFileSync(process.env.GITHUB_OUTPUT,'result='+status+'\nrecorded='+recorded+'\n');
 };
-const tags=['exam-process','speaking-strategy','time-management','stress-management',
-  'english-expression','ai-learning','exam-experience'];
+const taxonomy=readJS(F('question-bank','taxonomy.js'),'ELPA_TAXONOMY',null);
+if(!taxonomy)throw Error('Missing question-bank taxonomy');
+const allowed=(group,value)=>Object.hasOwn(taxonomy[group],value);
 function validate(data){
  if(!data||data.version!==2)return false;
  if(data.kind==='question')
    return typeof data.term==='string' && /^20\d{2} (Spring|Fall)$/.test(data.term) &&
-     (data.campus===undefined||['nansha','clear-water-bay'].includes(data.campus)) &&
-     (data.track===undefined||['regular','fast-track'].includes(data.track)) &&
-     ['start','mid','end'].includes(data.examStage) &&
+     (data.campus===undefined||allowed('campuses',data.campus)) &&
+     (data.track===undefined||allowed('tracks',data.track)) &&
+     allowed('examStages',data.examStage) &&
      data.main && valid(data.main.en,8,1000) && valid(data.main.cn,0,1000) &&
      Array.isArray(data.subs) && data.subs.length<=20 &&
      data.subs.every(s=>s && valid(s.en,1,400)&&valid(s.cn,0,400)) &&
      (data.alternatives===undefined||(Array.isArray(data.alternatives) && data.alternatives.length<=1 &&
        data.alternatives.every(s=>s&&valid(s.en,8,1000)&&valid(s.cn,0,1000)))) &&
-     ['firsthand','secondhand'].includes(data.source) &&
+     allowed('sourceTypes',data.source) &&
      (data.linkedQuestionId===undefined||
        (typeof data.linkedQuestionId==='string'&&/^[A-DFHT]-[0-9]+$/.test(data.linkedQuestionId)&&
-        ['encounter','supplement'].includes(data.intent))) &&
+        allowed('contributionIntents',data.intent))) &&
      (data.intent===undefined||data.linkedQuestionId!==undefined) &&
      (data.intent!=='supplement'||data.subs.length>0||(data.alternatives&&data.alternatives.length>0));
  if(data.kind==='advice')
-   return (data.track===undefined||['regular','fast-track'].includes(data.track)) &&
-     ['before','during','after'].includes(data.phase) &&
+   return (data.track===undefined||allowed('tracks',data.track)) &&
+     allowed('advicePhases',data.phase) &&
      Array.isArray(data.tags) && data.tags.length>=1 && data.tags.length<=4 &&
-     new Set(data.tags).size===data.tags.length && data.tags.every(t=>tags.includes(t)) &&
+     new Set(data.tags).size===data.tags.length && data.tags.every(t=>allowed('adviceTags',t)) &&
      valid(data.title,4,120) && valid(data.body,20,6000);
  return false;
 }

@@ -307,3 +307,10 @@ test('new question accepts optional Chinese explanation without inventing transl
   assert.match(f.read('appearances.js'),/"D-1000805"/);
  }finally{f.close();}
 });
+
+test('Node importer reads the canonical taxonomy instead of duplicating allowed codes',()=>{
+  const src=fs.readFileSync(importer,'utf8');
+  assert.match(src,/readJS\(F\('question-bank','taxonomy\.js'\),'ELPA_TAXONOMY',null\)/);
+  for(const name of ['campuses','tracks','examStages','advicePhases','adviceTags','sourceTypes','contributionIntents'])
+    assert.ok(src.includes("allowed('"+name+"'"),'Importer does not reference taxonomy group: '+name);
+});

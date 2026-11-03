@@ -9,7 +9,7 @@
 - Follow-ups are optional and dynamically added, removed and ordered; if provided, English text is required. Initial count is zero and cap is 20.
 - Preparation advice uses **a single-language required title and body**, regardless of the site's interface language. No compulsory translation.
 - Advice may include `track` (`regular` or `fast-track`); older submissions without it belong to Regular. The guide shows reviewed advice for the selected track and offers a Fast Track sharing link when that track is empty.
-- All categories use fixed codes with bilingual labels in `question-bank/taxonomy.js`. No free-form categories.
+- All categories use fixed codes with bilingual labels in `question-bank/taxonomy.js` (including campuses, assessment tracks, encounter/supplement intents, exam stages, sources and advice tags). No free-form categories. The trusted Node importer reads this taxonomy directly; the Cloudflare Worker keeps independent server-side checks, with a regression test ensuring its code lists stay aligned.
 - Placeholders are **short, professional and non-repetitive**; length limits, privacy notes and instructions belong in labels, helper text or errors—not placeholder prose.
 - The new question form requires a year and one of six Spring/Fall × start/mid/end slots. No “unknown stage” option for **new** reports. Historic records without evidence of a stage remain unclassified.
 - English speaking practice stays English-first; Chinese translations, including follow-up translations, appear **only on click**. UI language is independent of translation visibility.
