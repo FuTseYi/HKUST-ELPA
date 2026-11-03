@@ -109,7 +109,7 @@ const output=(status, recorded=true)=>{
 };
 const taxonomy=readJS(F('question-bank','taxonomy.js'),'ELPA_TAXONOMY',null);
 if(!taxonomy)throw Error('Missing question-bank taxonomy');
-const allowed=(group,value)=>Object.hasOwn(taxonomy[group],value);
+const allowed=(group,value)=>typeof value==='string'&&Object.hasOwn(taxonomy[group],value);
 function validate(data){
  if(!data||data.version!==2)return false;
  if(data.kind==='question')
