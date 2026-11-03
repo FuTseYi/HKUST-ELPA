@@ -54,7 +54,7 @@ function importFixture(version,number,question){
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-publication-'));
   try{
     fs.mkdirSync(path.join(dir,'question-bank'));
-    for(const name of ['questions.js','appearances.js','advice.js'])
+    for(const name of ['questions.js','appearances.js','advice.js','taxonomy.js'])
       fs.copyFileSync(path.join(__dirname,'../question-bank',name),path.join(dir,'question-bank',name));
     const record=version===1?
       {version:1,term:'2027 Fall',question,subquestions:'',source:'firsthand'}:

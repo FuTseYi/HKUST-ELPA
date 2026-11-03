@@ -8,7 +8,7 @@ const bank=path.resolve(__dirname,'../question-bank/questions.js');
 function fixture(){
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-v2-'));
  fs.mkdirSync(path.join(root,'question-bank'));
- for(const name of ['questions.js','appearances.js','advice.js'])
+ for(const name of ['questions.js','appearances.js','advice.js','taxonomy.js'])
    fs.copyFileSync(path.resolve(__dirname,'../question-bank/'+name),path.join(root,'question-bank',name));
  return {root,close:()=>fs.rmSync(root,{recursive:true,force:true}),
    read:name=>fs.readFileSync(path.join(root,'question-bank',name),'utf8'),
