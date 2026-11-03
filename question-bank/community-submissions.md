@@ -21,3 +21,23 @@
 **提示小问**
 
 > 无
+
+## 2026 Fall · 南沙校区 · 常规 ELPA · Issue #58
+
+考试阶段：mid ｜ 来源：本人亲历 ｜ 类型：新增考试经历 ｜ 关联题目：C-10 ｜ [投稿记录](https://github.com/FuTseYi/HKUST-ELPA/issues/58)
+
+**English**
+
+> How do postgraduate students leverage digital tools (e.g. AI)?
+
+**中文**
+
+> 研究生如何利用数字工具（如 AI）？
+
+**相似问法**
+
+> 无
+
+**提示小问**
+
+> 无
