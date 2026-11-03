@@ -47,7 +47,7 @@ jobs:
             git checkout -B submission-publication origin/main
             # The importer reads untrusted issue content strictly as data.
             # Never interpolate an Issue field into a command.
-            node scripts/import-approved-submission.cjs
+            node scripts/import-completed-submission.cjs
             git add -A -- question-bank/
             if git diff --cached --quiet; then
               echo "published=false" >> "$GITHUB_OUTPUT"
