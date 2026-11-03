@@ -35,12 +35,18 @@ if(!banks||!banks.D||!Array.isArray(banks.D.items))throw Error('Missing D bank')
 const normalized=(s)=>String(s).normalize('NFKC').toLowerCase().replace(/[\p{P}\p{S}\s]/gu,'');
 const subject=normalized(data.question);
 const existing=Object.values(banks).flatMap(bank=>bank.items||[]);
-const output=(status)=>{
+const output=(status, recorded)=>{
   console.log('Import status:',status);
-  if(process.env.GITHUB_OUTPUT)fs.appendFileSync(process.env.GITHUB_OUTPUT,'result='+status+'\n');
+  if(process.env.GITHUB_OUTPUT)
+    fs.appendFileSync(process.env.GITHUB_OUTPUT,'result='+status+'\nrecorded='+recorded+'\n');
 };
 if(existing.some(x=>normalized(x.en)===subject)){
-  output('duplicate');process.exit(0);
+  // A matching question does not mean this Issue was previously published.
+  const file=path.join('question-bank','community-submissions.md');
+  const doc=fs.existsSync(file)?fs.readFileSync(file,'utf8'):'';
+  const recorded=banks.D.items.some(item=>item.num===1000000+number) ||
+    new RegExp('Issue #'+number+'(?![0-9])').test(doc);
+  output('duplicate',recorded);process.exit(0);
 }
 // Numeric ID is based on GitHub Issue, not an append index, to remain stable
 // even if multiple approvals are reviewed concurrently.
@@ -79,4 +85,4 @@ const addition='\n## '+data.term+' · Issue #'+number+
   '\n\n**主问题（回忆版）**\n\n'+quote(data.question)+
   '\n\n**提示小问**\n\n'+(data.subquestions?quote(data.subquestions):'> 未记录')+'\n';
 fs.writeFileSync(docPath,doc+addition,'utf8');
-output('added');
+output('added',true);

@@ -40,9 +40,54 @@ test('labels represent review and data status independently',()=>{
   assert.match(workflow,/steps\.publish\.outcome == 'failure'/);
 });
 
-test('an unchanged import is published only for a complete recorded Issue ID',()=>{
-  assert.match(workflow,/recorded=true/);
-  assert.match(workflow,/recorded=false/);
-  assert.match(workflow,/Issue #\$\{ISSUE_NUMBER\}\(\[\^\[:digit:\]\]\|\$\)/);
-  assert.match(workflow,/issueNumber/);
+test('publication trusts the importer result rather than parsing bank files in shell',()=>{
+  assert.match(workflow,/node scripts\/import-completed-submission\.cjs/);
+  assert.match(workflow,/RECORDED: \$\{\{ steps\.publish\.outputs\.recorded \}\}/);
+  assert.doesNotMatch(workflow,/grep -Eq/);
+  assert.doesNotMatch(workflow,/echo "recorded=(?:true|false)"/);
+});
+
+// Importer-owned publication status, verified with real temp fixtures.
+const os=require('node:os');
+const {spawnSync}=require('node:child_process');
+function importFixture(version,number,question){
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-publication-'));
+  try{
+    fs.mkdirSync(path.join(dir,'question-bank'));
+    for(const name of ['questions.js','appearances.js','advice.js'])
+      fs.copyFileSync(path.join(__dirname,'../question-bank',name),path.join(dir,'question-bank',name));
+    const record=version===1?
+      {version:1,term:'2027 Fall',question,subquestions:'',source:'firsthand'}:
+      {version:2,kind:'question',term:'2027 Fall',examStage:'start',
+        main:{en:question,cn:''},subs:[],source:'firsthand'};
+    const marker=Buffer.from(JSON.stringify(record)).toString('base64url');
+    const issue={number,title:'[ELPA 投稿] [2027 Fall] Example',
+      body:'<!-- elpa-submission-v'+version+':'+marker+' -->'};
+    const eventFile=path.join(dir,'event.json'),outputFile=path.join(dir,'output.txt');
+    fs.writeFileSync(eventFile,JSON.stringify({issue}));
+    const run=()=>{
+      fs.writeFileSync(outputFile,'');
+      const result=spawnSync(process.execPath,[path.join(__dirname,'../scripts/import-completed-submission.cjs')],
+        {cwd:dir,env:{...process.env,GITHUB_EVENT_PATH:eventFile,GITHUB_OUTPUT:outputFile},encoding:'utf8'});
+      assert.equal(result.status,0,result.stderr);
+      return fs.readFileSync(outputFile,'utf8');
+    };
+    return {first:run(),second:run()};
+  }finally{fs.rmSync(dir,{recursive:true,force:true});}
+}
+test('importer confirms the same v1 Issue when repeated',()=>{
+  const result=importFixture(1,900101,'How do you explain your research to visitors in a laboratory?');
+  assert.match(result.first,/recorded=true/);
+  assert.match(result.second,/recorded=true/);
+});
+test('importer confirms the same v2 Issue when repeated',()=>{
+  const result=importFixture(2,900102,'What strategies help your research team collaborate effectively?');
+  assert.match(result.first,/recorded=true/);
+  assert.match(result.second,/recorded=true/);
+});
+test('matching existing v1 question without its Issue is not considered published',()=>{
+  const result=importFixture(1,900103,'Explain one of your projects.');
+  assert.match(result.first,/result=duplicate/);
+  assert.match(result.first,/recorded=false/);
+  assert.match(result.second,/recorded=false/);
 });

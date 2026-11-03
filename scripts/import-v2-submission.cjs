@@ -14,9 +14,10 @@ const readJS=(file,name,defaultValue)=>{
   if(!fs.existsSync(file))return defaultValue;
   return vm.runInNewContext(fs.readFileSync(file,'utf8')+'\n;'+name,{}, {timeout:1000});
 };
-const output=(status)=>{
+const output=(status, recorded=true)=>{
   console.log('Import status:',status);
-  if(process.env.GITHUB_OUTPUT)fs.appendFileSync(process.env.GITHUB_OUTPUT,'result='+status+'\n');
+  if(process.env.GITHUB_OUTPUT)
+    fs.appendFileSync(process.env.GITHUB_OUTPUT,'result='+status+'\nrecorded='+recorded+'\n');
 };
 const tags=['exam-process','speaking-strategy','time-management','stress-management',
   'english-expression','ai-learning','exam-experience'];
