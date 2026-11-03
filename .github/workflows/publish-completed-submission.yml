@@ -1,0 +1,89 @@
+name: Publish completed ELPA submissions
+
+on:
+  issues:
+    types: [closed]
+
+# A completed closure by the repository owner is the single approval signal.
+# Other close reasons, including duplicate and not_planned, do not publish.
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  publish:
+    if: >-
+      ${{ github.event.sender.login == 'FuTseYi' &&
+          github.event.issue.state_reason == 'completed' &&
+          github.event.issue.state == 'closed' &&
+          !github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked browser test dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Import, validate, and publish with optimistic retries
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3 4 5 6 7 8; do
+            git fetch origin main
+            git checkout -B submission-publication origin/main
+            # The importer reads untrusted issue content strictly as data.
+            # Never interpolate an Issue field into a command.
+            node scripts/import-approved-submission.cjs
+            git add -A -- question-bank/
+            if git diff --cached --quiet; then
+              echo "published=false" >> "$GITHUB_OUTPUT"
+              echo "Already recorded or exact duplicate; no publish needed"
+              exit 0
+            fi
+            node scripts/check-submission-diff.cjs
+            npm run check
+            npm test
+            npm run test:browser
+            git commit -m "docs: publish reviewed ELPA issue #${ISSUE_NUMBER}"
+            if git push origin HEAD:main; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              echo "Published Issue #${ISSUE_NUMBER} to main"
+              exit 0
+            fi
+            echo "main moved during publication; retrying against latest data (${attempt}/8)"
+            sleep 2
+          done
+          echo "Unable to publish after concurrent updates" >&2
+          exit 1
+      - name: Request production deployment if a deploy hook is configured
+        if: steps.publish.outputs.published == 'true'
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$VERCEL_DEPLOY_HOOK_URL" ]; then
+            curl --fail --show-error --silent --retry 3 --request POST "$VERCEL_DEPLOY_HOOK_URL"
+          else
+            echo "::notice::Main updated. Verify the Vercel Git integration deployed this commit, or configure VERCEL_DEPLOY_HOOK_URL."
+          fi
+      - name: Report publication failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body "Automatic publication failed or needs attention. Review the [workflow run]($RUN_URL). The Issue remains closed as completed; rerun the failed workflow after fixing the problem."
