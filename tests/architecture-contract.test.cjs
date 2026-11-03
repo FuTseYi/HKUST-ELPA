@@ -27,7 +27,7 @@ test('historical question identities and aliases remain resolvable', () => {
 });
 
 test('existing practice record and submission draft storage contracts stay readable', () => {
-  const practice = read('js/practice.js');
+  const practice = read('js/practice-storage.js');
   for (const key of ['elpa-q-status-v1', 'elpa-notes-v1', 'elpa-data-snapshot-v2',
     'elpa-autosave', 'elpa-fs-db', 'data-dir']) {
     assert.ok(practice.includes(key), 'Missing stored compatibility identifier: ' + key);
@@ -55,4 +55,12 @@ test('practice session remains a separate, loaded module', () => {
   assert.match(session, /function tickTimer\(/);
   assert.match(session, /function drawPractice\(/);
   assert.ok(!read('js/practice.js').includes('function tickTimer('));
+});
+
+test('browser record storage is independently loaded before practice UI', () => {
+  const html=read('practice.html');
+  const store=html.indexOf('<script src="./js/practice-storage.js"></script>');
+  const ui=html.indexOf('<script src="./js/practice.js"></script>');
+  assert.ok(store>=0&&ui>store,'storage module must initialize before practice UI');
+  assert.ok(!read('js/practice.js').includes("const LS_SNAPSHOT"));
 });
