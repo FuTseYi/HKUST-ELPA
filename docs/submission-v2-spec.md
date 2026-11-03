@@ -84,6 +84,6 @@ Placeholders are hints, **not field labels**. Required status, accessibility lab
 
 ## Release acceptance
 
-Run `npm run check`, `npm test` and `npm run test:browser` on new code. The completed-Issue workflow runs these checks again on every imported submission and retries against fresh `main` if concurrent writes race. Its bot-authored push to `main` does not trigger ordinary GitHub Actions push runs; verify production deployment through the Vercel Git integration or a configured deploy hook. The operational review and recovery guide is [MODERATION.md](../question-bank/MODERATION.md).
+Run `npm run check`, `npm test` and `npm run test:browser` on new code. The completed-Issue workflow runs site and unit checks for each imported submission; browser smoke tests remain in PR CI. A concurrency queue serializes submissions, while bounded clean-checkout retries handle unrelated `main` updates. Bot-authored pushes do not trigger ordinary GitHub Actions push runs; verify Vercel Git integration deploys the first bot-authored commit. The operational review and recovery guide is [MODERATION.md](../question-bank/MODERATION.md).
 
 Regression coverage includes optional translations, linked-ID validation, supplement-only counting, dynamic follow-ups, taxonomy, payload size, CORS, Turnstile, v1 imports, multiple terms, rendering and notebook backup/restore.
