@@ -2,10 +2,9 @@ name: Publish completed ELPA submissions
 
 on:
   issues:
-    types: [closed]
+    types: [closed, reopened]
 
-# A completed closure by the repository owner is the single approval signal.
-# Other close reasons, including duplicate and not_planned, do not publish.
+# Serialize issue reviews that may change question-bank data or labels.
 concurrency:
   group: elpa-question-bank-publication
   queue: max
@@ -15,46 +14,53 @@ permissions:
   issues: write
 
 jobs:
-  publish:
-    if: >-
-      ${{ github.event.sender.login == 'FuTseYi' &&
-          github.event.issue.state_reason == 'completed' &&
-          github.event.issue.state == 'closed' &&
-          !github.event.issue.pull_request }}
+  review:
+    if: ${{ !github.event.issue.pull_request && startsWith(github.event.issue.title, '[ELPA 投稿]') }}
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
     steps:
+      - name: Ensure publication labels exist
+        run: |
+          gh label create submission:published --color 0e8a16 --description "已写入 main（不代表已上线）" --force
+          gh label create submission:failed --color b60205 --description "自动入库失败，请查看 Actions" --force
       - uses: actions/checkout@v4
+        if: ${{ github.event.action == 'closed' && github.event.issue.state_reason == 'completed' && github.event.sender.login == 'FuTseYi' }}
         with:
           ref: main
           fetch-depth: 0
           persist-credentials: true
       - uses: actions/setup-node@v4
+        if: ${{ github.event.action == 'closed' && github.event.issue.state_reason == 'completed' && github.event.sender.login == 'FuTseYi' }}
         with:
           node-version: 22
-          cache: npm
       - name: Import, validate, and publish
         id: publish
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        if: ${{ github.event.action == 'closed' && github.event.issue.state_reason == 'completed' && github.event.sender.login == 'FuTseYi' }}
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Serialization protects other submissions; retries cover unrelated main updates.
           for attempt in 1 2 3; do
             git fetch origin main
             git checkout -B submission-publication origin/main
             git reset --hard origin/main
             git clean -fd -- question-bank/
-            # The importer reads untrusted issue content strictly as data.
-            # Never interpolate an Issue field into a command.
+            # Issue text is processed as data, never interpolated into shell.
             node scripts/import-completed-submission.cjs
             git add -A -- question-bank/
             if git diff --cached --quiet; then
-              echo "published=false" >> "$GITHUB_OUTPUT"
-              echo "Already recorded or exact duplicate; no publish needed"
+              # An unchanged import is "published" only if this exact Issue
+              # was already recorded, not merely because its text is similar.
+              if grep -Fq "Issue #${ISSUE_NUMBER}" question-bank/community-submissions.md \
+                || grep -Fq "\"issueNumber\": ${ISSUE_NUMBER}" question-bank/appearances.js \
+                || grep -Fq "\"issueNumber\": ${ISSUE_NUMBER}" question-bank/advice.js; then
+                echo "recorded=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "recorded=false" >> "$GITHUB_OUTPUT"
+              fi
               exit 0
             fi
             node scripts/check-submission-diff.cjs
@@ -62,20 +68,50 @@ jobs:
             npm test
             git commit -m "docs: publish reviewed ELPA issue #${ISSUE_NUMBER}"
             if git push origin HEAD:main; then
-              echo "published=true" >> "$GITHUB_OUTPUT"
-              echo "Published Issue #${ISSUE_NUMBER} to main"
+              echo "recorded=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            echo "main moved during publication; retrying against latest data (${attempt}/3)"
+            echo "main moved; retrying clean import (${attempt}/3)"
             sleep 2
           done
           echo "Unable to publish after concurrent updates" >&2
           exit 1
-      - name: Report publication failure
-        if: failure()
+      - name: Synchronize Issue labels
+        if: ${{ success() }}
         env:
-          GH_TOKEN: ${{ github.token }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          EVENT_ACTION: ${{ github.event.action }}
+          CLOSE_REASON: ${{ github.event.issue.state_reason }}
+          CLOSING_USER: ${{ github.event.sender.login }}
+          RECORDED: ${{ steps.publish.outputs.recorded }}
+        run: |
+          set -euo pipefail
+          labels="$(gh issue view "$ISSUE_NUMBER" --json labels --jq '.labels[].name')"
+          has() { grep -Fxq "$1" <<< "$labels"; }
+          args=()
+          remove() { if has "$1"; then args+=(--remove-label "$1"); fi; }
+          add() { if ! has "$1"; then args+=(--add-label "$1"); fi; }
+          if [[ "$EVENT_ACTION" == "reopened" ]]; then
+            # A published record remains published; reopening cannot undo it.
+            add submission:pending
+            remove submission:failed
+          else
+            remove submission:pending
+            remove submission:failed
+            if [[ "$CLOSE_REASON" == "completed" && "$CLOSING_USER" == "FuTseYi" && "$RECORDED" == "true" ]]; then
+              add submission:published
+            fi
+          fi
+          if (( ${#args[@]} )); then gh issue edit "$ISSUE_NUMBER" "${args[@]}"; fi
+          if [[ "$EVENT_ACTION" == "closed" && "$CLOSE_REASON" == "completed" && "$CLOSING_USER" == "FuTseYi" && "$RECORDED" == "false" ]]; then
+            gh issue comment "$ISSUE_NUMBER" --body "No new record was published: the submission matched existing material but this Issue has no recorded appearance. Review whether it should be closed as duplicate."
+          fi
+      - name: Report publication failure
+        if: ${{ failure() && steps.publish.outcome == 'failure' }}
+        env:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          gh issue comment "$ISSUE_NUMBER" --body "Automatic publication failed or needs attention. Review the [workflow run]($RUN_URL). The Issue remains closed as completed; rerun the failed workflow after fixing the problem."
+          # Never replace an already-published status with a failure label.
+          if ! gh issue view "$ISSUE_NUMBER" --json labels --jq '.labels[].name' | grep -Fxq 'submission:published'; then
+            gh issue edit "$ISSUE_NUMBER" --add-label submission:failed --remove-label submission:pending
+          fi
+          gh issue comment "$ISSUE_NUMBER" --body "Automatic question-bank publication failed. Check the [workflow run]($RUN_URL), fix the cause, and rerun the failed job. Completed does not guarantee publication."
