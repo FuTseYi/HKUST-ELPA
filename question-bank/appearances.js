@@ -1,5 +1,13 @@
-/* Only source-supported exam sessions are stored here.
- * Legacy summaries without verified sessions remain in their canonical banks;
- * reviewed contributions add issue-linked appearances on import.
- */
-const ELPA_APPEARANCES = {};
+const ELPA_APPEARANCES = {
+  "D-5": [
+    {
+      "issueNumber": 57,
+      "term": "2026 Fall",
+      "examStage": "mid",
+      "source": "firsthand",
+      "campus": "nansha",
+      "track": "regular",
+      "intent": "encounter"
+    }
+  ]
+};
