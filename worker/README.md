@@ -78,10 +78,10 @@ configuration stays closed; verify the actual account and both origins before a 
 - Rate limiter: `SUBMISSION_LIMITER`, namespace `11247601`, 3 requests / 60 seconds per IP per Cloudflare location
 - Worker plaintext switch: production uses `SUBMISSION_MODE=public` and `SUBMISSIONS_DISABLED=false`; repository Wrangler defaults stay closed to prevent accidental public re-enablement.
 - GitHub token: configured as encrypted Worker Secret `GITHUB_TOKEN`; its value is never committed
-- GitHub repository is `FuTseYi/HKUST-ELPA`; moderation labels and Actions PR-creation permission have been configured by the owner
+- GitHub repository is `FuTseYi/HKUST-ELPA`; pending label and Actions write permission have been configured by the owner
 - Keep development branches after merges; this repository does not manage unrelated Workers.
 
-**Recorded verification**: GitHub Pages completed Turnstile-to-Issue testing (test Issue #13, closed); owner-approved Issue-to-PR automation was separately tested (test Issue #9 / PR #10, closed). This snapshot did not complete the Vercel browser check. Re-check both origins for a new release. Never merge test questions into the bank. To stop submissions immediately, set `SUBMISSIONS_DISABLED=true` in Cloudflare.
+**Recorded verification**: GitHub Pages completed Turnstile-to-Issue testing (test Issue #13, closed); previous approval-to-PR automation was separately tested (test Issue #9 / PR #10, closed; historical only, replaced by Completed closure publication). This snapshot did not complete the Vercel browser check. Re-check both origins for a new release. Never merge test questions into the bank. To stop submissions immediately, set `SUBMISSIONS_DISABLED=true` in Cloudflare.
 
 
 ## Time-bounded live verification
@@ -101,7 +101,7 @@ During test mode, the Worker rejects all other questions; the permitted question
 must use `term=2026 Fall`, empty `subquestions`, and `source=firsthand`.
 It still requires Turnstile Siteverify, rate limiting and a functioning GitHub
 Issue token. Clearly label the test question as **TEST ONLY / DO NOT PUBLISH**.
-Close any test Issue / generated PR without merging. Keep the test branch for
+Close a synthetic test Issue as **not planned** (never completed) so it cannot publish. Do not merge generated test data. Keep the test branch for
 development traceability.
 
 For immediate rollback set `SUBMISSIONS_DISABLED=true` and
