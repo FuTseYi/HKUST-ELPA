@@ -40,6 +40,9 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 - Remove obsolete implementation and unused tests after migration; avoid permanent dual paths, speculative fallbacks, or redundant state.
 - Keep substantial structural changes in a reviewable PR. Make coherent, verified commits; avoid repeated deployment-triggering pushes and never rewrite shared history without explicit authorization.
 
+
+- Shared navigation and footer are authored only in `site-parts/`. Run `npm run sync:layout` after editing them; the generated fragments stay committed in the five public HTML files. `npm run check` rejects drift. Keep direct static hosting (including opening a standalone HTML file) working; do not introduce a runtime include or a deployment-only build for this layout.
+
 ## Verification and documentation
 
 - Run `npm run check`, `npm test`, and, for user-facing changes, `npm run test:browser`. For Worker changes, include Worker security and contract tests. Report exactly what ran.
