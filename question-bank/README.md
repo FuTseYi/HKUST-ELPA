@@ -17,7 +17,7 @@
 ## 结构化数据与网页同步
 
 - **[fast-track.js](./fast-track.js)** 保存 GZ Fast Track（F 系列）、HK 常规（H 系列）和 HK Fast Track（T 系列）题库，各自使用独立 ID。
-- **[questions.js](./questions.js)** 是常规 ELPA 练习页面读取的题目数据文件。新增的社区题目须经维护者批准，由自动化生成 PR，不允许匿名投稿直接改动已发布数据。新增／修正题目时，优先在此维护稳定 ID、英文题干、中文说明和提示小问；页面会自动读取，不必修改 `index.html`。
+- **[questions.js](./questions.js)** 是常规 ELPA 练习页面读取的题目数据文件。新增的社区题目须经维护者审核，选择 Close as completed 后由自动化安全发布，不允许匿名投稿直接改动已发布数据。新增／修正题目时，优先在此维护稳定 ID、英文题干、中文说明和提示小问；页面会自动读取，不必修改 `index.html`。
 - 本目录下的 Markdown 文档负责**场次、来源、回忆差异与整理说明**，不是从数据文件自动生成的副本。更新题目时应一并检查相关说明是否需要同步修订。
 - **[appearances.js](./appearances.js)** 只保存经审核、有来源依据的考试场次与新增反馈；原有往年汇总或 Fast Track 练习题不凭空补录考试日期。`supplement` 不增加考试经历计数。
 - **[advice.js](./advice.js)** 保存考生经验；**[taxonomy.js](./taxonomy.js)** 提供稳定分类代码及中英文标签。
@@ -55,4 +55,4 @@
 
 ## 审核与持续更新
 
-新题通过站内表单进入公开 GitHub Issues，**未经审核不得自动入库**。只有仓库维护者添加 `submission:approved` 标签，自动化才会准备数据更新 PR；该 PR 仍需要人工复核与合并。详见 [审核维护说明](./MODERATION.md)。
+新题通过站内表单进入公开 GitHub Issues，**未经审核不得自动入库**。仓库所有者审核后选择 **Close as completed** 即批准发布，Actions 验证数据和测试后更新 `main`；关闭为 Not planned 或 Duplicate 则不入库。详见 [审核维护说明](./MODERATION.md)。
