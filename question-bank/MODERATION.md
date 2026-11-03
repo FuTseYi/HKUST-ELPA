@@ -13,6 +13,8 @@ The `issues: closed` workflow checks the trusted GitHub sender and `state_reason
 
 **Completed means approved, not necessarily published.** The workflow sets `submission:published` only after the Issue's record is confirmed in `main` (including a repeat run). If data import fails, it sets `submission:failed` and posts a run link; fix the cause and rerun the failed workflow. When an unchanged report merely matches an existing question but the Issue itself is not recorded, neither publication nor a `published` label is claimed. Labels do not certify Vercel deployment. Never use closure as a bypass for validating a submission.
 
+Historical synthetic test Issue [#13](https://github.com/FuTseYi/HKUST-ELPA/issues/13) was accidentally imported into the public question bank despite its explicit DO NOT PUBLISH marking. Its non-genuine D-1000013 entry has been removed from published practice content; the Issue and Git history retain the audit record. This is an intentional exception to preserving real question IDs. Never approve synthetic test Issues as real student recollections.
+
 ## Safety boundaries
 
 - Only GitHub's authenticated owner closure event is accepted; comments, labels, reopen and any other close reason never approve.

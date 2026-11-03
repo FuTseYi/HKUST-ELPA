@@ -1,5 +1,8 @@
 /* Shared, reviewable labels: stable codes; localized copy is display-only. */
 const ELPA_TAXONOMY = Object.freeze({
+  campuses: Object.freeze({nansha:'GZ','clear-water-bay':'HK'}),
+  tracks: Object.freeze({regular:'Regular','fast-track':'Fast Track'}),
+  contributionIntents: Object.freeze({encounter:'Encounter',supplement:'Supplement'}),
   examStages: Object.freeze({
     start: {zh:'开学阶段',en:'Beginning of Semester'},
     mid: {zh:'学期中',en:'Mid-semester'},

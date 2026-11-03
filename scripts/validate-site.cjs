@@ -65,7 +65,7 @@ function validateSite(){
       assert.ok(fs.existsSync(path.resolve(root,path.dirname(file),local)),'Broken document link: '+file+' → '+target);
     }
   }
-  const sources=['questions','fast-track','taxonomy','appearances','advice'].map(name=>read('question-bank/'+name+'.js'));
+  const sources=['questions','taxonomy','appearances','advice'].map(name=>read('question-bank/'+name+'.js'));
   const data=vm.runInNewContext(sources.join('\n')+'\n;({banks:BANKS,past:PAST_QUESTION_IDS,aliases:LEGACY_QUESTION_ALIASES,appearances:ELPA_APPEARANCES,advice:ELPA_ADVICE,taxonomy:ELPA_TAXONOMY})',{}, {timeout:1000});
   const questionIds=new Set();
   for(const [key,bank] of Object.entries(data.banks)){
@@ -75,6 +75,7 @@ function validateSite(){
       assert.ok(!questionIds.has(id),'Duplicate question '+id);
       assert.ok((Number.isSafeInteger(item.num)&&item.num>0)||id==='A-附','Invalid stable ID '+id);
       assert.ok(typeof item.en==='string'&&item.en.trim(),'Missing question text '+id);
+      assert.ok(!/^TEST ONLY(?:\b|\s*[-:])/i.test(item.en),'Synthetic test question in public bank: '+id);
       assert.ok(Array.isArray(item.subs),'Invalid follow-ups '+id);
       for(const sub of item.subs)assert.ok(typeof sub.en==='string'&&typeof sub.cn==='string','Invalid bilingual follow-up '+id);
       questionIds.add(id);

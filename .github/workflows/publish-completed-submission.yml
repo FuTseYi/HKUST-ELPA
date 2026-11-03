@@ -53,15 +53,7 @@ jobs:
             node scripts/import-completed-submission.cjs
             git add -A -- question-bank/
             if git diff --cached --quiet; then
-              # An unchanged import is "published" only if this exact Issue
-              # was already recorded, not merely because its text is similar.
-              if grep -Eq "Issue #${ISSUE_NUMBER}([^[:digit:]]|$)" question-bank/community-submissions.md \
-                || grep -Eq "\"issueNumber\": ${ISSUE_NUMBER}(,|[[:space:]]*})" question-bank/appearances.js \
-                || grep -Eq "\"issueNumber\": ${ISSUE_NUMBER}(,|[[:space:]]*})" question-bank/advice.js; then
-                echo "recorded=true" >> "$GITHUB_OUTPUT"
-              else
-                echo "recorded=false" >> "$GITHUB_OUTPUT"
-              fi
+              # The importer already classified this Issue; no shell parsing of bank data.
               exit 0
             fi
             node scripts/check-submission-diff.cjs
@@ -69,7 +61,6 @@ jobs:
             npm test
             git commit -m "docs: publish reviewed ELPA issue #${ISSUE_NUMBER}"
             if git push origin HEAD:main; then
-              echo "recorded=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             echo "main moved; retrying clean import (${attempt}/3)"

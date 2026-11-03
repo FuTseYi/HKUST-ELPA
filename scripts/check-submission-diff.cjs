@@ -3,7 +3,6 @@ const {execFileSync}=require('node:child_process');
 
 const allowed=new Set([
   'question-bank/questions.js',
-  'question-bank/fast-track.js',
   'question-bank/appearances.js',
   'question-bank/advice.js',
   'question-bank/community-submissions.md',
