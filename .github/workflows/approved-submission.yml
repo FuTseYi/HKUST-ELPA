@@ -1,65 +1,89 @@
-name: Prepare approved ELPA question PR
+name: Publish completed ELPA submissions
 
 on:
   issues:
-    types: [labeled]
+    types: [closed]
 
-# Do not run arbitrary source/commands from issues. The issue payload is
-# decoded by a trusted local script and written as escaped data.
+# A completed closure by the repository owner is the single approval signal.
+# Other close reasons, including duplicate and not_planned, do not publish.
 permissions:
   contents: write
-  pull-requests: write
   issues: write
 
-concurrency:
-  # Each issue is independent. A global concurrency key can discard queued approvals.
-  group: elpa-approved-${{ github.event.issue.number }}
-  cancel-in-progress: false
-
 jobs:
-  propose:
-    if: ${{ github.event.label.name == 'submission:approved' && github.event.sender.login == 'FuTseYi' && github.event.issue.state == 'open' && !github.event.issue.pull_request }}
+  publish:
+    if: >-
+      ${{ github.event.sender.login == 'FuTseYi' &&
+          github.event.issue.state_reason == 'completed' &&
+          github.event.issue.state == 'closed' &&
+          !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
           persist-credentials: true
-      - name: Import approved submission as data only
-        id: import
-        run: node scripts/import-approved-submission.cjs
-      - name: Validate imported data and website
-        if: steps.import.outputs.result == 'added' || steps.import.outputs.result == 'linked'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked browser test dependencies
         run: |
-          npm run check
-          npm test
-      - name: Open data-only PR
-        if: steps.import.outputs.result == 'added' || steps.import.outputs.result == 'linked'
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Import, validate, and publish with optimistic retries
+        id: publish
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+        shell: bash
         run: |
           set -euo pipefail
-          BRANCH="elpa/approved-issue-${ISSUE_NUMBER}"
-          if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null 2>&1; then
-            echo "Proposal branch already exists; refusing to recreate it."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "${BRANCH}"
-          git add -A -- question-bank/
-          changed="$(git diff --cached --name-only)"
-          test -n "$changed"
-          node scripts/check-submission-diff.cjs
-          git commit -m "docs: propose approved ELPA question from issue #${ISSUE_NUMBER}"
-          git push --set-upstream origin "${BRANCH}"
-          gh pr create --base main --head "${BRANCH}" \
-            --title "question-bank: review approved submission #${ISSUE_NUMBER}" \
-            --body "Proposed import from approved Issue #${ISSUE_NUMBER}. Review English recollection, duplicate similarity, source labels, and generated question ID. **Do not auto-merge.**"
-      - name: Mark duplicate as needing review
-        if: steps.import.outputs.result == 'duplicate'
+          for attempt in 1 2 3 4 5 6 7 8; do
+            git fetch origin main
+            git checkout -B submission-publication origin/main
+            # The importer reads untrusted issue content strictly as data.
+            # Never interpolate an Issue field into a command.
+            node scripts/import-approved-submission.cjs
+            git add -A -- question-bank/
+            if git diff --cached --quiet; then
+              echo "published=false" >> "$GITHUB_OUTPUT"
+              echo "Already recorded or exact duplicate; no publish needed"
+              exit 0
+            fi
+            node scripts/check-submission-diff.cjs
+            npm run check
+            npm test
+            npm run test:browser
+            git commit -m "docs: publish reviewed ELPA issue #${ISSUE_NUMBER}"
+            if git push origin HEAD:main; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              echo "Published Issue #${ISSUE_NUMBER} to main"
+              exit 0
+            fi
+            echo "main moved during publication; retrying against latest data (${attempt}/8)"
+            sleep 2
+          done
+          echo "Unable to publish after concurrent updates" >&2
+          exit 1
+      - name: Request production deployment if a deploy hook is configured
+        if: steps.publish.outputs.published == 'true'
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$VERCEL_DEPLOY_HOOK_URL" ]; then
+            curl --fail --show-error --silent --retry 3 --request POST "$VERCEL_DEPLOY_HOOK_URL"
+          else
+            echo "::notice::Main updated. Verify the Vercel Git integration deployed this commit, or configure VERCEL_DEPLOY_HOOK_URL."
+          fi
+      - name: Report publication failure
+        if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: gh issue comment "${ISSUE_NUMBER}" --body "A matching existing question was detected. No change PR was created; please check whether this report adds new context."
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body "Automatic publication failed or needs attention. Review the [workflow run]($RUN_URL). The Issue remains closed as completed; rerun the failed workflow after fixing the problem."
