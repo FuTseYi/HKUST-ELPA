@@ -448,6 +448,10 @@ const serve=http.createServer((request,response)=>{
             writeText(text){window.__elpaCopied=text;return Promise.resolve();}
           }});
           renderAll();
+          // D-1 may move to the archive when a new reviewed session arrives.
+          // Filter by the fixture itself instead of assuming a fixed page.
+          searchInput.value=BANKS.D.items[0].en;
+          applyFilters(true);
         });
         const variant=page.locator('#variants-D-1');
         await variant.locator('.subq-head').click();
