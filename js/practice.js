@@ -3,8 +3,6 @@
 
 /* 题目数据由 question-bank/questions.js 提供，见同目录的来源说明。 */
 
-/* ============ 学习记录：浏览器本地优先，JSON 文件可选同步 ============ */
-const DATA_FILE = 'elpa_data.json';
 /* Campus distinguishes the source of a question, not the university-wide assessment category. */
 let activeCampus='nansha',activeTrack='regular';
 const examChoiceNote=document.getElementById('elpaChoiceNote');

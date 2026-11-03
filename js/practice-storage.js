@@ -1,4 +1,5 @@
 'use strict';
+const DATA_FILE = 'elpa_data.json';
 /* Local-first study records: old storage keys and JSON payloads remain compatible. */
 const LS_KEY = 'elpa-q-status-v1'; // 兼容旧数据
 const LS_NOTES = 'elpa-notes-v1';  // 兼容旧数据
