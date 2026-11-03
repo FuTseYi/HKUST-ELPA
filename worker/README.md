@@ -10,7 +10,7 @@ It does **not** edit website files or publish a question. Maintainer review rema
 1. Create a Cloudflare Turnstile widget restricted to **futseyi.github.io** and **hkust-elpa.vercel.app**.
    Use action **elpa_submit**. Keep the Site Key public; keep the Secret private.
 2. Use a Wrangler version supporting this `wrangler.jsonc` and the native Rate Limiting binding. The configured `namespace_id` is `11247601`; it is account-specific and must be checked when deploying to another account.
-3. Create the GitHub labels `submission:pending` and `submission:approved` in the repository before accepting submissions. The pending label is applied by the Worker when it creates an Issue. Then create a **fine-grained GitHub PAT** restricted to only
+3. Create the GitHub label `submission:pending` in the repository before accepting submissions. The pending label is applied by the Worker when it creates an Issue. Then create a **fine-grained GitHub PAT** restricted to only
    `FuTseYi/HKUST-ELPA`, permission **Issues: Read and write**;
    no Contents/Actions/Admin permissions. Store it only as a Worker secret.
 4. Configure Worker secrets via:
