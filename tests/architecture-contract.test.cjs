@@ -64,3 +64,10 @@ test('browser record storage is independently loaded before practice UI', () => 
   assert.ok(store>=0&&ui>store,'storage module must initialize before practice UI');
   assert.ok(!read('js/practice.js').includes("const LS_SNAPSHOT"));
 });
+
+test('synthetic browser-verification questions are not published as actual exam practice',()=>{
+  const bank=read('question-bank/questions.js');
+  const docs=read('question-bank/community-submissions.md');
+  assert.doesNotMatch(bank,/TEST ONLY - HKUST-ELPA browser submission verification/);
+  assert.doesNotMatch(docs,/Issue #13(?:\D|$)/);
+});
