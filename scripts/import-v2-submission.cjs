@@ -1,4 +1,4 @@
-/* Trusted importer for maintainer-approved v2 Issues.
+/* Trusted importer for owner-completed v2 Issues.
  * Never execute issue text. All untrusted content is validated and JSON-stringified.
  */
 'use strict';
