@@ -11,7 +11,6 @@ const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 test('historical question identities and aliases remain resolvable', () => {
   const data = vm.runInNewContext(
     read('question-bank/questions.js') + '\n' +
-    read('question-bank/fast-track.js') + '\n' +
     ';({BANKS, PAST_QUESTION_IDS, LEGACY_QUESTION_ALIASES})',
     {}, { timeout: 1000 }
   );

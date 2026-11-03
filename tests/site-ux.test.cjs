@@ -331,14 +331,14 @@ test('homepage explains the full learning workflow without a repeated oversized 
  for(const id of [...sessionData.ids,...Array.from({length:12},(_,i)=>'D-'+(i+1))])
    for(const entry of sessionData.data[id]||[])
      assert.ok(Number.isSafeInteger(entry.issueNumber)&&entry.issueNumber>0,id);
- const fastTrack=fs.readFileSync(path.join(__dirname,'../question-bank/fast-track.js'),'utf8');
- const fastSessionData=new Function(questions+'\n'+fastTrack+'\n'+appearances+'\nreturn {ids:BANKS.F.items.map(x=>"F-"+x.num),data:ELPA_APPEARANCES};')();
+ const fastTrack=questions;
+ const fastSessionData=new Function(questions+'\n'+appearances+'\nreturn {ids:BANKS.F.items.map(x=>"F-"+x.num),data:ELPA_APPEARANCES};')();
  assert.equal(fastSessionData.ids.length,12);
  for(const id of fastSessionData.ids)
    for(const entry of fastSessionData.data[id]||[])
      assert.ok(Number.isSafeInteger(entry.issueNumber)&&entry.issueNumber>0,id);
  assert.match(fastTrack,/"num": 1,[\s\S]*?"subs": \[\]/);
- assert.doesNotMatch(fastTrack,/"num": 13/);
+ assert.equal(fastSessionData.ids.length,12);
  assert.doesNotMatch(questions,/"F-13"/);
  assert.doesNotMatch(practice,/fastIntroSection|fastIntroDetails|ELPA_FAST_TRACK_INTRO|补充准备 · 完整自我介绍任务/);
  assert.match(practice,/titleStatus\.textContent=total\?'第 '\+page\+' \/ '\+pages\+' 页 · 总 '\+total\+' 题':'0 题'/);

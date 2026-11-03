@@ -65,7 +65,7 @@ function validateSite(){
       assert.ok(fs.existsSync(path.resolve(root,path.dirname(file),local)),'Broken document link: '+file+' → '+target);
     }
   }
-  const sources=['questions','fast-track','taxonomy','appearances','advice'].map(name=>read('question-bank/'+name+'.js'));
+  const sources=['questions','taxonomy','appearances','advice'].map(name=>read('question-bank/'+name+'.js'));
   const data=vm.runInNewContext(sources.join('\n')+'\n;({banks:BANKS,past:PAST_QUESTION_IDS,aliases:LEGACY_QUESTION_ALIASES,appearances:ELPA_APPEARANCES,advice:ELPA_ADVICE,taxonomy:ELPA_TAXONOMY})',{}, {timeout:1000});
   const questionIds=new Set();
   for(const [key,bank] of Object.entries(data.banks)){

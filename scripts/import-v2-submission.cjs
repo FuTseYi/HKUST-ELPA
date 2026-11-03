@@ -80,11 +80,8 @@ module.exports=function importV2(event){
  }
  const campus=data.campus||'nansha',track=data.track||'regular';
  const bankKey=campus==='nansha'?(track==='regular'?'D':'F'):(track==='regular'?'H':'T');
- const extraFile=F('question-bank','fast-track.js');
  const content=fs.readFileSync(bankFile,'utf8');
- const extra=fs.existsSync(extraFile)?fs.readFileSync(extraFile,'utf8'):'';
- if(bankKey!=='D'&&!extra)throw Error('Fast Track and campus bank file missing');
- const banks=vm.runInNewContext(content+'\n'+extra+'\n;BANKS',{}, {timeout:1000});
+ const banks=vm.runInNewContext(content+'\n;BANKS',{}, {timeout:1000});
  if(!banks||!banks.D||!banks[bankKey]||!Array.isArray(banks[bankKey].items))
    throw Error('Question bank invalid');
  const display=vm.runInNewContext(content+'\n;PAST_QUESTION_IDS',{}, {timeout:1000});
@@ -120,8 +117,8 @@ module.exports=function importV2(event){
    if(banks[bankKey].items.some(x=>x.num===num))throw Error('Duplicate question ID');
    const item={num,term:data.term,en:text(data.main.en),cn:text(data.main.cn),
      subs:data.subs.map(x=>({en:text(x.en),cn:text(x.cn)}))};
-   const file=bankKey==='D'?bankFile:extraFile;
-   const original=bankKey==='D'?content:extra;
+   const file=bankFile;
+   const original=content;
    const begin=original.indexOf('BANKS.'+bankKey+' = {');
    if(begin<0)throw Error('Missing target bank '+bankKey);
    const lineEnd=original.indexOf('};',begin);
