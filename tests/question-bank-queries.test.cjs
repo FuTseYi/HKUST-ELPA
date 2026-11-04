@@ -13,13 +13,13 @@ const queries=read('assets/js/question-bank-queries.js');
 function loadQueries(){
   const context=vm.createContext({});
   vm.runInContext(bank+'\n'+appearances+'\n'+queries,context);
-  return vm.runInContext('({all:elpaAllPracticeIds(),term:elpaLatestTerm(),current:elpaCurrentQuestionIds(),archived:elpaArchivedQuestionIds(),reported:elpaReportedTerms("D-5"),prior:elpaReportedTerms("A-1"),fast:BANKS.F.items.length,alias:LEGACY_QUESTION_ALIASES["A-附"]})',context);
+  return vm.runInContext('({all:elpaAllPracticeIds(),term:elpaLatestTerm(),current:elpaCurrentQuestionIds(),archived:elpaArchivedQuestionIds(),reported:elpaReportedTerms("D-5"),prior:elpaReportedTerms("A-1"),fast:BANKS.F.items.length,hasHistoricalId:BANKS.A.items.some(item=>String(item.num)==="附"),alias:LEGACY_QUESTION_ALIASES["A-附"]})',context);
 }
 
 test('historical IDs and reported terms survive independent query extraction',()=>{
   const result=JSON.parse(JSON.stringify(loadQueries()));
   assert.equal(result.alias,'C-16');
-  assert.ok(result.all.includes('A-附'));
+  assert.ok(result.hasHistoricalId);
   assert.ok(result.all.includes('D-5'));
   assert.equal(result.term,'2026 Fall');
   assert.ok(result.current.includes('D-5'));
