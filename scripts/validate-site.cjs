@@ -42,7 +42,10 @@ function validateSite(){
       const url=new URL(raw.replace(/&amp;/g,'&'),'https://elpa.local/'+name);
       if(url.origin!=='https://elpa.local')continue;
       const file=decodeURIComponent(url.pathname).slice(1);
-      assert.ok(fs.existsSync(path.join(root,file)),'Missing local resource: '+name+' → '+raw);
+      // These four scripts are generated from canonical JSON into output/site/.
+      const generated=file.match(/^question-bank\/(questions|appearances|advice|taxonomy)\.js$/);
+      const source=generated?'question-bank/'+generated[1]+'.json':file;
+      assert.ok(fs.existsSync(path.join(root,source)),'Missing local resource: '+name+' → '+raw);
       if(url.hash&&ids.has(file))assert.ok(ids.get(file).has(decodeURIComponent(url.hash.slice(1))),'Missing anchor: '+name+' → '+raw);
     }
   }
