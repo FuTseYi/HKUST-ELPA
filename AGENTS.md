@@ -46,7 +46,7 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 ## Verification and documentation
 
 - Run `npm run check`, `npm test`, and, for user-facing changes, `npm run test:browser`. For Worker changes, include Worker security and contract tests. Report exactly what ran.
-- Verify both the Vercel root and GitHub Pages `/HKUST-ELPA/` path; production deployment settings and secrets remain external to source control.
+- Vercel and GitHub Pages must publish the same `output/site/` build; Pages uses its own Actions artifact deployment and needs Pages Source set to GitHub Actions. Check root and `/HKUST-ELPA/` URLs after rollout; keep production secrets external to source control.
 - Test old backup restore, existing note keys, linked/supplement submission semantics, duplicate/failed publication, mobile layouts, keyboard interactions, and timer behavior whenever related code changes.
 - `README.md` describes project usage. `question-bank/README.md` owns question sources and editorial provenance. `question-bank/MODERATION.md` owns approval and recovery operations. `docs/submission-v2-spec.md` owns the submission data contract; `worker/README.md` owns Worker operations. Reference these documents rather than copying their full rules into multiple places.
 - This guide governs engineering priorities and document ownership. Update the relevant owner document when behavior changes; do not duplicate business policy here.

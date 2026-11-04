@@ -8,7 +8,7 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 
 [首页](https://hkust-elpa.vercel.app/) · [指南与经验](https://hkust-elpa.vercel.app/guide.html) · [题库练习](https://hkust-elpa.vercel.app/practice.html) · [分享考题与经验](https://hkust-elpa.vercel.app/submit.html) · [资料来源](https://hkust-elpa.vercel.app/sources.html)
 
-备用入口：[GitHub Pages](https://futseyi.github.io/HKUST-ELPA/)（需确认 Pages 发布源已使用构建产物）。**学习记录不会跨域名自动同步**。
+备用入口：[GitHub Pages](https://futseyi.github.io/HKUST-ELPA/)（仓库需先在 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**；首次部署完成后核对备用站）。**学习记录不会跨域名自动同步**。
 
 [![Website validation](https://github.com/FuTseYi/HKUST-ELPA/actions/workflows/site-checks.yml/badge.svg)](https://github.com/FuTseYi/HKUST-ELPA/actions/workflows/site-checks.yml)
 
@@ -111,7 +111,7 @@ HKUST-ELPA/
 
 | 组件 | 职责与边界 |
 | --- | --- |
-| 静态前端 | Vercel 使用 `vercel.json` 托管 `output/site/`；GitHub Pages 只有在配置为发布相同构建产物后才等价。学习记录按浏览器来源隔离。 |
+| 静态前端 | Vercel 依据 `vercel.json` 构建 `output/site/`；GitHub Pages 通过 `deploy-pages.yml` 发布同一目录（需在 Pages 设置启用 Actions）。学习记录按浏览器来源隔离。 |
 | GitHub 星数 | HTML 直接嵌入 Shields 数字徽章，无自定义请求和缓存脚本；加载失败时隐藏数字，仓库链接仍可用。 |
 | 投稿 Worker | 校验来源、Turnstile、频率、大小和字段，成功后只创建待处理的公开 Issue。 |
 | 审核工作流 | 仓库所有者将 Issue 关闭为 Completed 后执行，自动验证数据与测试并提交至 `main`。 |
@@ -124,6 +124,8 @@ HKUST-ELPA/
 2. 维护者核对来源、隐私、重复经历、题干及小问。**考生回忆不等于学校确认的原题。**
 3. 仓库所有者选择 **Close as completed** 批准投稿；**Close as not planned / duplicate** 则不收录。
 4. Actions 仅允许修改题库相关文件，完成数据验证和单元测试后自动推送 `main`。`submission:published` 表示已收录进 Git 仓库，`submission:failed` 表示入库失败；实际部署成功仍以 Vercel 为准。
+
+Pages 工作流除监听人工提交至 `main` 外，还监听审核工作流成功完成，以覆盖 `GITHUB_TOKEN` 自动入库推送不触发普通 `push` 工作流的情况。Pages 发布状态需在对应 Actions 任务中单独核实，不等同于 `submission:published` 标签。
 
 相同题目保留原 ID；新的考试经历增加出现记录，仅补充问法或小问不增加考过次数。`submission:pending` 在关闭后移除、重新打开后恢复；失败时在原 Issue 提示工作流记录，可修复后重新运行。授权及文件白名单见 [审核说明](./question-bank/MODERATION.md)。
 
