@@ -6,13 +6,16 @@ const path=require('node:path');
 const vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
-const bank=read('question-bank/questions.js');
-const appearances=read('question-bank/appearances.js');
+const data=JSON.parse(read('question-bank/questions.json'));
+const appearances=JSON.parse(read('question-bank/appearances.json'));
 const queries=read('assets/js/question-bank-queries.js');
 
 function loadQueries(){
   const context=vm.createContext({});
-  vm.runInContext(bank+'\n'+appearances+'\n'+queries,context);
+  vm.runInContext('const BANKS='+JSON.stringify(data.banks)+';\n'+
+    'const PAST_QUESTION_IDS='+JSON.stringify(data.pastQuestionIds)+';\n'+
+    'const LEGACY_QUESTION_ALIASES='+JSON.stringify(data.legacyQuestionAliases)+';\n'+
+    'const ELPA_APPEARANCES='+JSON.stringify(appearances)+';\n'+queries,context);
   return vm.runInContext('({all:elpaAllPracticeIds(),term:elpaLatestTerm(),current:elpaCurrentQuestionIds(),archived:elpaArchivedQuestionIds(),reported:elpaReportedTerms("D-5"),prior:elpaReportedTerms("A-1"),fast:BANKS.F.items.length,hasHistoricalId:BANKS.A.items.some(item=>String(item.num)==="附"),alias:LEGACY_QUESTION_ALIASES["A-附"]})',context);
 }
 
@@ -37,6 +40,6 @@ test('practice loads data, appearances and grouping logic before interactive UI'
   const offsets=files.map(file=>html.indexOf('<script src="./'+file+'"></script>'));
   assert.ok(offsets.every(offset=>offset>=0),'Missing required script');
   assert.deepEqual([...offsets].sort((a,b)=>a-b),offsets);
-  assert.doesNotMatch(bank,/function elpaLatestTermForIds/);
+  assert.equal(typeof data.banks,'object');
   assert.match(queries,/function elpaLatestTermForIds/);
 });

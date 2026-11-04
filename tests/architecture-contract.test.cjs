@@ -3,17 +3,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const vm = require('node:vm');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
 test('historical question identities and aliases remain resolvable', () => {
-  const data = vm.runInNewContext(
-    read('question-bank/questions.js') + '\n' +
-    ';({BANKS, PAST_QUESTION_IDS, LEGACY_QUESTION_ALIASES})',
-    {}, { timeout: 1000 }
-  );
+  const content=JSON.parse(read('question-bank/questions.json'));
+  const data={BANKS:content.banks,PAST_QUESTION_IDS:content.pastQuestionIds,
+    LEGACY_QUESTION_ALIASES:content.legacyQuestionAliases};
   const ids = new Set(Object.entries(data.BANKS).flatMap(([bank, group]) =>
     group.items.map(item => bank + '-' + item.num)));
   for (const id of data.PAST_QUESTION_IDS) assert.ok(ids.has(id), 'Historical question missing: ' + id);
@@ -66,7 +63,7 @@ test('browser record storage is independently loaded before practice UI', () => 
 });
 
 test('synthetic browser-verification questions are not published as actual exam practice',()=>{
-  const bank=read('question-bank/questions.js');
+  const bank=read('question-bank/questions.json');
   const docs=read('question-bank/community-submissions.md');
   assert.doesNotMatch(bank,/TEST ONLY - HKUST-ELPA browser submission verification/);
   assert.doesNotMatch(docs,/Issue #13(?:\D|$)/);

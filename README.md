@@ -8,7 +8,7 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 
 [首页](https://hkust-elpa.vercel.app/) · [指南与经验](https://hkust-elpa.vercel.app/guide.html) · [题库练习](https://hkust-elpa.vercel.app/practice.html) · [分享考题与经验](https://hkust-elpa.vercel.app/submit.html) · [资料来源](https://hkust-elpa.vercel.app/sources.html)
 
-备用入口：[GitHub Pages](https://futseyi.github.io/HKUST-ELPA/)。两个网站使用同一套静态代码，**学习记录不会跨域名自动同步**。
+备用入口：[GitHub Pages](https://futseyi.github.io/HKUST-ELPA/)（需确认 Pages 发布源已使用构建产物）。**学习记录不会跨域名自动同步**。
 
 [![Website validation](https://github.com/FuTseYi/HKUST-ELPA/actions/workflows/site-checks.yml/badge.svg)](https://github.com/FuTseYi/HKUST-ELPA/actions/workflows/site-checks.yml)
 
@@ -44,15 +44,17 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 
 ### 预览网站
 
-网站无前端框架、无构建步骤。克隆后在根目录启动静态文件服务：
+网站无前端框架，但题库数据由 Python 从 JSON 构建成可直接托管的静态资源。克隆后先生成网站，再启动静态文件服务：
 
 ```bash
 git clone https://github.com/FuTseYi/HKUST-ELPA.git
 cd HKUST-ELPA
-python -m http.server 8000
+python3 scripts/build-site.py --output output/site
+cd output/site
+python3 -m http.server 8000
 ```
 
-macOS / Linux 若没有 `python` 命令，可改用 `python3`。打开 `http://localhost:8000/`。也可直接打开 HTML 文件预览页面；涉及文件读取、下载及浏览器权限的验证应使用本地 HTTP 服务。
+打开 `http://localhost:8000/`。浏览器读取的是 `output/site/` 中的完整构建产物；直接打开仓库根目录的 HTML 不会自动生成题库脚本。
 
 本地页面可以练习、保存记录和预览投稿；**正式投稿仅允许已配置的生产站点来源**，本地预览不会获得生产 Turnstile 验证权限。
 
@@ -92,12 +94,12 @@ HKUST-ELPA/
 └── .github/workflows/             # 网站校验、Completed 后自动审核发布
 ```
 
-`output/`、`.playwright-cli/`、`node_modules/` 和本地密钥文件均不纳入版本控制。
+`output/site/` 是唯一静态发布产物；`output/`、`.playwright-cli/`、`node_modules/` 和本地密钥文件均不纳入版本控制。
 
 ### 文件维护边界
 
 - **页面与代码分离**：HTML 保留语义内容及真实导航；交互在 `assets/js/` 中，样式在 `assets/css/`。保持经典脚本的加载顺序和现有事件绑定，未经迁移不要改成模块或异步加载。
-- **共享导航与页脚**：只编辑 `scripts/templates/nav.html` 和 `scripts/templates/footer.html`，运行 `npm run sync:layout` 自动同步五个静态页面，再运行 `npm run check` 验证。生成后的 HTML 提交到仓库，直接打开文件以及无构建的双平台部署仍然可用。
+- **共享导航与页脚**：只编辑 `scripts/templates/nav.html` 和 `scripts/templates/footer.html`，运行 `npm run sync:layout` 自动同步五个静态页面，再运行 `npm run check` 验证。同步后的 HTML 保留在仓库；对外部署使用 Python 生成的 `output/site/`，不直接托管源码根目录。
 - **双语排版**：保留中文主体和简短英文标签；放得下时并排，空间不足时将英文放在下方。题目翻译与用户输入不自动改写。
 - **题库与记录兼容**：不重编号已发布题目，不改变既有 localStorage 键。提示小问笔记按位置关联，已发布小问不随意重排；需要调整时必须设计记录迁移。
 - **数据与来源分离**：结构化数据负责显示和关联；Markdown 负责来源、场次背景与不确定性，不是自动生成的数据副本。
@@ -109,7 +111,7 @@ HKUST-ELPA/
 
 | 组件 | 职责与边界 |
 | --- | --- |
-| 静态前端 | Vercel / GitHub Pages 托管相同文件，无构建依赖；学习记录按浏览器来源隔离。 |
+| 静态前端 | Vercel 使用 `vercel.json` 托管 `output/site/`；GitHub Pages 只有在配置为发布相同构建产物后才等价。学习记录按浏览器来源隔离。 |
 | GitHub 星数 | HTML 直接嵌入 Shields 数字徽章，无自定义请求和缓存脚本；加载失败时隐藏数字，仓库链接仍可用。 |
 | 投稿 Worker | 校验来源、Turnstile、频率、大小和字段，成功后只创建待处理的公开 Issue。 |
 | 审核工作流 | 仓库所有者将 Issue 关闭为 Completed 后执行，自动验证数据与测试并提交至 `main`。 |

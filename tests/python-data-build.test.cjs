@@ -6,7 +6,8 @@ const os = require('node:os');
 const path = require('node:path');
 const vm = require('node:vm');
 const {spawnSync} = require('node:child_process');
-const {writeExport, exportData} = require('../scripts/export-question-bank.cjs');
+const bankRoot=path.join(__dirname,'../question-bank');
+const dataset=name=>JSON.parse(fs.readFileSync(path.join(bankRoot,name+'.json'),'utf8'));
 const root = path.resolve(__dirname, '..');
 const py = process.platform === 'win32' ? 'python' : 'python3';
 
@@ -18,10 +19,11 @@ function build(input, output) {
 test('Python JSON build preserves all current question records and historical identities', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'elpa-data-build-'));
   try {
-    const source = path.join(dir, 'source');
     const output = path.join(dir, 'output');
-    const expected = writeExport(source);
-    const result = build(source, output);
+    const expected = { 'questions.json':dataset('questions'),
+      'appearances.json':dataset('appearances'), 'advice.json':dataset('advice'),
+      'taxonomy.json':dataset('taxonomy') };
+    const result = build(bankRoot, output);
     assert.equal(result.status, 0, result.stderr);
     const question = vm.runInNewContext(
       fs.readFileSync(path.join(output, 'questions.js'), 'utf8') +
@@ -38,7 +40,6 @@ test('Python JSON build preserves all current question records and historical id
     assert.deepEqual(plain(appearances), expected['appearances.json']);
     assert.deepEqual(plain(advice), expected['advice.json']);
     assert.deepEqual(plain(taxonomy), expected['taxonomy.json']);
-    assert.deepEqual(Object.keys(exportData()), Object.keys(expected));
     assert.deepEqual(fs.readdirSync(output).sort(),
       ['advice.js', 'appearances.js', 'questions.js', 'taxonomy.js']);
   } finally {
@@ -51,7 +52,9 @@ test('Python builder rejects missing historical targets rather than emitting bro
   try {
     const source = path.join(dir, 'source');
     const output = path.join(dir, 'output');
-    writeExport(source);
+    fs.mkdirSync(source,{recursive:true});
+    for(const name of ['questions','appearances','advice','taxonomy'])
+      fs.copyFileSync(path.join(bankRoot,name+'.json'),path.join(source,name+'.json'));
     const file = path.join(source, 'questions.json');
     const data = JSON.parse(fs.readFileSync(file, 'utf8'));
     data.legacyQuestionAliases['A-附'] = 'C-999999';

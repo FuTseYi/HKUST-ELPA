@@ -41,7 +41,7 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 - Keep substantial structural changes in a reviewable PR. Make coherent, verified commits; avoid repeated deployment-triggering pushes and never rewrite shared history without explicit authorization.
 
 
-- Shared navigation and footer are authored only in `scripts/templates/`. Run `npm run sync:layout` after editing them; the generated fragments stay committed in the five public HTML files. `npm run check` rejects drift. Keep direct static hosting (including opening a standalone HTML file) working; do not introduce a runtime include or a deployment-only build for this layout.
+- Shared navigation and footer are authored only in `scripts/templates/`. Run `npm run sync:layout` after editing them; the generated fragments stay committed in the five public HTML files. `npm run check` rejects drift. Keep the committed HTML pages synchronized, but publish `output/site/` generated from canonical JSON. Do not introduce runtime HTML includes or duplicate maintained bank scripts.
 
 ## Verification and documentation
 
