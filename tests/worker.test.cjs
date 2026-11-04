@@ -370,8 +370,7 @@ test('v2 supplement must have an existing ID and either a similar wording or fol
 // The Worker intentionally validates independently, but its allowed values must
 // match the canonical browser/Node taxonomy. No Worker runtime import is needed.
 test('Worker allowed codes match the canonical taxonomy',()=>{
-  const taxonomyFile=fs.readFileSync(path.resolve(__dirname,'../question-bank/taxonomy.js'),'utf8');
-  const taxonomy=vm.runInNewContext(taxonomyFile+'\n;ELPA_TAXONOMY',{}, {timeout:1000});
+  const taxonomy=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../question-bank/taxonomy.json'),'utf8'));
   const prelude=source.split('export default {')[0];
   const workerEnums=vm.runInNewContext(prelude+'\n;({campuses:ELPA_CAMPUSES,tracks:ELPA_TRACKS,examStages:EXAM_STAGES,advicePhases:ADVICE_PHASES,adviceTags:ADVICE_TAGS})',{}, {timeout:1000});
   for(const [group,values] of Object.entries(workerEnums)){
