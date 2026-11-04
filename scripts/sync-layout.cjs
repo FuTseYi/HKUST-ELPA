@@ -9,7 +9,7 @@ const footerPattern=/<footer class="elpa-footer"[\s\S]*?<\/footer>/;
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 
 function renderNavigation(page){
-  let nav=read('site-parts/nav.html');
+  let nav=read('scripts/templates/nav.html');
   if(page==='submit'){
     // Preserve the existing compact logo and selected sharing action.
     nav=nav.replace('width="38" height="38"','width="29" height="29"');
@@ -23,7 +23,7 @@ function renderNavigation(page){
   return nav.trimEnd();
 }
 function renderPage(page,source){
-  const footer=read('site-parts/footer.html').trimEnd();
+  const footer=read('scripts/templates/footer.html').trimEnd();
   if((source.match(new RegExp(navPattern.source,'g'))||[]).length!==1 ||
      (source.match(new RegExp(footerPattern.source,'g'))||[]).length!==1)
     throw Error('Expected one navigation and footer in '+page+'.html');

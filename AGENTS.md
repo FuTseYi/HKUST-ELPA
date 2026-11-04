@@ -8,7 +8,7 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 
 ## Architecture and ownership
 
-- HTML pages are the user-facing routes; CSS and browser JavaScript implement presentation and interactions. Avoid introducing a frontend framework or runtime dependency without a demonstrated need.
+- HTML pages remain at the repository root. `assets/css/` and `assets/js/` own browser styles and scripts; `assets/images/`, `assets/icons/`, and `assets/demos/` own media. `scripts/templates/` owns shared navigation and footer. CSS and browser JavaScript implement presentation and interactions. Avoid introducing a frontend framework or runtime dependency without a demonstrated need.
 - `question-bank/` owns canonical questions, reported encounters, reviewed advice, stable taxonomy, and source provenance. The same question must not be recreated for each appearance.
 - Browser learning records are local to the current origin; no account or server database is required.
 - `worker/` accepts untrusted submissions and creates GitHub Issues. It never publishes questions directly. Cloudflare secrets must never enter the website or repository.
@@ -41,7 +41,7 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 - Keep substantial structural changes in a reviewable PR. Make coherent, verified commits; avoid repeated deployment-triggering pushes and never rewrite shared history without explicit authorization.
 
 
-- Shared navigation and footer are authored only in `site-parts/`. Run `npm run sync:layout` after editing them; the generated fragments stay committed in the five public HTML files. `npm run check` rejects drift. Keep direct static hosting (including opening a standalone HTML file) working; do not introduce a runtime include or a deployment-only build for this layout.
+- Shared navigation and footer are authored only in `scripts/templates/`. Run `npm run sync:layout` after editing them; the generated fragments stay committed in the five public HTML files. `npm run check` rejects drift. Keep direct static hosting (including opening a standalone HTML file) working; do not introduce a runtime include or a deployment-only build for this layout.
 
 ## Verification and documentation
 
