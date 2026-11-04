@@ -24,7 +24,7 @@ test('submission jobs queue and retry from clean main without forced writes',()=
 
 test('publication keeps data validation and does not introduce another deploy path',()=>{
   assert.match(workflow,/scripts\/check-submission-diff\.cjs/);
-  assert.match(workflow,/python3 scripts\/build-site\.py --output output\/site/);
+  assert.match(workflow,/python3 preview\.py --build-only/);
   assert.match(workflow,/npm run check\n            npm test/);
   assert.doesNotMatch(workflow,/VERCEL_DEPLOY_HOOK_URL/);
   assert.match(workflow,/if: \$\{\{ failure\(\) && steps\.publish\.outcome == 'failure' \}\}/);
