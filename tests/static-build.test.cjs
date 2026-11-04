@@ -32,6 +32,8 @@ test('portable site build publishes all pages and generates scripts from JSON',(
     assert.deepEqual(generated.banks,bank.banks);
     assert.deepEqual(generated.ids,bank.pastQuestionIds);
     assert.deepEqual(generated.aliases,bank.legacyQuestionAliases);
+    const references=fs.readFileSync(path.join(dest,'question-bank/fast-track.md'),'utf8');
+    assert.match(references,/github\.com\/FuTseYi\/HKUST-ELPA\/blob\/main\/question-bank\/questions\.json/);
     const practice=fs.readFileSync(path.join(dest,'practice.html'),'utf8');
     assert.ok(practice.indexOf('question-bank/questions.js')<
       practice.indexOf('assets/js/question-bank-queries.js'));
