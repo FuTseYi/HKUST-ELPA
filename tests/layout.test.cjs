@@ -25,7 +25,7 @@ test('generated layout replaces drift instead of adding another independent copy
 });
 
 test('practice palette aliases reuse the global design tokens',()=>{
-  const site=read('site.css'),practice=read('css/practice.css');
+  const site=read('assets/css/site.css'),practice=read('assets/css/practice.css');
   for(const [local,global] of [
     ['bg','site-bg'],['ink','site-ink'],['line','site-line'],
     ['brand','site-navy'],['brand-2','site-blue']

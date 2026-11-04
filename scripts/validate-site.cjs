@@ -9,7 +9,7 @@ const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 // Source-level tests inspect the same ordered files the browser loads.
 function readPageSource(name){
   const html=read(name);
-  const files=[...html.matchAll(/(?:src|href)="\.\/((?:js|css)\/[^"?#]+)"/g)].map(match=>match[1]);
+  const files=[...html.matchAll(/(?:src|href)="\.\/(assets\/(?:js|css)\/[^"?#]+)"/g)].map(match=>match[1]);
   return html+'\n'+files.map(read).join('\n');
 }
 function validateSite(){
@@ -27,14 +27,14 @@ function validateSite(){
       assert.ok(nav.includes('href="./'+route+'.html"'),'Missing route '+route+' in '+name);
     assert.equal((nav.match(/class="elpa-nav-github"/g)||[]).length,1,'One GitHub entry: '+name);
     assert.equal((nav.match(/<small lang="en">/g)||[]).length,5,'Bilingual navigation and sharing: '+name);
-    assert.ok(html.includes('href="./site.css"'),'Shared CSS missing: '+name);
+    assert.ok(html.includes('href="./assets/css/site.css"'),'Shared CSS missing: '+name);
     assert.ok(nav.includes('https://img.shields.io/github/stars/FuTseYi/HKUST-ELPA?'),'Star badge missing: '+name);
     assert.ok(html.includes('href="./assets/icons/elpa-mark.svg"'),'Favicon missing: '+name);
     const currentFooter=html.match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/)?.[0];
     assert.ok(currentFooter,'Missing footer: '+name);
     if(footer)assert.equal(currentFooter,footer,'Shared footer drift: '+name);
     footer=currentFooter;
-    const script=name==='sources.html'?null:'./js/'+path.basename(name,'.html')+'.js';
+    const script=name==='sources.html'?null:'./assets/js/'+path.basename(name,'.html')+'.js';
     if(script)assert.ok(html.includes('src="'+script+'"'),'Page script missing: '+name);
   }
   for(const [name,html] of pages){
@@ -46,7 +46,7 @@ function validateSite(){
       if(url.hash&&ids.has(file))assert.ok(ids.get(file).has(decodeURIComponent(url.hash.slice(1))),'Missing anchor: '+name+' → '+raw);
     }
   }
-  for(const file of ['site.css','css/practice.css','css/submit.css']){
+  for(const file of ['assets/css/site.css','assets/css/practice.css','assets/css/submit.css']){
     for(const [,raw] of read(file).matchAll(/url\(['"]?([^)'"\s]+)['"]?\)/g)){
       if(/^(data:|https?:)/.test(raw))continue;
       assert.ok(fs.existsSync(path.resolve(root,path.dirname(file),raw)),'Missing CSS resource: '+file+' → '+raw);
@@ -111,7 +111,7 @@ function validateSite(){
 if(require.main===module){
   validateSite();
   const files=['submission-config.js'];
-  for(const dir of ['js','question-bank','scripts','tests']){
+  for(const dir of ['assets/js','question-bank','scripts','tests']){
     for(const file of fs.readdirSync(path.join(root,dir)))
       if(/\.(?:js|cjs)$/.test(file))files.push(path.join(dir,file));
   }

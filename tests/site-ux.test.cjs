@@ -100,7 +100,7 @@ test('one exercise entry and predictable compact question card',()=>{
  assert.match(practice,/env\(safe-area-inset-bottom,0px\)/);
 });
 function newTimerFixture(){
- const code=fs.readFileSync(path.join(__dirname,'../js/practice-session.js'),'utf8');
+ const code=fs.readFileSync(path.join(__dirname,'../assets/js/practice-session.js'),'utf8');
  const elements=new Map(),listeners=new Map();
  const cls=()=>{const store=new Set();return {
    add:(...names)=>names.forEach(name=>store.add(name)),
@@ -213,8 +213,8 @@ test('footer is concise, community-oriented and identical across five pages',()=
    assert.doesNotMatch(f,/Not affiliated with or endorsed by HKUST|资料来源与声明|Created &amp; Maintained by/);
  }
  assert.match(read('sources.html'),/本站为学生整理的备考资源，并非学校官方题库/);
- assert.match(read('site.css'),/\.elpa-footer \.elpa-footer-action\{[^}]*min-height:28px/);
- assert.match(read('site.css'),/\.question-feedback a::after/);
+ assert.match(read('assets/css/site.css'),/\.elpa-footer \.elpa-footer-action\{[^}]*min-height:28px/);
+ assert.match(read('assets/css/site.css'),/\.question-feedback a::after/);
  assert.equal((read('practice.html').match(/id="exportBtn"/g)||[]).length,1);
 });
 
@@ -298,7 +298,7 @@ test('homepage explains the full learning workflow without a repeated oversized 
  assert.match(home,/公开记录保存/);
  assert.doesNotMatch(home,/elpa-next-primary|elpa-home-next|elpa-start-actions|elpa-capability|提交 → 后端校验 → 审核 → 入库/);
  assert.match(home,/class="elpa-cta elpa-cta-primary" href="\.\/practice\.html"/);
- const css=fs.readFileSync(path.join(__dirname,'../site.css'),'utf8');
+ const css=fs.readFileSync(path.join(__dirname,'../assets/css/site.css'),'utf8');
  assert.match(css,/\.elpa-home-feature\{display:grid/);
  assert.match(css,/@media\(max-width:700px\)/);
  assert.doesNotMatch(css,/\.elpa-next-primary|\.elpa-quickstart|\.elpa-capability/);

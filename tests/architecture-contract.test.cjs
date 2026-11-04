@@ -27,14 +27,14 @@ test('historical question identities and aliases remain resolvable', () => {
 });
 
 test('existing practice record and submission draft storage contracts stay readable', () => {
-  const practice = read('js/practice-storage.js');
+  const practice = read('assets/js/practice-storage.js');
   for (const key of ['elpa-q-status-v1', 'elpa-notes-v1', 'elpa-data-snapshot-v2',
     'elpa-autosave', 'elpa-fs-db', 'data-dir']) {
     assert.ok(practice.includes(key), 'Missing stored compatibility identifier: ' + key);
   }
   assert.match(practice, /version:\s*1,\s*updatedAt:/);
   assert.match(practice, /\bnormalizePayload\s*\(/);
-  assert.match(read('js/submit.js'), /elpa-submission-draft-v1:/);
+  assert.match(read('assets/js/submit.js'), /elpa-submission-draft-v1:/);
 });
 
 test('published routes and owner-approved Issue publication remain available', () => {
@@ -51,18 +51,18 @@ test('published routes and owner-approved Issue publication remain available', (
 test('practice session remains a separate, loaded module', () => {
   const html=read('practice.html');
   assert.match(html, /<script src="\.\/js\/practice\.js"><\/script>[\s\S]*?<script src="\.\/js\/practice-session\.js"><\/script>/);
-  const session=read('js/practice-session.js');
+  const session=read('assets/js/practice-session.js');
   assert.match(session, /function tickTimer\(/);
   assert.match(session, /function drawPractice\(/);
-  assert.ok(!read('js/practice.js').includes('function tickTimer('));
+  assert.ok(!read('assets/js/practice.js').includes('function tickTimer('));
 });
 
 test('browser record storage is independently loaded before practice UI', () => {
   const html=read('practice.html');
-  const store=html.indexOf('<script src="./js/practice-storage.js"></script>');
-  const ui=html.indexOf('<script src="./js/practice.js"></script>');
+  const store=html.indexOf('<script src="./assets/js/practice-storage.js"></script>');
+  const ui=html.indexOf('<script src="./assets/js/practice.js"></script>');
   assert.ok(store>=0&&ui>store,'storage module must initialize before practice UI');
-  assert.ok(!read('js/practice.js').includes("const LS_SNAPSHOT"));
+  assert.ok(!read('assets/js/practice.js').includes("const LS_SNAPSHOT"));
 });
 
 test('synthetic browser-verification questions are not published as actual exam practice',()=>{
