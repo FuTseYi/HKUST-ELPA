@@ -5,6 +5,7 @@ const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
 const {spawnSync}=require('node:child_process');
+const vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
 const importer=path.join(root,'scripts/import-reviewed-json.cjs');
 const names=['questions.json','appearances.json','taxonomy.json','advice.json'];
@@ -108,4 +109,56 @@ test('malformed data and synthetic Issue are rejected without changing JSON',()=
     assert.notEqual(f.run(injection,708).status,0);
     assert.deepEqual(names.map(name=>f.raw(name)),before);
   }finally{f.close();}
+});
+
+test('reviewed JSON Issue flows through Python build into browser grouping without losing IDs',()=>{
+  const f=fixture();
+  try {
+    const previous=f.read('questions.json');
+    const item=question('How do you explain an academic project to new students?');
+    item.term='2028 Spring';
+    item.examStage='mid';
+    const imported=f.run(item,711);
+    assert.equal(imported.status,0,imported.stderr);
+    assert.match(imported.output,/recorded=true/);
+
+    const generated=path.join(f.dir,'generated');
+    const python=process.platform==='win32'?'python':'python3';
+    const built=spawnSync(python,[path.join(root,'scripts/build-question-data.py'),
+      '--input',path.join(f.dir,'question-bank'),'--output',generated],{encoding:'utf8'});
+    assert.equal(built.status,0,built.stderr);
+    const context=vm.createContext({});
+    for(const file of ['questions.js','appearances.js','taxonomy.js']){
+      vm.runInContext(fs.readFileSync(path.join(generated,file),'utf8'),context,
+        {filename:file,timeout:1000});
+    }
+    vm.runInContext(fs.readFileSync(path.join(root,'assets/js/question-bank-queries.js'),'utf8'),
+      context,{filename:'question-bank-queries.js',timeout:1000});
+    const actual=JSON.parse(JSON.stringify(vm.runInContext(
+      '({latest:elpaLatestTerm(),current:elpaCurrentQuestionIds(),all:elpaAllPracticeIds(),alias:LEGACY_QUESTION_ALIASES["A-附"],extra:elpaReportedTerms("D-1000711")})',
+      context,{timeout:1000})));
+    assert.equal(actual.latest,'2028 Spring');
+    assert.ok(actual.current.includes('D-1000711'));
+    assert.ok(actual.all.includes('D-1000711'));
+    assert.equal(actual.alias,previous.legacyQuestionAliases['A-附']);
+    assert.deepEqual(actual.extra,['2028 Spring']);
+    const after=f.read('questions.json');
+    assert.deepEqual(after.pastQuestionIds,previous.pastQuestionIds);
+    assert.deepEqual(after.banks.A,previous.banks.A);
+    assert.deepEqual(after.banks.B,previous.banks.B);
+    assert.deepEqual(after.banks.C,previous.banks.C);
+    assert.deepEqual(after.banks.F,previous.banks.F);
+  } finally { f.close(); }
+});
+
+test('invalid linked supplement cannot change reviewed JSON or generate fake history',()=>{
+  const f=fixture();
+  try {
+    const before=names.map(name=>f.raw(name));
+    const missing={...question('A previously unreported topic about future research priorities?'),
+      linkedQuestionId:'D-999999',intent:'supplement'};
+    const result=f.run(missing,712);
+    assert.notEqual(result.status,0);
+    assert.deepEqual(names.map(name=>f.raw(name)),before);
+  } finally { f.close(); }
 });
