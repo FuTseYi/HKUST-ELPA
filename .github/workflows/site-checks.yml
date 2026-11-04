@@ -18,6 +18,10 @@ jobs:
           node-version: 22
       - run: npm run check
       - run: npm test
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/build-site.py --output output/site
 
   browser-smoke:
     runs-on: ubuntu-latest
@@ -28,5 +32,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/build-site.py --output output/site
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+        env:
+          ELPA_SITE_ROOT: output/site
