@@ -35,7 +35,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Build portable site
-        run: python scripts/build-site.py --output output/site
+        run: python preview.py --build-only
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

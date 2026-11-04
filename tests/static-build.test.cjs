@@ -14,8 +14,8 @@ test('portable site build publishes all pages and generates scripts from JSON',(
   const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-static-build-'));
   try{
     const dest=path.join(tmp,'site');
-    const built=spawnSync(python,[path.join(root,'scripts/build-site.py'),
-      '--output',dest],{cwd:root,encoding:'utf8'});
+    const built=spawnSync(python,[path.join(root,'preview.py'),
+      '--build-only','--output',dest],{cwd:root,encoding:'utf8'});
     assert.equal(built.status,0,built.stderr);
     for(const page of pages) assert.ok(fs.existsSync(path.join(dest,page+'.html')));
     for(const asset of ['submission-config.js','elpa_data.json',
@@ -40,8 +40,8 @@ test('portable site build publishes all pages and generates scripts from JSON',(
     assert.equal(fs.existsSync(path.join(dest,'question-bank/questions.json')),false,
       'Browser output must not carry a second copy of canonical JSON');
     const before=fs.readFileSync(path.join(dest,'question-bank/questions.js'),'utf8');
-    const again=spawnSync(python,[path.join(root,'scripts/build-site.py'),
-      '--output',dest],{cwd:root,encoding:'utf8'});
+    const again=spawnSync(python,[path.join(root,'preview.py'),
+      '--build-only','--output',dest],{cwd:root,encoding:'utf8'});
     assert.equal(again.status,0,again.stderr);
     assert.equal(fs.readFileSync(path.join(dest,'question-bank/questions.js'),'utf8'),before);
   }finally{fs.rmSync(tmp,{recursive:true,force:true});}
@@ -50,9 +50,17 @@ test('portable site build publishes all pages and generates scripts from JSON',(
 test('invalid canonical data fails without replacing the previously built site',()=>{
   const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-invalid-output-'));
   try{
-    const result=spawnSync(python,[path.join(root,'scripts/build-site.py'),
-      '--output',path.join(root,'question-bank')],{cwd:root,encoding:'utf8'});
+    const result=spawnSync(python,[path.join(root,'preview.py'),
+      '--build-only','--output',path.join(root,'question-bank')],{cwd:root,encoding:'utf8'});
     assert.notEqual(result.status,0,'Refuse to overwrite tracked canonical data');
     assert.ok(fs.existsSync(path.join(root,'assets/js/practice.js')));
   }finally{fs.rmSync(tmp,{recursive:true,force:true});}
+});
+
+test('local preview and production share one Python builder',()=>{
+  const source=fs.readFileSync(path.join(root,'preview.py'),'utf8');
+  assert.match(source,/def preview\(port: int\)/);
+  assert.match(source,/--build-only/);
+  assert.match(source,/ThreadingHTTPServer/);
+  assert.equal(fs.existsSync(path.join(root,'scripts/build-site.py')),false);
 });

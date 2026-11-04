@@ -49,12 +49,10 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 ```bash
 git clone https://github.com/FuTseYi/HKUST-ELPA.git
 cd HKUST-ELPA
-python3 scripts/build-site.py --output output/site
-cd output/site
-python3 -m http.server 8000
+python3 preview.py
 ```
 
-打开 `http://localhost:8000/`。浏览器读取的是 `output/site/` 中的完整构建产物；直接打开仓库根目录的 HTML 不会自动生成题库脚本。
+Windows 使用 `py -3 preview.py`；macOS / Linux 使用 `python3 preview.py`。默认打开 `http://127.0.0.1:8765/`，保存源码后自动重新构建，刷新浏览器即可。仅构建并验证使用 `py -3 preview.py --build-only`（macOS / Linux 使用 `python3 preview.py --build-only`）。发布产物保存在 `output/site/`，页面的静态 URL 保持不变。
 
 本地页面可以练习、保存记录和预览投稿；**正式投稿仅允许已配置的生产站点来源**，本地预览不会获得生产 Turnstile 验证权限。
 
@@ -81,6 +79,7 @@ Linux CI 使用 `npx playwright install --with-deps chromium` 安装系统依赖
 
 ```text
 HKUST-ELPA/
+├── preview.py                     # 本地预览与静态构建唯一入口
 ├── index.html / guide.html / practice.html / sources.html / submit.html
 ├── assets/                        # css/、js/、images/、icons/、demos/ 统一静态资源
 ├── submission-config.js           # 公开投稿端点与 Turnstile Site Key
@@ -111,7 +110,7 @@ HKUST-ELPA/
 
 | 组件 | 职责与边界 |
 | --- | --- |
-| 静态前端 | Vercel 依据 `vercel.json` 构建 `output/site/`；GitHub Pages 通过 `deploy-pages.yml` 发布同一目录（需在 Pages 设置启用 Actions）。学习记录按浏览器来源隔离。 |
+| 静态前端 | Vercel 与 GitHub Pages 都通过 `preview.py --build-only` 生成并发布 `output/site/`（需在 Pages 设置启用 Actions）。学习记录按浏览器来源隔离。 |
 | GitHub 星数 | HTML 直接嵌入 Shields 数字徽章，无自定义请求和缓存脚本；加载失败时隐藏数字，仓库链接仍可用。 |
 | 投稿 Worker | 校验来源、Turnstile、频率、大小和字段，成功后只创建待处理的公开 Issue。 |
 | 审核工作流 | 仓库所有者将 Issue 关闭为 Completed 后执行，自动验证数据与测试并提交至 `main`。 |

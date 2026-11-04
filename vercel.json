@@ -1,5 +1,5 @@
 {
   "framework": null,
-  "buildCommand": "python3 scripts/build-site.py --output output/site",
+  "buildCommand": "python3 preview.py --build-only",
   "outputDirectory": "output/site"
 }
