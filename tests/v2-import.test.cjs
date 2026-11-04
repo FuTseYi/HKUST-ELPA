@@ -4,6 +4,7 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {spawnSync}=require('node:child_process');
 const {checkSubmissionFiles}=require('../scripts/check-submission-diff.cjs');
 const importer=path.resolve(__dirname,'../scripts/import-completed-submission.cjs');
+const queryHelpers=fs.readFileSync(path.resolve(__dirname,'../assets/js/question-bank-queries.js'),'utf8');
 const bank=path.resolve(__dirname,'../question-bank/questions.js');
 function fixture(){
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-v2-'));
@@ -165,7 +166,7 @@ test('current-term grouping archives other sessions without renumbering saved ID
  const f=fixture();try{
   // Measure the reviewed fixture before importing; new approved questions may
   // already exist, so fixed historical totals are not stable.
-  const baseline=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+`
+  const baseline=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+'\n'+queryHelpers+`
     return {
       fall:elpaCurrentQuestionIds('2026 Fall').length,
       total:new Set([
@@ -177,7 +178,7 @@ test('current-term grouping archives other sessions without renumbering saved ID
   const spring={...question('Can you describe your current academic interests in simple terms?'),
     term:'2027 Spring'};
   assert.equal(f.run(spring,302).status,0);
-  const classify=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+`
+  const classify=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+'\n'+queryHelpers+`
     return {
       fall:elpaCurrentQuestionIds('2026 Fall'),
       spring:elpaCurrentQuestionIds('2027 Spring'),
@@ -194,7 +195,7 @@ test('current-term grouping archives other sessions without renumbering saved ID
   assert.equal(groups.latest,'2027 Spring');
   const older=question('How should a student plan a research project with limited time?');
   assert.equal(f.run(older,303).status,0);
-  const latestAfterOlder=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+
+  const latestAfterOlder=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+'\n'+queryHelpers+
     '\nreturn elpaLatestTerm();')();
   assert.equal(latestAfterOlder,'2027 Spring');
   assert.ok(groups.sorted.includes('D-1'));
@@ -250,7 +251,7 @@ test('regular and Fast Track each show their own latest reviewed term and histor
   assert.equal(f.run(fast,601).status,0);
   assert.equal(f.run(older,602).status,0);
   const source=f.read('questions.js')+'\n'+
-    f.read('appearances.js')+'\n';
+    f.read('appearances.js')+'\n'+queryHelpers+'\n';
   const grouping=new Function(source+`
     const fastIds=BANKS.F.items.map(x=>'F-'+x.num);
     const nanshaRegular=elpaLatestTerm();
