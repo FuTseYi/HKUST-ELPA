@@ -12,3 +12,11 @@ test-results/
 .dev.vars
 .dev.vars.*
 *.log
+
+.venv/
+__pycache__/
+*.py[cod]
+
+_site/
+
+.preview-*/

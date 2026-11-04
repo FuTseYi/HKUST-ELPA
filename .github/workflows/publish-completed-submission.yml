@@ -26,16 +26,20 @@ jobs:
         run: |
           gh label create submission:published --color 0e8a16 --description "已写入 main（不代表已上线）" --force
           gh label create submission:failed --color b60205 --description "自动入库失败，请查看 Actions" --force
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: ${{ github.event.action == 'closed' && github.event.issue.state_reason == 'completed' && github.event.sender.login == 'FuTseYi' }}
         with:
           ref: main
           fetch-depth: 0
           persist-credentials: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         if: ${{ github.event.action == 'closed' && github.event.issue.state_reason == 'completed' && github.event.sender.login == 'FuTseYi' }}
         with:
           node-version: 22
+      - uses: actions/setup-python@v7
+        if: ${{ github.event.action == 'closed' && github.event.issue.state_reason == 'completed' && github.event.sender.login == 'FuTseYi' }}
+        with:
+          python-version: '3.12'
       - name: Import, validate, and publish
         id: publish
         if: ${{ github.event.action == 'closed' && github.event.issue.state_reason == 'completed' && github.event.sender.login == 'FuTseYi' }}
@@ -51,7 +55,6 @@ jobs:
             git clean -fd -- question-bank/
             # Issue text is processed as data, never interpolated into shell.
             node scripts/import-completed-submission.cjs
-            python3 scripts/build-site.py --output output/site
             git add -A -- question-bank/
             if git diff --cached --quiet; then
               # The importer already classified this Issue; no shell parsing of bank data.
