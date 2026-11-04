@@ -30,7 +30,7 @@
 
 > Please introduce yourself and explain a research method or tool that is very important in your field
 
-其余 10 题的英文练习问法及完整中文译文请见 [结构化题库](./questions.js)，它们不是已核实的英文原题。
+其余 10 题的英文练习问法及完整中文译文请见 [结构化题库](./questions.json)，它们不是已核实的英文原题。
 
 ## 使用范围与资格提醒
 
