@@ -51,6 +51,7 @@ jobs:
             git clean -fd -- question-bank/
             # Issue text is processed as data, never interpolated into shell.
             node scripts/import-completed-submission.cjs
+            python3 scripts/build-site.py --output output/site
             git add -A -- question-bank/
             if git diff --cached --quiet; then
               # The importer already classified this Issue; no shell parsing of bank data.

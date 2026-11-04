@@ -7,7 +7,7 @@ const path=require('node:path');
 const {spawnSync}=require('node:child_process');
 const vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
-const importer=path.join(root,'scripts/import-reviewed-json.cjs');
+const importer=path.join(root,'scripts/import-completed-submission.cjs');
 const names=['questions.json','appearances.json','taxonomy.json','advice.json'];
 function fixture(){
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-reviewed-json-'));

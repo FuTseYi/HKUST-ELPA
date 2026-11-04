@@ -2,9 +2,9 @@
 const {execFileSync}=require('node:child_process');
 
 const allowed=new Set([
-  'question-bank/questions.js',
-  'question-bank/appearances.js',
-  'question-bank/advice.js',
+  'question-bank/questions.json',
+  'question-bank/appearances.json',
+  'question-bank/advice.json',
   'question-bank/community-submissions.md',
   'question-bank/community-advice.md'
 ]);

@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict');
-const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const fs=require('node:fs'),path=require('node:path');
 const {execFileSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..');
 const pageNames=['index','guide','practice','sources','submit'];
@@ -65,8 +65,10 @@ function validateSite(){
       assert.ok(fs.existsSync(path.resolve(root,path.dirname(file),local)),'Broken document link: '+file+' → '+target);
     }
   }
-  const sources=['questions','taxonomy','appearances','advice'].map(name=>read('question-bank/'+name+'.js'));
-  const data=vm.runInNewContext(sources.join('\n')+'\n;({banks:BANKS,past:PAST_QUESTION_IDS,aliases:LEGACY_QUESTION_ALIASES,appearances:ELPA_APPEARANCES,advice:ELPA_ADVICE,taxonomy:ELPA_TAXONOMY})',{}, {timeout:1000});
+  const json=name=>JSON.parse(read('question-bank/'+name+'.json'));
+  const questions=json('questions');
+  const data={banks:questions.banks,past:questions.pastQuestionIds,aliases:questions.legacyQuestionAliases,
+    appearances:json('appearances'),advice:json('advice'),taxonomy:json('taxonomy')};
   const questionIds=new Set();
   for(const [key,bank] of Object.entries(data.banks)){
     assert.ok(Array.isArray(bank.items),'Invalid bank '+key);

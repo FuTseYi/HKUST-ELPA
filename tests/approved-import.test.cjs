@@ -6,11 +6,11 @@ const path=require('node:path');
 const {spawnSync}=require('node:child_process');
 const {test}=require('node:test');
 const importer=path.resolve(__dirname,'../scripts/import-completed-submission.cjs');
-const bank=path.resolve(__dirname,'../question-bank/questions.js');
+const bank=path.resolve(__dirname,'../question-bank/questions.json');
 function attempt(input,question,issueNumber,displayPrefix='') {
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-approved-'));
   fs.mkdirSync(path.join(root,'question-bank'));
-  fs.copyFileSync(bank,path.join(root,'question-bank/questions.js'));
+  fs.copyFileSync(bank,path.join(root,'question-bank/questions.json'));
   const encoded=Buffer.from(JSON.stringify({
     version:1,term:'2027 Fall',question,subquestions:'a. Why?\nb. How?',
     source:'firsthand',...input
@@ -23,7 +23,7 @@ function attempt(input,question,issueNumber,displayPrefix='') {
     cwd:root,env:{...process.env,GITHUB_EVENT_PATH:eventFile,GITHUB_OUTPUT:''},
     encoding:'utf8'
   });
-  const contents=fs.readFileSync(path.join(root,'question-bank/questions.js'),'utf8');
+  const contents=fs.readFileSync(path.join(root,'question-bank/questions.json'),'utf8');
   const doc=path.join(root,'question-bank/community-submissions.md');
   const docExists=fs.existsSync(doc);
   const docContents=docExists?fs.readFileSync(doc,'utf8'):'';
@@ -34,11 +34,11 @@ test('reviewed issue imports a stable non-sequential question ID',()=>{
   const {result,contents,docExists,docContents}=attempt({},'This is a unique sample question about teamwork?',42);
   assert.equal(result.status,0,result.stderr);
   assert.match(result.stdout,/Import status: added/);
-  assert.match(contents,/"num":1000042/);
+  assert.match(contents,/"num":\s*1000042/);
   assert.equal(docExists,true);
   assert.match(docContents,/Issue #42/);
-  assert.match(contents,/"subs":\[\{"en":"a\. Why\?"/);
-  assert.doesNotThrow(()=>new Function(contents+'\nreturn BANKS.D.items.length'));
+  assert.deepEqual(JSON.parse(contents).banks.D.items.at(-1).subs[0],{en:"a. Why?",cn:""});
+  assert.doesNotThrow(()=>JSON.parse(contents).banks.D.items.length);
 });
 test('exact duplicate does not change bank',()=>{
   const {result,contents,docExists}=attempt({},'Explain one of your projects.',43);
@@ -50,7 +50,7 @@ test('exact duplicate does not change bank',()=>{
 test('untrusted input remains a string, never executable JS',()=>{
   const {result,contents}=attempt({},'Explain this term: "; process.exit(15); //',44);
   assert.equal(result.status,0,result.stderr);
-  assert.doesNotThrow(()=>new Function(contents+'\nreturn BANKS.D.items.length'));
+  assert.doesNotThrow(()=>JSON.parse(contents).banks.D.items.length);
 });
 test('malformed issue is rejected',()=>{
   const {result}=attempt({source:'unsupported'},'Explain this phrase to students in a class?',45);
@@ -82,7 +82,7 @@ test('synthetic verification Issue is never reimported after removal from public
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-synthetic-'));
   try{
     fs.mkdirSync(path.join(root,'question-bank'));
-    fs.copyFileSync(bank,path.join(root,'question-bank/questions.js'));
+    fs.copyFileSync(bank,path.join(root,'question-bank/questions.json'));
     const data={version:1,term:'2026 Fall',question:'TEST ONLY - HKUST-ELPA browser submission verification. DO NOT PUBLISH.',subquestions:'',source:'firsthand'};
     const event={issue:{number:13,title:'[ELPA 投稿] [2026 Fall] TEST ONLY - browser submission verification',
       body:'<!-- elpa-submission-v1:'+Buffer.from(JSON.stringify(data)).toString('base64url')+' -->'}};
@@ -92,6 +92,6 @@ test('synthetic verification Issue is never reimported after removal from public
       env:{...process.env,GITHUB_EVENT_PATH:eventFile,GITHUB_OUTPUT:''},encoding:'utf8'});
     assert.notEqual(result.status,0);
     assert.match(result.stderr,/Synthetic verification Issue cannot be published/);
-    assert.doesNotMatch(fs.readFileSync(path.join(root,'question-bank/questions.js'),'utf8'),/1000013/);
+    assert.doesNotMatch(fs.readFileSync(path.join(root,'question-bank/questions.json'),'utf8'),/1000013/);
   }finally{fs.rmSync(root,{recursive:true,force:true});}
 });
