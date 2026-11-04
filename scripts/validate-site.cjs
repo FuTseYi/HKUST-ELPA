@@ -4,12 +4,13 @@ const fs=require('node:fs'),path=require('node:path');
 const {execFileSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..');
 const pageNames=['index','guide','practice','sources','submit'];
-const read=file=>fs.readFileSync(path.join(root,file),'utf8');
+const site=path.join(root,'_site');
+const read=file=>fs.readFileSync(path.join(file.endsWith('.html')?site:root,file),'utf8');
 
 // Source-level tests inspect page-specific JS/CSS in load order; shared site.css is tested separately.
 function readPageSource(name){
   const html=read(name);
-  const files=[...html.matchAll(/(?:src|href)="\.\/(assets\/(?:js|css)\/[^"?#]+)"/g)].map(match=>match[1]).filter(file=>file!=='assets/css/site.css');
+  const files=[...html.matchAll(/(?:src|href)="\.\/(assets\/(?:js|css)\/[^"?#]+)(?:\?[^"]*)?"/g)].map(match=>match[1]).filter(file=>file!=='assets/css/site.css');
   return html+'\n'+files.map(read).join('\n');
 }
 function validateSite(){
@@ -27,7 +28,7 @@ function validateSite(){
       assert.ok(nav.includes('href="./'+route+'.html"'),'Missing route '+route+' in '+name);
     assert.equal((nav.match(/class="elpa-nav-github"/g)||[]).length,1,'One GitHub entry: '+name);
     assert.equal((nav.match(/<small lang="en">/g)||[]).length,5,'Bilingual navigation and sharing: '+name);
-    assert.ok(html.includes('href="./assets/css/site.css"'),'Shared CSS missing: '+name);
+    assert.ok(html.includes('href="./assets/css/site.css?v='),'Shared CSS missing: '+name);
     assert.ok(nav.includes('https://img.shields.io/github/stars/FuTseYi/HKUST-ELPA?'),'Star badge missing: '+name);
     assert.ok(html.includes('href="./assets/icons/elpa-mark.svg"'),'Favicon missing: '+name);
     const currentFooter=html.match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/)?.[0];
@@ -35,17 +36,14 @@ function validateSite(){
     if(footer)assert.equal(currentFooter,footer,'Shared footer drift: '+name);
     footer=currentFooter;
     const script=name==='sources.html'?null:'./assets/js/'+path.basename(name,'.html')+'.js';
-    if(script)assert.ok(html.includes('src="'+script+'"'),'Page script missing: '+name);
+    if(script)assert.ok(html.includes('src="'+script+'?v='),'Page script missing: '+name);
   }
   for(const [name,html] of pages){
     for(const [,raw] of html.matchAll(/(?:src|href|data-demo)="([^"]+)"/g)){
       const url=new URL(raw.replace(/&amp;/g,'&'),'https://elpa.local/'+name);
       if(url.origin!=='https://elpa.local')continue;
       const file=decodeURIComponent(url.pathname).slice(1);
-      // These four scripts are generated from canonical JSON into output/site/.
-      const generated=file.match(/^question-bank\/(questions|appearances|advice|taxonomy)\.js$/);
-      const source=generated?'question-bank/'+generated[1]+'.json':file;
-      assert.ok(fs.existsSync(path.join(root,source)),'Missing local resource: '+name+' → '+raw);
+      assert.ok(fs.existsSync(path.join(site,file)),'Missing local resource: '+name+' → '+raw);
       if(url.hash&&ids.has(file))assert.ok(ids.get(file).has(decodeURIComponent(url.hash.slice(1))),'Missing anchor: '+name+' → '+raw);
     }
   }
@@ -65,7 +63,7 @@ function validateSite(){
     for(const [,target] of read(file).matchAll(/\]\(([^\s)]+)\)/g)){
       if(/^(?:[a-z]+:|#)/i.test(target))continue;
       const local=decodeURIComponent(target.split(/[?#]/)[0]);
-      assert.ok(fs.existsSync(path.resolve(root,path.dirname(file),local)),'Broken document link: '+file+' → '+target);
+      assert.ok(fs.existsSync((local.includes('.html')?path.join(site,path.basename(local)):path.resolve(root,path.dirname(file),local))),'Broken document link: '+file+' → '+target);
     }
   }
   const json=name=>JSON.parse(read('question-bank/'+name+'.json'));
@@ -114,6 +112,9 @@ function validateSite(){
   console.log('Validated 5 pages, local resources, '+questionIds.size+' stable question IDs, '+data.advice.length+' advice entries and legacy aliases');
 }
 if(require.main===module){
+  const python=process.platform==='win32'?'py':'python3';
+  const pythonArgs=process.platform==='win32'?['-3']:[];
+  execFileSync(python,[...pythonArgs,'preview.py','--build-only'],{cwd:root,stdio:'inherit'});
   validateSite();
   const files=['submission-config.js'];
   for(const dir of ['assets/js','question-bank','scripts','tests']){
@@ -127,4 +128,4 @@ if(require.main===module){
   });
   console.log('JavaScript syntax checks passed');
 }
-module.exports={readPageSource,validateSite};
+module.exports={read,readPageSource,validateSite};

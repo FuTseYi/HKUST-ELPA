@@ -8,7 +8,7 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 
 ## Architecture and ownership
 
-- HTML pages remain at the repository root. `assets/css/` and `assets/js/` own browser styles and scripts; `assets/images/`, `assets/icons/`, and `assets/demos/` own media. `scripts/templates/` owns shared navigation and footer. CSS and browser JavaScript implement presentation and interactions. Avoid introducing a frontend framework or runtime dependency without a demonstrated need.
+- Root HTML files own their respective page UI. Public output is built into `_site/`. `assets/css/` and `assets/js/` own browser styles and scripts; `assets/images/`, `assets/icons/`, and `assets/demos/` own media. `index.html` owns shared navigation and footer, which are reused during the build. CSS and browser JavaScript implement presentation and interactions. Avoid introducing a frontend framework or runtime dependency without a demonstrated need.
 - `question-bank/` owns canonical questions, reported encounters, reviewed advice, stable taxonomy, and source provenance. The same question must not be recreated for each appearance.
 - Browser learning records are local to the current origin; no account or server database is required.
 - `worker/` accepts untrusted submissions and creates GitHub Issues. It never publishes questions directly. Cloudflare secrets must never enter the website or repository.
@@ -34,6 +34,8 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 
 ## Engineering and change management
 
+- Treat cross-project alignment as a quality baseline, not a fixed repository template. Prefer familiar, purpose-driven organization; reuse proven logic only when it suits this project. Each site may evolve its UI, dependencies and structure independently.
+
 - Read the affected callers, dependencies, source data, tests, and deployment configuration before changing structure.
 - Prefer removing the underlying cause of drift over adding checks for multiple manually maintained copies. Use generation only when it reduces total maintenance and keeps portable static output.
 - Reuse code where semantics really match. Do not create generic services, abstract layers, or a large number of small files solely to reduce line count.
@@ -41,12 +43,12 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 - Keep substantial structural changes in a reviewable PR. Make coherent, verified commits; avoid repeated deployment-triggering pushes and never rewrite shared history without explicit authorization.
 
 
-- Shared navigation and footer are authored only in `scripts/templates/`. Run `npm run sync:layout` after editing them; the generated fragments stay committed in the five public HTML files. `npm run check` rejects drift. Keep the committed HTML pages synchronized, but publish `output/site/` generated from canonical JSON. Do not introduce runtime HTML includes or duplicate maintained bank scripts.
+- Edit each root HTML page directly. Shared navigation and footer follow `index.html` during the build. Keep site-specific organization simple; no external shared package, generated source synchronization or separate template directory is required.
 
 ## Verification and documentation
 
-- Run `npm run check`, `npm test`, and, for user-facing changes, `npm run test:browser`. For Worker changes, include Worker security and contract tests. Report exactly what ran.
-- `preview.py` is the single Python build and local preview entry point: Windows `py -3 preview.py`, otherwise `python3 preview.py`. Vercel, Pages and CI must use `preview.py --build-only` to publish the same `output/site/` build, without a parallel build wrapper. Verify root and `/HKUST-ELPA/` paths; keep deployment secrets external.
+- Run the common Python suite `python -m unittest discover -s tests -t . -p 'test_*.py'`, `npm run check`, `npm test`, and, for user-facing changes, `npm run test:browser`. For Worker changes, include Worker security and contract tests. Report exactly what ran.
+- `preview.py` is the single Python build and local preview entry point: Windows `py -3 preview.py`, otherwise `python3 preview.py`. Vercel, Pages and CI must use `preview.py --build-only` to publish the same `_site/` build, without a parallel build wrapper. Verify root and `/HKUST-ELPA/` paths; keep deployment secrets external.
 - Test old backup restore, existing note keys, linked/supplement submission semantics, duplicate/failed publication, mobile layouts, keyboard interactions, and timer behavior whenever related code changes.
 - `README.md` describes project usage. `question-bank/README.md` owns question sources and editorial provenance. `question-bank/MODERATION.md` owns approval and recovery operations. `docs/submission-v2-spec.md` owns the submission data contract; `worker/README.md` owns Worker operations. Reference these documents rather than copying their full rules into multiple places.
 - This guide governs engineering priorities and document ownership. Update the relevant owner document when behavior changes; do not duplicate business policy here.

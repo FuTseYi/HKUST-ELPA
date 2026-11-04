@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright');
-const root=path.resolve(process.env.ELPA_SITE_ROOT || path.join(__dirname,'..'));
+const root=path.resolve(process.env.ELPA_SITE_ROOT || path.join(__dirname,'../_site'));
 const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8',
   '.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.png':'image/png'};
 const serve=http.createServer((request,response)=>{
@@ -479,6 +479,59 @@ const serve=http.createServer((request,response)=>{
       console.log('Browser UI passed at '+width+'px');
       await page.close();
     }
+    for(const prefix of ['','/HKUST-ELPA']){
+      for(const reducedMotion of ['reduce','no-preference']){
+        const page=await newPage({viewport:{width:390,height:844},reducedMotion});
+        const errors=[];
+        page.on('pageerror',error=>errors.push(error.message));
+        await page.addInitScript(()=>{
+          addEventListener('pagereveal',event=>{
+            window.__documentTransition=Boolean(event.viewTransition);
+          });
+        });
+        const base='http://127.0.0.1:'+serve.address().port+prefix;
+        await page.goto(base+'/index.html',{waitUntil:'networkidle'});
+        await page.locator('.elpa-nav-links a[href="./guide.html"]').click();
+        await page.waitForLoadState('networkidle');
+        if(reducedMotion==='reduce') assert.equal(await page.evaluate(()=>window.__documentTransition),false,
+          'Reduced-motion navigation must not create a document transition');
+        const navigation=await page.evaluate(()=>{
+          let value;
+          const visit=rules=>{for(const rule of rules){
+            if(rule.conditionText && !matchMedia(rule.conditionText).matches) continue;
+            if(rule.cssRules) visit(rule.cssRules);
+            else if(rule.cssText.startsWith('@view-transition')) value=rule.navigation;
+          }};
+          for(const sheet of document.styleSheets) visit(sheet.cssRules);
+          return value;
+        });
+        assert.equal(navigation,reducedMotion==='reduce'?'none':'auto');
+        await page.locator('#guideFastTab').click();
+        await page.locator('#fastGuide .elpa-guide-practice').click();
+        await page.waitForLoadState('networkidle');
+        assert.equal(new URL(page.url()).searchParams.get('track'),'fast-track');
+        assert.equal(new URL(page.url()).searchParams.get('campus'),'nansha');
+        const card=page.locator('.qcard:visible').first();
+        const id=await card.getAttribute('id');
+        await card.locator('.note-toggle').click();
+        await card.locator('textarea').fill('Cross-page navigation note');
+        await page.locator('.elpa-nav-links a[href="./guide.html"]').click();
+        await page.waitForLoadState('networkidle');
+        await page.goBack({waitUntil:'networkidle'});
+        assert.equal(await page.locator('#'+id+' textarea').inputValue(),'Cross-page navigation note',
+          'Notes survive native document navigation and browser Back');
+        assert.deepEqual(errors,[],prefix+' navigation errors with '+reducedMotion);
+        await page.close();
+        console.log('Document navigation passed: '+(prefix||'/')+', '+reducedMotion);
+      }
+    }
+    const noScript=await browser.newPage({javaScriptEnabled:false,reducedMotion:'reduce'});
+    await noScript.goto('http://127.0.0.1:'+serve.address().port+'/index.html');
+    await noScript.locator('.elpa-nav-links a[href="./sources.html"]').click();
+    await noScript.waitForURL('**/sources.html');
+    assert.equal(await noScript.locator('#official-sources').isVisible(),true,
+      'Document navigation remains available without JavaScript');
+    await noScript.close();
     const pages=await newPage({viewport:{width:390,height:844}});
     const pagesErrors=[];
     pages.on('pageerror',error=>pagesErrors.push(error.message));

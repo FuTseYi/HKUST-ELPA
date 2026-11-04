@@ -1,7 +1,9 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
-const {readPageSource}=require('../scripts/validate-site.cjs');
+const {read:readArtifact,readPageSource:readSource}=require('../scripts/validate-site.cjs');
+const read=file=>readArtifact(file).replace(/\?v=[a-f0-9]{12}(?=")/g,'');
+const readPageSource=file=>readSource(file).replace(/\?v=[a-f0-9]{12}(?=")/g,'');
 const practice=readPageSource('practice.html');
 const submit=readPageSource('submit.html');
 function section(source,start,end){
@@ -198,7 +200,6 @@ test('pause and resume preserve seconds, custom countdown and stopwatch work',()
 
 test('footer is concise, community-oriented and identical across five pages',()=>{
  const pages=['index.html','guide.html','practice.html','sources.html','submit.html'];
- const read=p=>fs.readFileSync(path.resolve(__dirname,'..',p),'utf8');
  const footers=pages.map(p=>{
    const html=read(p),matches=html.match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/g);
    assert.equal(matches?.length,1,p+' should have one footer');
@@ -221,7 +222,7 @@ test('footer is concise, community-oriented and identical across five pages',()=
 test('all pages share one compact banner and the practice brand uses the site palette',()=>{
  const pages=['index.html','guide.html','practice.html','sources.html','submit.html'];
  for(const page of pages){
-   const html=fs.readFileSync(path.resolve(__dirname,'..',page),'utf8');
+   const html=read(page);
    assert.match(html,/class="[^"]*elpa-subhero/);
    assert.equal((html.match(/<main(?:\s|>)/g)||[]).length,1,page+' should have one main landmark');
  }
@@ -229,7 +230,7 @@ test('all pages share one compact banner and the practice brand uses the site pa
 });
 
 test('sources page keeps external references without duplicate question-bank documents',()=>{
- const sources=fs.readFileSync(path.join(__dirname,'../sources.html'),'utf8');
+ const sources=read('sources.html');
   assert.match(sources,/id="official-sources">学校官方说明 <span[^>]*lang="en">Official Information<\/span><\/h2>/);
   assert.match(sources,/id="community-sources">补充链接 <span[^>]*lang="en">Additional Links<\/span><\/h2>/);
  assert.match(sources,/docs\.qq\.com\/doc\/DT3BxSkJzSGdUamJE/);
@@ -411,7 +412,7 @@ test('Fast Track documentation links to the selectable practice route',()=>{
 });
 
 test('official source links remain separate from community references',()=>{
- const sources=fs.readFileSync(path.join(__dirname,'../sources.html'),'utf8');
+ const sources=read('sources.html');
  assert.match(sources,/id="official-sources"/);
  assert.match(sources,/id="community-sources"/);
  for(const target of ['https://elpa.hkust-gz.edu.cn/','https://fytgs.hkust-gz.edu.cn/handbooks/handbook-for-research-postgraduate-studies','https://cle.hkust.edu.hk/elpa','https://cle.hkust.edu.hk/sites/default/files/2026-08/ELPA-Speaking-Scale-Student-Version.pdf'])assert.ok(sources.includes(target),target);

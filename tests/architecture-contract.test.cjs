@@ -5,7 +5,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const {read:readArtifact}=require('../scripts/validate-site.cjs');
+const read=file=>readArtifact(file).replace(/\?v=[a-f0-9]{12}(?=")/g,'');
 
 test('historical question identities and aliases remain resolvable', () => {
   const content=JSON.parse(read('question-bank/questions.json'));
@@ -36,7 +37,7 @@ test('existing practice record and submission draft storage contracts stay reada
 
 test('published routes and owner-approved Issue publication remain available', () => {
   for (const page of ['index', 'guide', 'practice', 'submit', 'sources'])
-    assert.ok(fs.existsSync(path.join(root, page + '.html')), 'Missing public route: ' + page);
+    assert.ok(fs.existsSync(path.join(root, '_site', page + '.html')), 'Missing public route: ' + page);
   const worker = read('worker/src/index.js');
   assert.match(worker, /elpa-submission-v2:/);
   assert.match(worker, /elpa-submission-v1:/);

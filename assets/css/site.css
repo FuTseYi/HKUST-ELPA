@@ -349,7 +349,6 @@ body { margin:0; }
 
 
 /* 2026 UI consistency: restrained navigation, two predictable hero actions. */
-@view-transition { navigation:auto; }
 @keyframes elpa-reveal {from{opacity:.88}to{opacity:1}}
 ::view-transition-old(root){animation-duration:.09s}
 ::view-transition-new(root){animation:elpa-reveal .13s ease-out}

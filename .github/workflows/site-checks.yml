@@ -12,31 +12,31 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - run: npm run check
-      - run: npm test
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - run: python preview.py --build-only
+      - run: npm run check
+      - run: npm test
+      - run: python -m unittest discover -s tests -t . -p 'test_*.py'
 
   browser-smoke:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - run: python preview.py --build-only
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
         env:
-          ELPA_SITE_ROOT: output/site
+          ELPA_SITE_ROOT: _site

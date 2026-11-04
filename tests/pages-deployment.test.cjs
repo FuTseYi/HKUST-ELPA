@@ -8,10 +8,10 @@ const root=path.resolve(__dirname,'..');
 test('Pages and Vercel publish the identical Python-built site directory',()=>{
   const workflow=fs.readFileSync(path.join(root,'.github/workflows/deploy-pages.yml'),'utf8');
   const vercel=JSON.parse(fs.readFileSync(path.join(root,'vercel.json'),'utf8'));
-  assert.equal(vercel.outputDirectory,'output/site');
+  assert.equal(vercel.outputDirectory,'_site');
   assert.match(workflow,/python preview\.py --build-only/);
-  assert.match(workflow,/actions\/upload-pages-artifact@v4[\s\S]*?path: output\/site/);
-  assert.match(workflow,/actions\/deploy-pages@v4/);
+  assert.match(workflow,/actions\/upload-pages-artifact@v5[\s\S]*?path: _site/);
+  assert.match(workflow,/actions\/deploy-pages@v5/);
 });
 
 test('Pages handles manual pushes and owner-approved Issue publication without unsafe checkout',()=>{

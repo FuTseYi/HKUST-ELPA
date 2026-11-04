@@ -52,7 +52,7 @@ cd HKUST-ELPA
 python3 preview.py
 ```
 
-Windows 使用 `py -3 preview.py`；macOS / Linux 使用 `python3 preview.py`。默认打开 `http://127.0.0.1:8765/`，保存源码后自动重新构建，刷新浏览器即可。仅构建并验证使用 `py -3 preview.py --build-only`（macOS / Linux 使用 `python3 preview.py --build-only`）。发布产物保存在 `output/site/`，页面的静态 URL 保持不变。
+Windows 使用 `py -3 preview.py`；macOS / Linux 使用 `python3 preview.py`。启动后访问 `http://127.0.0.1:8765/`，保存源码后自动重新构建，刷新浏览器即可。仅构建并验证使用 `py -3 preview.py --build-only`（macOS / Linux 使用 `python3 preview.py --build-only`）。发布产物保存在 `_site/`，页面的静态 URL 保持不变。
 
 本地页面可以练习、保存记录和预览投稿；**正式投稿仅允许已配置的生产站点来源**，本地预览不会获得生产 Turnstile 验证权限。
 
@@ -85,7 +85,7 @@ HKUST-ELPA/
 ├── submission-config.js           # 公开投稿端点与 Turnstile Site Key
 ├── elpa_data.json                 # 空的初始记录文件，非个人备份
 ├── question-bank/                 # 稳定题目、场次、经验及来源文档
-├── scripts/                       # templates/ 共享布局；同步、校验、投稿导入及发布白名单
+├── scripts/                       # 网站构建、校验、投稿导入及发布白名单
 ├── tests/                         # Worker、导入器、页面逻辑与浏览器回归
 ├── worker/                        # 独立部署的 Cloudflare 投稿接口
 ├── docs/                          # 投稿数据约定及维护说明
@@ -93,12 +93,13 @@ HKUST-ELPA/
 └── .github/workflows/             # 网站校验、Completed 后自动审核发布
 ```
 
-`output/site/` 是唯一静态发布产物；`output/`、`.playwright-cli/`、`node_modules/` 和本地密钥文件均不纳入版本控制。
+`_site/` 是唯一静态发布产物；`_site/`、`.venv/`、`output/`、`.playwright-cli/`、`node_modules/` 和本地密钥文件均不纳入版本控制。
 
 ### 文件维护边界
 
 - **页面与代码分离**：HTML 保留语义内容及真实导航；交互在 `assets/js/` 中，样式在 `assets/css/`。保持经典脚本的加载顺序和现有事件绑定，未经迁移不要改成模块或异步加载。
-- **共享导航与页脚**：只编辑 `scripts/templates/nav.html` 和 `scripts/templates/footer.html`，运行 `npm run sync:layout` 自动同步五个静态页面，再运行 `npm run check` 验证。同步后的 HTML 保留在仓库；对外部署使用 Python 生成的 `output/site/`，不直接托管源码根目录。
+- **页面维护**：直接编辑根目录各 HTML 的页面内容。公共导航与页脚以 `index.html` 为准，构建时应用到其他页面；不需要手动同步或单独维护模板目录。
+- **页面切换**：普通 HTML 链接配合浏览器原生跨页过渡；减少动态效果时关闭过渡。首屏等待正文解析完成，保留原生前进、后退和直接访问。
 - **双语排版**：保留中文主体和简短英文标签；放得下时并排，空间不足时将英文放在下方。题目翻译与用户输入不自动改写。
 - **题库与记录兼容**：不重编号已发布题目，不改变既有 localStorage 键。提示小问笔记按位置关联，已发布小问不随意重排；需要调整时必须设计记录迁移。
 - **数据与来源分离**：结构化数据负责显示和关联；Markdown 负责来源、场次背景与不确定性，不是自动生成的数据副本。
@@ -110,7 +111,7 @@ HKUST-ELPA/
 
 | 组件 | 职责与边界 |
 | --- | --- |
-| 静态前端 | Vercel 与 GitHub Pages 都通过 `preview.py --build-only` 生成并发布 `output/site/`（需在 Pages 设置启用 Actions）。学习记录按浏览器来源隔离。 |
+| 静态前端 | Vercel 与 GitHub Pages 都通过 `preview.py --build-only` 生成并发布 `_site/`（需在 Pages 设置启用 Actions）。学习记录按浏览器来源隔离。 |
 | GitHub 星数 | HTML 直接嵌入 Shields 数字徽章，无自定义请求和缓存脚本；加载失败时隐藏数字，仓库链接仍可用。 |
 | 投稿 Worker | 校验来源、Turnstile、频率、大小和字段，成功后只创建待处理的公开 Issue。 |
 | 审核工作流 | 仓库所有者将 Issue 关闭为 Completed 后执行，自动验证数据与测试并提交至 `main`。 |

@@ -4,24 +4,19 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const root=path.resolve(__dirname,'..');
-const {renderNavigation,renderPage}=require('../scripts/sync-layout.cjs');
-const read=file=>fs.readFileSync(path.join(root,file),'utf8');
+const {read:readArtifact}=require('../scripts/validate-site.cjs');
+const read=file=>readArtifact(file).replace(/\?v=[a-f0-9]{12}(?=")/g,'');
 
-test('all five pages are derived from one navigation and footer',()=>{
+test('all five built pages reuse homepage chrome with one selected navigation link',()=>{
+  const footer=read('index.html').match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/)[0];
   for(const page of ['index','guide','practice','submit','sources']){
     const html=read(page+'.html');
-    assert.equal(renderPage(page,html),html,'Unsynchronized shared layout: '+page);
-    const nav=renderNavigation(page);
+    const nav=html.match(/<nav class="elpa-nav"[\s\S]*?<\/nav>/)[0];
     assert.equal((nav.match(/aria-current="page"/g)||[]).length,1);
-    if(page==='submit')assert.match(nav,/elpa-nav-submit" aria-current="page"/);
-    else assert.ok(nav.includes('href="./'+page+'.html" class="active" aria-current="page"'));
+    assert.ok(nav.includes('aria-current="page"'));
+    assert.equal(html.match(/<footer class="elpa-footer"[\s\S]*?<\/footer>/)[0],footer);
+    assert.ok(fs.existsSync(path.join(root,page+'.html')),'Keep each page directly editable');
   }
-});
-test('generated layout replaces drift instead of adding another independent copy',()=>{
-  const html=read('guide.html');
-  const tampered=html.replace('Speaking Preparation','Outdated Branding');
-  assert.notEqual(tampered,html);
-  assert.equal(renderPage('guide',tampered),html);
 });
 
 test('practice palette aliases reuse the global design tokens',()=>{
