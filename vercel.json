@@ -1,0 +1,5 @@
+{
+  "framework": null,
+  "buildCommand": "python3 scripts/build-site.py --output output/site",
+  "outputDirectory": "output/site"
+}

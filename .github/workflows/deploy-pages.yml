@@ -1,0 +1,45 @@
+name: Deploy ELPA to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # GITHUB_TOKEN pushes from the reviewed-Issue importer do not trigger push workflows.
+  workflow_run:
+    workflows: ["Publish completed ELPA submissions"]
+    types: [completed]
+
+concurrency:
+  group: elpa-pages-deployment
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'issues') }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Always build trusted, current main. Never check out an untrusted workflow_run head.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build portable site
+        run: python scripts/build-site.py --output output/site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: output/site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

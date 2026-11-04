@@ -2,12 +2,14 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright');
-const root=path.resolve(__dirname,'..');
+const root=path.resolve(process.env.ELPA_SITE_ROOT || path.join(__dirname,'..'));
 const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8',
   '.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.png':'image/png'};
 const serve=http.createServer((request,response)=>{
   const url=new URL(request.url,'http://localhost');
-  const pathname=decodeURIComponent(url.pathname==='/'?'/practice.html':url.pathname);
+  // Exercise the identical static output at GitHub Pages' project subpath.
+  const routed=url.pathname.startsWith('/HKUST-ELPA/')?url.pathname.slice('/HKUST-ELPA'.length):url.pathname;
+  const pathname=decodeURIComponent(routed==='/'?'/practice.html':routed);
   const file=path.resolve(root,'.'+pathname);
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){
     response.writeHead(404).end('Not found');return;
@@ -477,6 +479,15 @@ const serve=http.createServer((request,response)=>{
       console.log('Browser UI passed at '+width+'px');
       await page.close();
     }
+    const pages=await newPage({viewport:{width:390,height:844}});
+    const pagesErrors=[];
+    pages.on('pageerror',error=>pagesErrors.push(error.message));
+    await pages.goto('http://127.0.0.1:'+serve.address().port+
+      '/HKUST-ELPA/practice.html',{waitUntil:'load'});
+    await pages.waitForSelector('#bankD .qcard');
+    assert.deepEqual(pagesErrors,[],'GitHub Pages subpath must load generated bank scripts');
+    assert.ok((await pages.locator('#bankD .qcard').count())>0);
+    await pages.close();
   }finally{
     if(browser)await browser.close();
     await new Promise(resolve=>serve.close(resolve));

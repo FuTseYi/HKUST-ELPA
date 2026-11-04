@@ -41,12 +41,12 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 - Keep substantial structural changes in a reviewable PR. Make coherent, verified commits; avoid repeated deployment-triggering pushes and never rewrite shared history without explicit authorization.
 
 
-- Shared navigation and footer are authored only in `scripts/templates/`. Run `npm run sync:layout` after editing them; the generated fragments stay committed in the five public HTML files. `npm run check` rejects drift. Keep direct static hosting (including opening a standalone HTML file) working; do not introduce a runtime include or a deployment-only build for this layout.
+- Shared navigation and footer are authored only in `scripts/templates/`. Run `npm run sync:layout` after editing them; the generated fragments stay committed in the five public HTML files. `npm run check` rejects drift. Keep the committed HTML pages synchronized, but publish `output/site/` generated from canonical JSON. Do not introduce runtime HTML includes or duplicate maintained bank scripts.
 
 ## Verification and documentation
 
 - Run `npm run check`, `npm test`, and, for user-facing changes, `npm run test:browser`. For Worker changes, include Worker security and contract tests. Report exactly what ran.
-- Verify both the Vercel root and GitHub Pages `/HKUST-ELPA/` path; production deployment settings and secrets remain external to source control.
+- Vercel and GitHub Pages must publish the same `output/site/` build; Pages uses its own Actions artifact deployment and needs Pages Source set to GitHub Actions. Check root and `/HKUST-ELPA/` URLs after rollout; keep production secrets external to source control.
 - Test old backup restore, existing note keys, linked/supplement submission semantics, duplicate/failed publication, mobile layouts, keyboard interactions, and timer behavior whenever related code changes.
 - `README.md` describes project usage. `question-bank/README.md` owns question sources and editorial provenance. `question-bank/MODERATION.md` owns approval and recovery operations. `docs/submission-v2-spec.md` owns the submission data contract; `worker/README.md` owns Worker operations. Reference these documents rather than copying their full rules into multiple places.
 - This guide governs engineering priorities and document ownership. Update the relevant owner document when behavior changes; do not duplicate business policy here.

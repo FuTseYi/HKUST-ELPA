@@ -1,11 +1,12 @@
-/* Import an owner-completed GitHub Issue to reviewed question-bank data.
+/* Import an owner-completed Issue to reviewed JSON data.
  * Inputs are read from the event JSON file (never interpolated into shell).
  * Run against the trusted repository checkout only.
  */
 'use strict';
 const fs=require('node:fs');
-const vm=require('node:vm');
 const path=require('node:path');
+const readJSON=file=>JSON.parse(fs.readFileSync(file,'utf8'));
+const writeJSON=(file,value)=>fs.writeFileSync(file,JSON.stringify(value,null,2)+'\n','utf8');
 const eventFile=process.env.GITHUB_EVENT_PATH || process.argv[2];
 if(!eventFile)throw Error('GitHub event payload required');
 const event=JSON.parse(fs.readFileSync(eventFile,'utf8'));
@@ -31,10 +32,9 @@ if(data.version!==1||!valid(data.question,8,1000)||
    !( /^20\d{2} (Spring|Fall)$/.test(data.term||'')||data.term==='Other / Unknown')||
    !['firsthand','secondhand'].includes(data.source))
   throw Error('Malformed or unsupported submission');
-const bankPath=path.join('question-bank','questions.js');
-let content=fs.readFileSync(bankPath,'utf8');
-// Load only the trusted checked-out bank source, never submitted text.
-const banks=vm.runInNewContext(content+'\n;BANKS',{});
+const bankPath=path.join('question-bank','questions.json');
+const bankData=readJSON(bankPath);
+const banks=bankData.banks;
 if(!banks||!banks.D||!Array.isArray(banks.D.items))throw Error('Missing D bank');
 const normalized=(s)=>String(s).normalize('NFKC').toLowerCase().replace(/[\p{P}\p{S}\s]/gu,'');
 const subject=normalized(data.question);
@@ -68,16 +68,8 @@ const item={
   recallTag:/[\u3400-\u9fff]/u.test(data.question) ? '中文题意回忆，未核实英文原题' : '考生英文回忆，非官方原题',
   subs:subItems
 };
-const start=content.indexOf('BANKS.D = {');
-const end=content.indexOf('\n};',start);
-if(start<0||end<start)throw Error('Cannot find D bank');
-const section=content.slice(start,end);
-const insertAt=section.lastIndexOf('\n  ]');
-if(insertAt<0||insertAt<section.indexOf('items: ['))throw Error('Invalid D bank structure');
-const where=start+insertAt;
-const insert=',\n    '+JSON.stringify(item);
-content=content.slice(0,where)+insert+content.slice(where);
-fs.writeFileSync(bankPath,content,'utf8');
+banks.D.items.push(item);
+writeJSON(bankPath,bankData);
 const docPath=path.join('question-bank','community-submissions.md');
 const doc=fs.existsSync(docPath)?fs.readFileSync(docPath,'utf8'):
   '# 已审核社区投稿 · Community Submissions\n\n> 学生自主整理、非官方资料。此处的“已审核”仅指维护者同意收录，不代表学校确认原题。\n';
@@ -94,24 +86,19 @@ output('added',true);
 
 /* v2 structured import is kept as a scoped branch of this single entrypoint. */
 function importV2(event){
-const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const F=path.join.bind(path);
 const valid=(s,min,max)=>typeof s==='string' && s.trim().length>=min &&
   s.trim().length<=max && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(s);
 const text=(s)=>s.trim();
 const normalized=(s)=>String(s).normalize('NFKC').toLowerCase().replace(/[\p{P}\p{S}\s]/gu,'');
 const quote=(s)=>String(s).split(/\r?\n/).map(x=>'> '+x.replace(/</g,'&lt;')).join('\n');
-const saveJS=(file,name,value)=>fs.writeFileSync(file,'const '+name+' = '+JSON.stringify(value,null,2)+';\n','utf8');
-const readJS=(file,name,defaultValue)=>{
-  if(!fs.existsSync(file))return defaultValue;
-  return vm.runInNewContext(fs.readFileSync(file,'utf8')+'\n;'+name,{}, {timeout:1000});
-};
+const readOptionalJSON=(file,defaultValue)=>fs.existsSync(file)?readJSON(file):defaultValue;
 const output=(status, recorded=true)=>{
   console.log('Import status:',status);
   if(process.env.GITHUB_OUTPUT)
     fs.appendFileSync(process.env.GITHUB_OUTPUT,'result='+status+'\nrecorded='+recorded+'\n');
 };
-const taxonomy=readJS(F('question-bank','taxonomy.js'),'ELPA_TAXONOMY',null);
+const taxonomy=readOptionalJSON(F('question-bank','taxonomy.json'),null);
 if(!taxonomy)throw Error('Missing question-bank taxonomy');
 const allowed=(group,value)=>typeof value==='string'&&Object.hasOwn(taxonomy[group],value);
 function validate(data){
@@ -153,19 +140,19 @@ function runV2(event){
  let data;
  try{data=JSON.parse(Buffer.from(mark[1],'base64url').toString('utf8'));}catch{throw Error('Malformed v2 record');}
  if(!validate(data))throw Error('Invalid v2 contribution');
- const bankFile=F('question-bank','questions.js');
- const appFile=F('question-bank','appearances.js');
- const adviceFile=F('question-bank','advice.js');
+ const bankFile=F('question-bank','questions.json');
+ const appFile=F('question-bank','appearances.json');
+ const adviceFile=F('question-bank','advice.json');
  const questionDoc=F('question-bank','community-submissions.md');
  const adviceDoc=F('question-bank','community-advice.md');
  if(data.kind==='advice'){
-   const existing=readJS(adviceFile,'ELPA_ADVICE',[]);
+   const existing=readOptionalJSON(adviceFile,[]);
    if(!Array.isArray(existing))throw Error('Advice database invalid');
    const id='ADV-'+number;
    if(existing.some(x=>x.id===id)){output('duplicate');return;}
    existing.push({id,issueNumber:number,track:data.track||'regular',phase:data.phase,tags:data.tags,
      title:text(data.title),body:text(data.body)});
-   saveJS(adviceFile,'ELPA_ADVICE',existing);
+   writeJSON(adviceFile,existing);
    appendDoc(adviceDoc,'# 社区备考经验 · Reviewed Preparation Advice\n\n> 考生分享，不代表学校官方建议。\n',
      '\n## '+id+' · '+quote(text(data.title))+'\n\n考试方式：'+(data.track||'regular')+' ｜ 阶段：'+data.phase+
      ' ｜ 标签：'+data.tags.join(', ')+' ｜ [原始投稿](https://github.com/FuTseYi/HKUST-ELPA/issues/'+number+')'+
@@ -174,11 +161,11 @@ function runV2(event){
  }
  const campus=data.campus||'nansha',track=data.track||'regular';
  const bankKey=campus==='nansha'?(track==='regular'?'D':'F'):(track==='regular'?'H':'T');
- const content=fs.readFileSync(bankFile,'utf8');
- const banks=vm.runInNewContext(content+'\n;BANKS',{}, {timeout:1000});
+ const bankData=readJSON(bankFile);
+ const banks=bankData.banks;
  if(!banks||!banks.D||!banks[bankKey]||!Array.isArray(banks[bankKey].items))
    throw Error('Question bank invalid');
- const display=vm.runInNewContext(content+'\n;PAST_QUESTION_IDS',{}, {timeout:1000});
+ const display=bankData.pastQuestionIds;
  const known=new Set([...display,...banks.D.items.map(x=>'D-'+x.num)]);
  const eligibleBanks=bankKey==='D'?['A','B','C','D']:[bankKey];
  const exact=[];
@@ -197,7 +184,7 @@ function runV2(event){
  }
  if(data.intent==='supplement'&&!matched)throw Error('Content supplements require an existing question');
  const id=matched?matched.id:bankKey+'-'+(1000000+number);
- const app=readJS(appFile,'ELPA_APPEARANCES',{});
+ const app=readOptionalJSON(appFile,{});
  if(!app||typeof app!=='object'||Array.isArray(app))throw Error('Appearance database invalid');
  const appearances=Array.isArray(app[id])?app[id]:[];
  if(appearances.some(x=>x.issueNumber===number)){output('duplicate');return;}
@@ -211,30 +198,9 @@ function runV2(event){
    if(banks[bankKey].items.some(x=>x.num===num))throw Error('Duplicate question ID');
    const item={num,term:data.term,en:text(data.main.en),cn:text(data.main.cn),
      subs:data.subs.map(x=>({en:text(x.en),cn:text(x.cn)}))};
-   const file=bankFile;
-   const original=content;
-   const begin=original.indexOf('BANKS.'+bankKey+' = {');
-   if(begin<0)throw Error('Missing target bank '+bankKey);
-   const lineEnd=original.indexOf('};',begin);
-   const blockEnd=original.indexOf('\n};',begin);
-   const finish=blockEnd>=0&&(lineEnd<0||blockEnd<=lineEnd)?blockEnd:lineEnd;
-   if(finish<begin)throw Error('Bank closure missing');
-   const section=original.slice(begin,finish);
-   let updated;
-   if(section.includes('items:[]')){
-     updated=original.slice(0,begin)+section.replace('items:[]','items:['+
-       JSON.stringify(item)+']')+original.slice(finish);
-   }else{
-     const pretty=section.lastIndexOf('\n  ]');
-     const relative=pretty>=0?pretty:section.lastIndexOf(']');
-     if(relative<0||relative<section.indexOf('items:['))throw Error('Invalid bank structure');
-     const already=banks[bankKey].items.length>0;
-     updated=original.slice(0,begin+relative)+(already?',':'')+
-       '\n    '+JSON.stringify(item)+original.slice(begin+relative);
-   }
-   fs.writeFileSync(file,updated,'utf8');
- }
- saveJS(appFile,'ELPA_APPEARANCES',app);
+   banks[bankKey].items.push(item);
+   writeJSON(bankFile,bankData); }
+ writeJSON(appFile,app);
  const campusLabel=campus==='nansha'?'南沙校区':'清水湾校区';
  const trackLabel=track==='regular'?'常规 ELPA':'ELPA Fast Track';
  appendDoc(questionDoc,'# 已审核社区投稿 · Community Submissions\n\n> 学生投稿经审核后整理收录。\n',

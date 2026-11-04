@@ -1,0 +1,28 @@
+'use strict';
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'..');
+
+test('Pages and Vercel publish the identical Python-built site directory',()=>{
+  const workflow=fs.readFileSync(path.join(root,'.github/workflows/deploy-pages.yml'),'utf8');
+  const vercel=JSON.parse(fs.readFileSync(path.join(root,'vercel.json'),'utf8'));
+  assert.equal(vercel.outputDirectory,'output/site');
+  assert.match(workflow,/python scripts\/build-site\.py --output output\/site/);
+  assert.match(workflow,/actions\/upload-pages-artifact@v4[\s\S]*?path: output\/site/);
+  assert.match(workflow,/actions\/deploy-pages@v4/);
+});
+
+test('Pages handles manual pushes and owner-approved Issue publication without unsafe checkout',()=>{
+  const workflow=fs.readFileSync(path.join(root,'.github/workflows/deploy-pages.yml'),'utf8');
+  assert.match(workflow,/push:\n    branches: \[main\]/);
+  assert.match(workflow,/workflow_dispatch:/);
+  assert.match(workflow,/workflow_run:\n    workflows: \["Publish completed ELPA submissions"\]/);
+  assert.match(workflow,/workflow_run\.conclusion == 'success'/);
+  assert.match(workflow,/workflow_run\.event == 'issues'/);
+  assert.match(workflow,/ref: main/);
+  assert.doesNotMatch(workflow,/ref:\s*\$\{\{.*head_sha/);
+  assert.match(workflow,/pages: write\n  id-token: write/);
+  assert.match(workflow,/group: elpa-pages-deployment/);
+});

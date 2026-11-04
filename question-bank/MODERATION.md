@@ -9,7 +9,7 @@ Community reports are untrusted input. A Cloudflare Worker creates a public GitH
 3. **Close as not planned** to reject; **Close as duplicate** to discard a redundant report. Neither publishes data.
 4. Leave the Issue **Open** when more review is needed. Reopening an Issue restores the pending review label; it never rolls back published data.
 
-The `issues: closed` workflow checks the trusted GitHub sender and `state_reason=completed`. It decodes the Issue marker **as data**, validates it, reuses canonical IDs, updates only the allowlisted `question-bank/` files, and runs site and unit checks before pushing to `main`. Browser regression tests remain in PR CI. Vercel Git integration is the single production deployment path; confirm the first bot-authored publication reaches READY.
+The `issues: closed` workflow checks the trusted GitHub sender and `state_reason=completed`. It decodes the Issue marker **as data**, validates it, reuses canonical IDs, updates only the allowlisted `question-bank/` files, and validates the Python-built site and runs unit checks before pushing to `main`. Browser regression tests remain in PR CI. Vercel Git integration is the single production deployment path; confirm the first bot-authored publication reaches READY.
 
 **Completed means approved, not necessarily published.** The workflow sets `submission:published` only after the Issue's record is confirmed in `main` (including a repeat run). If data import fails, it sets `submission:failed` and posts a run link; fix the cause and rerun the failed workflow. When an unchanged report merely matches an existing question but the Issue itself is not recorded, neither publication nor a `published` label is claimed. Labels do not certify Vercel deployment. Never use closure as a bypass for validating a submission.
 
@@ -22,7 +22,7 @@ Historical synthetic test Issue [#13](https://github.com/FuTseYi/HKUST-ELPA/issu
 - No automated translations, invented follow-up questions, or personal details in published data.
 - New v2 question IDs are `<bank>-(1000000 + issue number)`: D (GZ Regular), F (GZ Fast Track), H (HK Regular), T (HK Fast Track). Existing questions retain their ID. Legacy v1 imports to D.
 - `intent=encounter` records a new exam experience; `intent=supplement` adds alternative wording or follow-ups without increasing encounter counts. Do not reorder published follow-ups: old notes refer to their positions.
-- Changes are strictly limited by `scripts/check-submission-diff.cjs` to `questions.js`, `fast-track.js`, `appearances.js`, `advice.js`, `community-submissions.md`, and `community-advice.md` inside `question-bank/`.
+- Changes are strictly limited by `scripts/check-submission-diff.cjs` to `questions.json`, `appearances.json`, `advice.json`, `community-submissions.md`, and `community-advice.md` inside `question-bank/`.
 - GitHub Actions queues submissions in one concurrency group (`queue: max`, up to 100 waiting runs). Unrelated updates to `main` are handled by bounded retries with a clean checkout; pushes never force-update `main`. Each Issue is imported idempotently.
 - GitHub's `GITHUB_TOKEN` pushes do not trigger ordinary GitHub Actions `push` workflows. The submission workflow validates structure and runs unit tests itself. Verify Vercel's Git integration deploys bot-authored commits; do not add a second deployment trigger by default.
 - A manually reopened Issue does not undo a published item. Correct already-published data through a reviewed repository change.

@@ -4,11 +4,21 @@ const fs=require('node:fs'),os=require('node:os'),path=require('node:path');
 const {spawnSync}=require('node:child_process');
 const {checkSubmissionFiles}=require('../scripts/check-submission-diff.cjs');
 const importer=path.resolve(__dirname,'../scripts/import-completed-submission.cjs');
-const bank=path.resolve(__dirname,'../question-bank/questions.js');
+const queryHelpers=fs.readFileSync(path.resolve(__dirname,'../assets/js/question-bank-queries.js'),'utf8');
+const bank=path.resolve(__dirname,'../question-bank/questions.json');
+function browserCode(f){
+ const q=JSON.parse(f.read('questions.json'));
+ const occurrences=JSON.parse(f.read('appearances.json'));
+ return 'const BANKS='+JSON.stringify(q.banks)+';\n'+
+   'const PAST_QUESTION_IDS='+JSON.stringify(q.pastQuestionIds)+';\n'+
+   'const LEGACY_QUESTION_ALIASES='+JSON.stringify(q.legacyQuestionAliases)+';\n'+
+   'const ELPA_APPEARANCES='+JSON.stringify(occurrences)+';\n';
+}
+
 function fixture(){
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-v2-'));
  fs.mkdirSync(path.join(root,'question-bank'));
- for(const name of ['questions.js','appearances.js','advice.js','taxonomy.js'])
+ for(const name of ['questions.json','appearances.json','advice.json','taxonomy.json'])
    fs.copyFileSync(path.resolve(__dirname,'../question-bank/'+name),path.join(root,'question-bank',name));
  return {root,close:()=>fs.rmSync(root,{recursive:true,force:true}),
    read:name=>fs.readFileSync(path.join(root,'question-bank',name),'utf8'),
@@ -38,10 +48,10 @@ const advice=()=>({version:2,kind:'advice',phase:'before',
 test('non-string terms and linked IDs are rejected without changing data',()=>{
  for(const invalid of [{term:['2026 Fall']},{linkedQuestionId:['D-4'],intent:'encounter'}]){
   const f=fixture();try{
-   const before=f.read('questions.js');
+   const before=f.read('questions.json');
    const r=f.run({...question('Explain one of your projects.'),...invalid},501);
    assert.notEqual(r.status,0);
-   assert.equal(f.read('questions.js'),before);
+   assert.equal(f.read('questions.json'),before);
   }finally{f.close();}
  }
 });
@@ -50,7 +60,7 @@ test('every campus/track import fits the data-only PR allowlist',()=>{
  let number=600;
  for(const [campus,track] of [['nansha','regular'],['nansha','fast-track'],['clear-water-bay','regular'],['clear-water-bay','fast-track']]){
   const f=fixture();try{
-   const files=['questions.js','appearances.js','advice.js'];
+   const files=['questions.json','appearances.json','advice.json'];
    const before=Object.fromEntries(files.map(name=>[name,f.read(name)]));
    const result=f.run({...question(),campus,track},++number);
    assert.equal(result.status,0,result.stderr);
@@ -66,24 +76,24 @@ test('every campus/track import fits the data-only PR allowlist',()=>{
 test('v2 new question keeps bilingual main, dynamic subs, and stable ID',()=>{
  const f=fixture();try{
   const r=f.run(question(),101);assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/status: added/);
-  assert.match(f.read('questions.js'),/"num":1000101/);
-  assert.match(f.read('questions.js'),/"term":"2026 Fall"/);
-  assert.match(f.read('questions.js'),/"cn":"你如何为跨学科研究做准备？"/);
-  assert.match(f.read('questions.js'),/"en":"What was your main challenge\?","cn":"你遇到的主要挑战是什么？"/);
-  assert.match(f.read('appearances.js'),/"D-1000101"/);
-  assert.match(f.read('appearances.js'),/"examStage": "start"/);
+  assert.match(f.read('questions.json'),/"num":\s*1000101/);
+  assert.match(f.read('questions.json'),/"term":\s*"2026 Fall"/);
+  assert.match(f.read('questions.json'),/"cn":\s*"你如何为跨学科研究做准备？"/);
+  assert.match(f.read('questions.json'),/"en":\s*"What was your main challenge\?"\s*,\s*"cn":\s*"你遇到的主要挑战是什么？"/);
+  assert.match(f.read('appearances.json'),/"D-1000101"/);
+  assert.match(f.read('appearances.json'),/"examStage": "start"/);
   assert.match(f.read('community-submissions.md'),/Issue #101/);
-  assert.doesNotThrow(()=>new Function(f.read('questions.js')+'\nreturn BANKS.D.items.length'));
+  assert.doesNotThrow(()=>new Function(browserCode(f)+'\nreturn BANKS.D.items.length'));
  }finally{f.close();}
 });
 test('repeat of an existing question preserves its ID and adds a session occurrence',()=>{
  const f=fixture();try{
-  const original=f.read('questions.js');
+  const original=f.read('questions.json');
   const data=question('Explain one of your projects.');
   const r=f.run(data,102);assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/status: linked/);
-  assert.equal(f.read('questions.js'),original);
-  assert.match(f.read('appearances.js'),/"D-4"/);
-  assert.doesNotMatch(f.read('appearances.js'),/D-1000102/);
+  assert.equal(f.read('questions.json'),original);
+  assert.match(f.read('appearances.json'),/"D-4"/);
+  assert.doesNotMatch(f.read('appearances.json'),/D-1000102/);
  }finally{f.close();}
 });
 test('same new question from different semester reuses stable ID and records both appearances',()=>{
@@ -92,33 +102,33 @@ test('same new question from different semester reuses stable ID and records bot
   const different={...question(),term:'2027 Spring',examStage:'end',source:'secondhand'};
   const r=f.run(different,104);
   assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/status: linked/);
-  const appearance=f.read('appearances.js');
+  const appearance=f.read('appearances.json');
   assert.match(appearance,/"issueNumber": 103/);
   assert.match(appearance,/"issueNumber": 104/);
   assert.match(appearance,/"term": "2027 Spring"/);
   assert.match(appearance,/"examStage": "end"/);
-  assert.doesNotMatch(f.read('questions.js'),/1000104/);
+  assert.doesNotMatch(f.read('questions.json'),/1000104/);
  }finally{f.close();}
 });
 test('advice is single language and classified by exact tag codes',()=>{
  const f=fixture();try{
   const a=advice();const r=f.run(a,105);
   assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/status: added/);
-  assert.match(f.read('advice.js'),/ADV-105/);
-  assert.match(f.read('advice.js'),/"track": "regular"/);
-  assert.match(f.read('advice.js'),/speaking-strategy/);
+  assert.match(f.read('advice.json'),/ADV-105/);
+  assert.match(f.read('advice.json'),/"track": "regular"/);
+  assert.match(f.read('advice.json'),/speaking-strategy/);
   assert.match(f.read('community-advice.md'),/考前素材准备/);
-  assert.equal(f.read('questions.js'),fs.readFileSync(bank,'utf8'));
+  assert.equal(f.read('questions.json'),fs.readFileSync(bank,'utf8'));
  }finally{f.close();}
 });
 test('Fast Track advice imports with its track and never changes question IDs',()=>{
  const f=fixture();try{
-  const original=f.read('questions.js');
+  const original=f.read('questions.json');
   const r=f.run({...advice(),track:'fast-track'},205);
   assert.equal(r.status,0,r.stderr);
-  assert.match(f.read('advice.js'),/"track": "fast-track"/);
+  assert.match(f.read('advice.json'),/"track": "fast-track"/);
   assert.match(f.read('community-advice.md'),/考试方式：fast-track/);
-  assert.equal(f.read('questions.js'),original);
+  assert.equal(f.read('questions.json'),original);
  }finally{f.close();}
 });
 test('missing English and unknown taxonomy codes are rejected',()=>{
@@ -141,23 +151,23 @@ test('missing English and unknown taxonomy codes are rejected',()=>{
    const r=f.run(data,110+i);
    assert.notEqual(r.status,0,JSON.stringify({i,stdout:r.stdout}));
   }
-  assert.equal(f.read('appearances.js'),fs.readFileSync(path.resolve(__dirname,'../question-bank/appearances.js'),'utf8'));
+  assert.equal(f.read('appearances.json'),fs.readFileSync(path.resolve(__dirname,'../question-bank/appearances.json'),'utf8'));
  }finally{f.close();}
 });
 test('untrusted quote/JS delimiters remain data without injection',()=>{
  const f=fixture();try{
   const a={...advice(),body:'A quote with "; process.exit(99); // and <script> remains text, not code.'};
   assert.equal(f.run(a,106).status,0);
-  assert.doesNotThrow(()=>new Function(f.read('advice.js')+'\nreturn ELPA_ADVICE.length'));
-  assert.match(f.read('advice.js'),/process.exit\(99\)/);
+  assert.doesNotThrow(()=>JSON.parse(f.read('advice.json')).length);
+  assert.match(f.read('advice.json'),/process.exit\(99\)/);
  }finally{f.close();}
 });
 test('same Issue imported twice is idempotent',()=>{
  const f=fixture();try{
   const a=question();assert.equal(f.run(a,107).status,0);
-  const p=f.read('appearances.js');
+  const p=f.read('appearances.json');
   const r=f.run(a,107);assert.equal(r.status,0,r.stderr);assert.match(r.stdout,/status: duplicate/);
-  assert.equal(f.read('appearances.js'),p);
+  assert.equal(f.read('appearances.json'),p);
  }finally{f.close();}
 });
 
@@ -165,7 +175,7 @@ test('current-term grouping archives other sessions without renumbering saved ID
  const f=fixture();try{
   // Measure the reviewed fixture before importing; new approved questions may
   // already exist, so fixed historical totals are not stable.
-  const baseline=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+`
+  const baseline=new Function(browserCode(f)+'\n'+queryHelpers+`
     return {
       fall:elpaCurrentQuestionIds('2026 Fall').length,
       total:new Set([
@@ -177,7 +187,7 @@ test('current-term grouping archives other sessions without renumbering saved ID
   const spring={...question('Can you describe your current academic interests in simple terms?'),
     term:'2027 Spring'};
   assert.equal(f.run(spring,302).status,0);
-  const classify=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+`
+  const classify=new Function(browserCode(f)+'\n'+queryHelpers+`
     return {
       fall:elpaCurrentQuestionIds('2026 Fall'),
       spring:elpaCurrentQuestionIds('2027 Spring'),
@@ -194,7 +204,7 @@ test('current-term grouping archives other sessions without renumbering saved ID
   assert.equal(groups.latest,'2027 Spring');
   const older=question('How should a student plan a research project with limited time?');
   assert.equal(f.run(older,303).status,0);
-  const latestAfterOlder=new Function(f.read('questions.js')+'\n'+f.read('appearances.js')+
+  const latestAfterOlder=new Function(browserCode(f)+'\n'+queryHelpers+
     '\nreturn elpaLatestTerm();')();
   assert.equal(latestAfterOlder,'2027 Spring');
   assert.ok(groups.sorted.includes('D-1'));
@@ -211,22 +221,22 @@ test('Fast Track and campus categories keep distinct canonical IDs and review re
   const x=f.run(fast,501);
   assert.equal(x.status,0,x.stderr);
   assert.match(x.stdout,/status: added/);
-  assert.match(f.read('questions.js'),/"num":1000501/);
-  assert.match(f.read('appearances.js'),/"F-1000501"/);
-  assert.match(f.read('questions.js'),/1000501/);
+  assert.match(f.read('questions.json'),/"num":\s*1000501/);
+  assert.match(f.read('appearances.json'),/"F-1000501"/);
+  assert.match(f.read('questions.json'),/1000501/);
   const clear={...fast,campus:'clear-water-bay'};
   assert.equal(f.run(clear,502).status,0);
-  assert.match(f.read('questions.js'),/"num":1000502/);
-  assert.match(f.read('appearances.js'),/"T-1000502"/);
+  assert.match(f.read('questions.json'),/"num":\s*1000502/);
+  assert.match(f.read('appearances.json'),/"T-1000502"/);
   const regular={...clear,track:'regular'};
   assert.equal(f.run(regular,503).status,0);
-  assert.match(f.read('questions.js'),/"num":1000503/);
-  assert.match(f.read('appearances.js'),/"H-1000503"/);
-  // A second submission into a formerly empty bank must remain valid JS.
+  assert.match(f.read('questions.json'),/"num":\s*1000503/);
+  assert.match(f.read('appearances.json'),/"H-1000503"/);
+  // A second submission into a formerly empty bank must remain valid JSON.
   assert.equal(f.run({...regular,main:{
     en:'What academic skills are most valuable to a new graduate student?',
     cn:'研究生最重要的学术技能是什么？'}},504).status,0);
-  assert.doesNotThrow(()=>new Function(f.read('questions.js')+'\nreturn BANKS.H.items.length'));
+  assert.doesNotThrow(()=>new Function(browserCode(f)+'\nreturn BANKS.H.items.length'));
  }finally{f.close();}
 });
 test('existing Fast Track English wording is reused, not duplicated',()=>{
@@ -236,8 +246,8 @@ test('existing Fast Track English wording is reused, not duplicated',()=>{
   const r=f.run(record,505);
   assert.equal(r.status,0,r.stderr);
   assert.match(r.stdout,/status: linked/);
-  assert.match(f.read('appearances.js'),/"F-1"/);
-  assert.doesNotMatch(f.read('questions.js'),/1000505/);
+  assert.match(f.read('appearances.json'),/"F-1"/);
+  assert.doesNotMatch(f.read('questions.json'),/1000505/);
  }finally{f.close();}
 });
 
@@ -249,8 +259,7 @@ test('regular and Fast Track each show their own latest reviewed term and histor
     campus:'nansha',track:'fast-track',term:'2026 Fall'};
   assert.equal(f.run(fast,601).status,0);
   assert.equal(f.run(older,602).status,0);
-  const source=f.read('questions.js')+'\n'+
-    f.read('appearances.js')+'\n';
+  const source=browserCode(f)+'\n'+queryHelpers+'\n';
   const grouping=new Function(source+`
     const fastIds=BANKS.F.items.map(x=>'F-'+x.num);
     const nanshaRegular=elpaLatestTerm();
@@ -280,11 +289,11 @@ test('linked repeat adds an encounter while similar wording and followups remain
   const extra=f.run(supplement,802);
   assert.equal(extra.status,0,extra.stderr);
   assert.match(extra.stdout,/status: linked/);
-  assert.doesNotMatch(f.read('questions.js'),/1000801/);
-  assert.match(f.read('appearances.js'),/"intent": "encounter"/);
-  assert.match(f.read('appearances.js'),/"intent": "supplement"/);
-  assert.match(f.read('appearances.js'),/What tools did you use\?/);
-  assert.match(f.read('appearances.js'),/Could you explain a project you completed\?/);
+  assert.doesNotMatch(f.read('questions.json'),/1000801/);
+  assert.match(f.read('appearances.json'),/"intent": "encounter"/);
+  assert.match(f.read('appearances.json'),/"intent": "supplement"/);
+  assert.match(f.read('appearances.json'),/What tools did you use\?/);
+  assert.match(f.read('appearances.json'),/Could you explain a project you completed\?/);
   assert.match(f.read('community-submissions.md'),/补充题目内容/);
  }finally{f.close();}
 });
@@ -294,7 +303,7 @@ test('tampered linked ID cannot credit a different question',()=>{
   const failure=f.run(wrong,803);
   assert.notEqual(failure.status,0);
   assert.match(failure.stderr,/Linked question ID does not match/);
-  assert.equal(f.read('appearances.js'),fs.readFileSync(path.resolve(__dirname,'../question-bank/appearances.js'),'utf8'));
+  assert.equal(f.read('appearances.json'),fs.readFileSync(path.resolve(__dirname,'../question-bank/appearances.json'),'utf8'));
   const notLinked={...wrong,intent:'supplement',linkedQuestionId:undefined};
   const failed=f.run(notLinked,804);
   assert.notEqual(failed.status,0);
@@ -307,14 +316,14 @@ test('new question accepts optional Chinese explanation without inventing transl
     subs:[{en:'What example would you give?',cn:''}]};
   const r=f.run(data,805);
   assert.equal(r.status,0,r.stderr);
-  assert.match(f.read('questions.js'),/"cn":""/);
-  assert.match(f.read('appearances.js'),/"D-1000805"/);
+  assert.match(f.read('questions.json'),/"cn":\s*""/);
+  assert.match(f.read('appearances.json'),/"D-1000805"/);
  }finally{f.close();}
 });
 
 test('Node importer reads the canonical taxonomy instead of duplicating allowed codes',()=>{
   const src=fs.readFileSync(importer,'utf8');
-  assert.match(src,/readJS\(F\('question-bank','taxonomy\.js'\),'ELPA_TAXONOMY',null\)/);
+  assert.match(src,/readOptionalJSON\(F\('question-bank','taxonomy\.json'\),null\)/);
   for(const name of ['campuses','tracks','examStages','advicePhases','adviceTags','sourceTypes','contributionIntents'])
     assert.ok(src.includes("allowed('"+name+"'"),'Importer does not reference taxonomy group: '+name);
 });

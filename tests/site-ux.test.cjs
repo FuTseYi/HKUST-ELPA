@@ -240,10 +240,10 @@ test('sources page keeps external references without duplicate question-bank doc
 });
 
 test('seed advice uses the same track, phase and topic schema without invented provenance',()=>{
- const advice=fs.readFileSync(path.join(__dirname,'../question-bank/advice.js'),'utf8');
- assert.equal((advice.match(/id: 'ADVICE-REGULAR-/g)||[]).length,3);
- assert.equal((advice.match(/track: 'regular', phase: 'during'/g)||[]).length,3);
- assert.doesNotMatch(advice,/HIST-|provenance|历史考情整理/);
+ const advice=JSON.parse(fs.readFileSync(path.join(__dirname,'../question-bank/advice.json'),'utf8'));
+ assert.equal(advice.filter(item=>item.id.startsWith('ADVICE-REGULAR-')).length,3);
+ assert.equal(advice.filter(item=>item.track==='regular'&&item.phase==='during').length,3);
+ for(const item of advice)assert.ok(!/HIST-|provenance|历史考情整理/.test(JSON.stringify(item)));
  assert.match(submit,/<select id="adviceTrack">[\s\S]*?<option value="regular">常规 ELPA · Regular<\/option>[\s\S]*?<option value="fast-track">ELPA Fast Track<\/option>/);
 });
 
@@ -320,24 +320,23 @@ test('homepage explains the full learning workflow without a repeated oversized 
  assert.match(practice,/#recordsMenuBtn\{[^}]*width:auto;[^}]*padding:0 10px;[^}]*border-radius:999px/);
  assert.match(practice,/entry\.term\+' · '\+stage\.zh/);
  assert.doesNotMatch(practice,/id="termFilter"|id="examStageFilter"|session-badges|session-chip/);
- const appearances=fs.readFileSync(path.join(__dirname,'../question-bank/appearances.js'),'utf8');
- const questions=fs.readFileSync(path.join(__dirname,'../question-bank/questions.js'),'utf8');
- const sessionData=new Function(questions+'\n'+appearances+'\nreturn {ids:PAST_QUESTION_IDS,data:ELPA_APPEARANCES};')();
+ const appearances=JSON.parse(fs.readFileSync(path.join(__dirname,'../question-bank/appearances.json'),'utf8'));
+ const questions=JSON.parse(fs.readFileSync(path.join(__dirname,'../question-bank/questions.json'),'utf8'));
+ const sessionData={ids:questions.pastQuestionIds,data:appearances};
  assert.equal(sessionData.ids.length,25);
  // Legacy questions must not acquire invented year/stage evidence.
  // Future issue-linked reports may still add reviewed appearances to these IDs.
  for(const id of [...sessionData.ids,...Array.from({length:12},(_,i)=>'D-'+(i+1))])
    for(const entry of sessionData.data[id]||[])
      assert.ok(Number.isSafeInteger(entry.issueNumber)&&entry.issueNumber>0,id);
- const fastTrack=questions;
- const fastSessionData=new Function(questions+'\n'+appearances+'\nreturn {ids:BANKS.F.items.map(x=>"F-"+x.num),data:ELPA_APPEARANCES};')();
+ const fastSessionData={ids:questions.banks.F.items.map(x=>'F-'+x.num),data:appearances};
  assert.equal(fastSessionData.ids.length,12);
  for(const id of fastSessionData.ids)
    for(const entry of fastSessionData.data[id]||[])
      assert.ok(Number.isSafeInteger(entry.issueNumber)&&entry.issueNumber>0,id);
- assert.match(fastTrack,/"num": 1,[\s\S]*?"subs": \[\]/);
+ assert.ok(questions.banks.F.items.some(item=>item.num===1&&item.subs.length===0));
  assert.equal(fastSessionData.ids.length,12);
- assert.doesNotMatch(questions,/"F-13"/);
+ assert.ok(!fastSessionData.ids.includes('F-13'));
  assert.doesNotMatch(practice,/fastIntroSection|fastIntroDetails|ELPA_FAST_TRACK_INTRO|补充准备 · 完整自我介绍任务/);
  assert.match(practice,/titleStatus\.textContent=total\?'第 '\+page\+' \/ '\+pages\+' 页 · 总 '\+total\+' 题':'0 题'/);
  assert.match(practice,/function activeLatestSessionLabel\(\)[\s\S]*?session\.term\+' · '\+ELPA_TAXONOMY\.examStages\[session\.stage\]\.zh/);

@@ -1,4 +1,4 @@
-const ELPA_APPEARANCES = {
+{
   "D-5": [
     {
       "issueNumber": 57,
@@ -21,4 +21,4 @@ const ELPA_APPEARANCES = {
       "intent": "encounter"
     }
   ]
-};
+}
