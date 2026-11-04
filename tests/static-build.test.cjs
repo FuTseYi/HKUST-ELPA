@@ -49,8 +49,8 @@ test('invalid canonical data fails without replacing the previously built site',
   const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'elpa-invalid-output-'));
   try{
     const result=spawnSync(python,[path.join(root,'scripts/build-site.py'),
-      '--output',path.join(root,'assets')],{cwd:root,encoding:'utf8'});
-    assert.notEqual(result.status,0,'Refuse to overwrite tracked assets');
+      '--output',path.join(root,'question-bank')],{cwd:root,encoding:'utf8'});
+    assert.notEqual(result.status,0,'Refuse to overwrite tracked canonical data');
     assert.ok(fs.existsSync(path.join(root,'assets/js/practice.js')));
   }finally{fs.rmSync(tmp,{recursive:true,force:true});}
 });

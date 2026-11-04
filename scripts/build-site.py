@@ -14,7 +14,10 @@ PUBLIC_FILES = ("submission-config.js", "elpa_data.json")
 
 def build(destination: Path) -> None:
     destination = destination.resolve()
-    if destination == ROOT or ROOT in destination.parents and destination.name == "assets":
+    generated_root = ROOT / "output"
+    if destination == ROOT or (ROOT in destination.parents and
+                               destination != generated_root and
+                               generated_root not in destination.parents):
         raise ValueError("Refusing to replace source files")
     destination.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".elpa-build-", dir=destination.parent) as temporary:
