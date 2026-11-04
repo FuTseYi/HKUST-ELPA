@@ -6,10 +6,10 @@ const root=path.resolve(__dirname,'..');
 const pageNames=['index','guide','practice','sources','submit'];
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 
-// Source-level tests inspect the same ordered files the browser loads.
+// Source-level tests inspect page-specific JS/CSS in load order; shared site.css is tested separately.
 function readPageSource(name){
   const html=read(name);
-  const files=[...html.matchAll(/(?:src|href)="\.\/(assets\/(?:js|css)\/[^"?#]+)"/g)].map(match=>match[1]);
+  const files=[...html.matchAll(/(?:src|href)="\.\/(assets\/(?:js|css)\/[^"?#]+)"/g)].map(match=>match[1]).filter(file=>file!=='assets/css/site.css');
   return html+'\n'+files.map(read).join('\n');
 }
 function validateSite(){

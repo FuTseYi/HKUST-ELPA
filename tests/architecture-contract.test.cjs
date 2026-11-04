@@ -50,7 +50,7 @@ test('published routes and owner-approved Issue publication remain available', (
 
 test('practice session remains a separate, loaded module', () => {
   const html=read('practice.html');
-  assert.match(html, /<script src="\.\/js\/practice\.js"><\/script>[\s\S]*?<script src="\.\/js\/practice-session\.js"><\/script>/);
+  assert.match(html, /<script src="\.\/assets\/js\/practice\.js"><\/script>[\s\S]*?<script src="\.\/assets\/js\/practice-session\.js"><\/script>/);
   const session=read('assets/js/practice-session.js');
   assert.match(session, /function tickTimer\(/);
   assert.match(session, /function drawPractice\(/);
