@@ -1,4 +1,4 @@
-"""ELPA pages: one authoritative shell and separate content-only pages."""
+"""Build ELPA from three HTML entrypoints with homepage-owned information views."""
 import re
 import shutil
 import subprocess
@@ -6,7 +6,7 @@ import sys
 
 PAGES = ("index", "guide", "practice", "sources", "submit")
 SOURCE_FILES = ("index.html", "practice.html", "submit.html")
-SOURCE_DIRS = ("question-bank", "content/pages", "data")
+SOURCE_DIRS = ("question-bank", "data")
 CONTENT_PAGES = {
     "guide": ("考试与备考指南｜HKUST-ELPA",
               "HKUST-ELPA 非官方口语考试指南：常规 ELPA 与 Fast Track 流程、备考经验和练习入口。",
@@ -42,13 +42,22 @@ def build(root, destination, options):
     footer = re.search(r'<footer class="elpa-footer"[\s\S]*?</footer>', homepage)
     if not nav or not footer:
         raise ValueError("Homepage must define navigation and footer")
+    clean_homepage, count = re.subn(
+        r'\s*<template data-page="(?:guide|sources)">[\s\S]*?</template>',
+        '', homepage,
+    )
+    if count != len(CONTENT_PAGES):
+        raise ValueError("Expected one content template per information page")
     for page in PAGES:
         if page in CONTENT_PAGES:
             title, description, scripts = CONTENT_PAGES[page]
-            content = (root / "content/pages" / (page + ".html")).read_text(encoding="utf-8").strip()
-            if not content.startswith('<main id="main">') or not content.endswith("</main>"):
-                raise ValueError("Invalid page content: " + page)
-            html = replace_once(homepage, r'<main id="main">[\s\S]*?</main>', content)
+            fragment = re.search(
+                r'<template data-page="' + page + r'">\s*(<main id="main">[\s\S]*?</main>)\s*</template>',
+                homepage,
+            )
+            if not fragment:
+                raise ValueError("Missing information page in homepage: " + page)
+            html = replace_once(clean_homepage, r'<main id="main">[\s\S]*?</main>', fragment.group(1))
             html = replace_once(html, r'<title>.*?</title>', '<title>' + title + '</title>')
             html = replace_once(html, r'<meta name="description" content="[^"]*">',
                                 '<meta name="description" content="' + description + '">')
@@ -57,7 +66,7 @@ def build(root, destination, options):
             tags = '\n'.join('<script src="' + name + '"></script>' for name in scripts)
             html = html.replace('<script src="./assets/js/index.js"></script>', tags, 1)
         else:
-            html = (root / (page + ".html")).read_text(encoding="utf-8")
+            html = clean_homepage if page == "index" else (root / (page + ".html")).read_text(encoding="utf-8")
         if page != "index":
             html = replace_once(html, r'<nav class="elpa-nav"[\s\S]*?</nav>|<!-- shared-nav -->',
                                 navigation(nav.group(0), page))

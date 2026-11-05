@@ -39,11 +39,14 @@ test('three source entrypoints generate five complete published pages',()=>{
     assert.ok(source.includes('<!-- shared-footer -->'));
     assert.doesNotMatch(source,/<nav class="elpa-nav"|<footer class="elpa-footer"/);
   }
+  const homepage=fs.readFileSync(path.join(root,'index.html'),'utf8');
   for(const page of ['guide','sources']){
-    const fragment=fs.readFileSync(path.join(root,'content/pages',page+'.html'),'utf8').trim();
-    assert.ok(fragment.startsWith('<main id="main">')&&fragment.endsWith('</main>'));
+    const pattern=new RegExp('<template data-page="'+page+'">\\s*(<main id="main">[\\s\\S]*?<\\/main>)\\s*<\\/template>');
+    const fragment=homepage.match(pattern)?.[1];
+    assert.ok(fragment,'Missing authored '+page+' template in homepage');
     assert.ok(read(page+'.html').includes(fragment));
   }
+  assert.doesNotMatch(read('index.html'),/<template data-page=/);
   assert.ok(read('guide.html').includes('src="./assets/js/guide.js"'));
   assert.ok(read('guide.html').includes('src="./question-bank/taxonomy.js"'));
   assert.ok(!read('sources.html').includes('src="./assets/js/index.js"'));

@@ -40,48 +40,33 @@ An unofficial, student-maintained resource for HKUST and HKUST(GZ). Explore the 
 - **恢复会替换当前记录，建议先备份。** 清除浏览器数据也可能删除本地记录。
 - 支持单独导出笔记；部分浏览器还提供可选的本地文件夹同步。浏览器内自动保存不依赖该功能。
 
-## 本地预览与验证
+## 本地开发
 
-### 预览网站
+Windows：`py -3 preview.py`；macOS / Linux：`python3 preview.py`。访问 `http://127.0.0.1:8765/`，保存后自动构建，刷新浏览器即可。仅构建使用 `py -3 preview.py --build-only`（macOS / Linux 换为 `python3`），输出到 `_site/`。
 
-网站无前端框架，但题库数据由 Python 从 JSON 构建成可直接托管的静态资源。克隆后先生成网站，再启动静态文件服务：
+代码与安全测试使用 Node.js 22+ 内置功能，**无需 npm 或 `package.json`**：
 
-```bash
-git clone https://github.com/FuTseYi/HKUST-ELPA.git
-cd HKUST-ELPA
-python3 preview.py
-```
-
-Windows 使用 `py -3 preview.py`；macOS / Linux 使用 `python3 preview.py`。启动后访问 `http://127.0.0.1:8765/`，保存源码后自动重新构建，刷新浏览器即可。仅构建并验证使用 `py -3 preview.py --build-only`（macOS / Linux 使用 `python3 preview.py --build-only`）。发布产物保存在 `_site/`，页面的静态 URL 保持不变。
-
-本地页面可以练习、保存记录和预览投稿；**正式投稿仅允许已配置的生产站点来源**，本地预览不会获得生产 Turnstile 验证权限。
-
-### 自动化检查
-
-结构、安全和 JavaScript 单元测试使用 Node.js 22+ 内置功能，**无需 npm 依赖清单**：
-
-```bash
+```sh
 node scripts/validate-site.cjs
 node --test
 ```
 
-浏览器回归统一使用 Python Playwright，开发依赖只在 `requirements-dev.txt` 中声明：
+需要浏览器回归时，安装独立的 Python 开发依赖：
 
-```bash
+```sh
 python -m pip install -r requirements-dev.txt
 python -m playwright install chromium webkit
 python tests/browser_smoke.py
 ```
 
-Linux CI 使用 `python -m playwright install --with-deps chromium webkit` 安装系统依赖。浏览器测试使用独立测试上下文和本地服务，覆盖 320–1280px 的八种宽度，以及 Chromium、WebKit 下的 Sources 刷新与重复导航；外部星数、人机验证与投稿请求被隔离，**不会创建公开投稿**。真实 Turnstile、Worker 部署及原生文件夹选择器仍需单独验证。
+测试不会向生产投稿接口发送真实请求。本地预览可以练习和保留笔记，但正式投稿仍受生产来源与 Turnstile 限制。
 
 ## 项目结构
 
 ```text
 HKUST-ELPA/
 ├── preview.py                     # 本地预览与静态构建唯一入口
-├── index.html / practice.html / submit.html  # 三个页面入口源文件
-├── content/pages/                  # 指南与来源正文，构建保留旧 URL
+├── index.html / practice.html / submit.html  # 三个源页面；首页内含指南和来源的内容模板
 ├── assets/                        # css/、js/、images/、icons/、demos/ 统一静态资源
 ├── data/                          # 公开投稿配置和空白记录模板的权威源文件
 ├── question-bank/                 # 稳定题目、场次、经验及来源文档
@@ -98,8 +83,8 @@ HKUST-ELPA/
 ### 文件维护边界
 
 - **页面与代码分离**：HTML 保留语义内容及真实导航；交互在 `assets/js/` 中，样式在 `assets/css/`。保持经典脚本的加载顺序和现有事件绑定，未经迁移不要改成模块或异步加载。
-- **页面维护**：直接编辑根目录三个页面入口；指南和来源分别编辑 `content/pages/guide.html` 与 `content/pages/sources.html` 的正文。公共导航与页脚只在 `index.html` 定义，构建产生五个完整页面并保留旧链接及锚点。
-- **页面切换**：普通 HTML 链接直接切换页面，新正文仅做短暂透明度淡入，不保留或混合旧页快照；重复点击当前页导航只回到顶部，不重新加载；减少动态效果时关闭过渡。保留原生前进、后退和直接访问。
+- **页面维护**：仅维护根目录三个 HTML；指南与资料来源正文定义在首页的内容模板中。构建时生成原有五个静态 URL，公共导航和页脚也只在首页定义。
+- **页面切换**：使用原生 HTML 链接和浏览器历史；重复点击当前页导航回到顶部，不强加整页淡入或自制客户端路由。
 - **双语排版**：保留中文主体和简短英文标签；放得下时并排，空间不足时将英文放在下方。题目翻译与用户输入不自动改写。
 - **题库与记录兼容**：不重编号已发布题目，不改变既有 localStorage 键。提示小问笔记按位置关联，已发布小问不随意重排；需要调整时必须设计记录迁移。
 - **数据与来源分离**：结构化数据负责显示和关联；Markdown 负责来源、场次背景与不确定性，不是自动生成的数据副本。
