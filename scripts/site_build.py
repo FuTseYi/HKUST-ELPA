@@ -5,8 +5,8 @@ import subprocess
 import sys
 
 PAGES = ("index", "guide", "practice", "sources", "submit")
-SOURCE_FILES = ("index.html", "practice.html", "submit.html", "submission-config.js", "elpa_data.json")
-SOURCE_DIRS = ("question-bank", "content/pages")
+SOURCE_FILES = ("index.html", "practice.html", "submit.html")
+SOURCE_DIRS = ("question-bank", "content/pages", "data")
 CONTENT_PAGES = {
     "guide": ("考试与备考指南｜HKUST-ELPA",
               "HKUST-ELPA 非官方口语考试指南：常规 ELPA 与 Fast Track 流程、备考经验和练习入口。",
@@ -65,7 +65,7 @@ def build(root, destination, options):
                                 footer.group(0))
         (destination / (page + ".html")).write_text(html, encoding="utf-8")
     for name in ("submission-config.js", "elpa_data.json"):
-        shutil.copy2(root / name, destination / name)
+        shutil.copy2(root / "data" / name, destination / name)
     shutil.copytree(root / "assets", destination / "assets")
     bank = destination / "question-bank"
     bank.mkdir()

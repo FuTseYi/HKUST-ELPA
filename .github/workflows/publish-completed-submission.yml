@@ -61,8 +61,8 @@ jobs:
               exit 0
             fi
             node scripts/check-submission-diff.cjs
-            npm run check
-            npm test
+            node scripts/validate-site.cjs
+            node --test
             git commit -m "docs: publish reviewed ELPA issue #${ISSUE_NUMBER}"
             if git push origin HEAD:main; then
               exit 0
