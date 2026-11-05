@@ -54,7 +54,7 @@ function validateSite(){
     }
   }
   const documents=['README.md','worker/README.md'];
-  for(const dir of ['docs','question-bank']){
+  for(const dir of ['question-bank']){
     for(const file of fs.readdirSync(path.join(root,dir))){
       if(file.endsWith('.md'))documents.push(dir+'/'+file);
     }

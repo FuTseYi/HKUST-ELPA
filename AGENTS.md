@@ -42,7 +42,6 @@ HKUST-ELPA is a student-maintained static ELPA preparation website built with HT
 - `README.md`: usage, local development, architecture overview.
 - `question-bank/README.md`: editorial provenance and question data.
 - `question-bank/MODERATION.md`: review approval and recovery.
-- `docs/submission-v2-spec.md`: submission protocol.
 - `worker/README.md`: Worker deployment, security settings and operations.
 
 Update the document that owns a rule rather than repeating its full specification in multiple places.
