@@ -175,6 +175,74 @@ def check_without_scripts(browser, origin):
         context.close()
 
 
+
+def check_extended_behaviors(browser, origin):
+    context, page, errors = page_context(browser, 390)
+    try:
+        page.goto(origin + "/guide.html", wait_until="load")
+        assert page.locator("#guideAdviceList article").count() == 3
+        assert page.locator("#guideAdviceFilters").is_visible()
+        page.locator("#adviceTagFilter").select_option("speaking-strategy")
+        assert page.locator("#guideAdviceList article").count() == 2
+        page.locator("#adviceTagFilter").select_option("")
+        page.locator("#guideFastTab").click()
+        assert page.locator("#guideAdviceList article").count() == 0
+        assert not page.locator("#guideAdviceFilters").is_visible()
+        assert page.locator("#guideAdviceEmpty").is_visible()
+        assert "kind=advice&track=fast-track" in page.locator("#guideAdviceShare").get_attribute("href")
+
+        page.goto(origin + "/practice.html?campus=clear-water-bay", wait_until="load")
+        for track in ("regular", "fast-track"):
+            page.locator(f'[data-track="{track}"]').click()
+            assert page.locator("#categoryEmpty").is_visible()
+            assert page.locator("#timerDrill").is_disabled()
+        page.locator('[data-campus="nansha"]').click()
+        assert not page.locator("#categoryEmpty").is_visible()
+        assert page.locator("#timerDrill").is_enabled()
+        page.locator("#searchInput").fill("no-matching-question-for-draw")
+        assert page.locator("#emptyState").is_visible()
+        assert page.locator("#timerDrill").is_disabled()
+        page.locator("#searchClear").click()
+        assert page.locator("#timerDrill").is_enabled()
+
+        page.goto(origin + "/practice.html?track=fast-track", wait_until="load")
+        page.locator("#bankD .qcard").first.wait_for()
+        questions = page.locator("#bankD .q-title > .en,#bankPast .q-title > .en").all_text_contents()
+        assert questions
+        page.locator("#searchInput").fill("no-matching-question-for-export")
+        page.locator("#recordsMenuBtn").click()
+        with page.expect_download() as download:
+            page.locator("#recordsExportBtn").click()
+        markdown = Path(download.value.path()).read_text(encoding="utf-8")
+        import re
+        exported = [re.sub(r"^### \d+\. ", "", line) for line in markdown.splitlines()
+                    if re.match(r"^### \d+\. ", line)]
+        assert exported == questions, "Markdown export must preserve the displayed question order"
+
+        page.goto(origin + "/submit.html?question=D-1&intent=supplement", wait_until="load")
+        page.locator("#submissionCampus").select_option("nansha")
+        page.locator("#submissionSlot").select_option(index=1)
+        page.locator("#supplementEn").fill("Draft-only alternative wording")
+        page.locator("#addFollowup").click()
+        page.locator('#followupList [data-lang="en"]').first.fill("First draft follow-up")
+        page.locator("#addFollowup").click()
+        page.locator('#followupList [data-lang="en"]').last.fill("Second draft follow-up")
+        page.locator("#tabAdvice").click()
+        page.locator("#adviceTags input").first.check()
+        page.locator("#adviceTitle").fill("Recoverable advice draft")
+        page.locator("#adviceBody").fill("Recoverable advice text from an isolated local browser test.")
+        page.reload(wait_until="load")
+        assert page.locator("#tabAdvice").get_attribute("aria-pressed") == "true"
+        assert page.locator("#adviceTitle").input_value() == "Recoverable advice draft"
+        page.locator("#tabQuestion").click()
+        assert page.locator("#supplementEn").input_value() == "Draft-only alternative wording"
+        assert page.locator('#followupList [data-lang="en"]').count() == 2
+        assert not errors, (browser.browser_type.name, errors)
+        print(f"{browser.browser_type.name}: advice, export, draft and empty-category regressions passed")
+    finally:
+        context.close()
+
+
 def main():
     server = ThreadingHTTPServer(
         ("127.0.0.1", 0), partial(Handler, directory=str(ROOT / "_site"))
@@ -191,6 +259,7 @@ def main():
                         check_content(browser, origin, width)
                     check_navigation(browser, origin)
                     check_without_scripts(browser, origin)
+                    check_extended_behaviors(browser, origin)
                 finally:
                     browser.close()
     finally:
