@@ -1,4 +1,4 @@
-:root { view-transition-name:none; --site-navy:#003e74; --site-blue:#1763a3; --site-gold:#f4c65a; --site-ink:#172940; --site-muted:#64748b; --site-line:#dbe5f0; --site-bg:#f5f8fc; }
+:root { --site-navy:#003e74; --site-blue:#1763a3; --site-gold:#f4c65a; --site-ink:#172940; --site-muted:#64748b; --site-line:#dbe5f0; --site-bg:#f5f8fc; }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; scroll-padding-top:90px; }
 body { margin:0; }
@@ -349,9 +349,8 @@ body { margin:0; }
 
 
 /* 2026 UI consistency: restrained navigation, two predictable hero actions. */
-main{view-transition-name:elpa-content}
-::view-transition-group(elpa-content){animation:none}
-::view-transition-old(elpa-content),::view-transition-new(elpa-content){animation-duration:.16s;animation-timing-function:ease-out}
+@keyframes elpa-enter{from{opacity:.92}to{opacity:1}}
+main{animation:elpa-enter .12s ease-out}
 .elpa-nav-links a{border-bottom-width:2px;}
 .elpa-nav-links a.active{background:transparent;border-bottom-color:var(--site-gold);}
 .elpa-subhero{border-bottom:0;}
@@ -377,6 +376,7 @@ main{view-transition-name:elpa-content}
 }
 @media(max-width:360px){.elpa-cta{font-size:12px;padding-inline:6px;}}
 @media(prefers-reduced-motion:reduce){
+  main{animation:none}
   .elpa-cta{transition:none;transform:none!important;}
   .elpa-cta::after,.elpa-guide-practice::after,
   .elpa-home-tools::after,

@@ -13,7 +13,6 @@ SOURCE_DIRS = ("question-bank",)
 def build(root, destination, options):
     destination.mkdir()
     homepage = (root / "index.html").read_text(encoding="utf-8")
-    transition = re.search(r'<style id="navigation-transition">.*?</style>', homepage, re.S)[0]
     nav = re.search(r'<nav class="elpa-nav".*?</nav>', homepage, re.S)[0]
     footer = re.search(r'<footer class="elpa-footer".*?</footer>', homepage, re.S)[0]
     nav = nav.replace(' class="active"', '').replace(' aria-current="page"', '')
@@ -26,8 +25,6 @@ def build(root, destination, options):
             link = f'<a href="./{page}.html"'
             selected = selected.replace(link, link + ' class="active" aria-current="page"')
         source = (root / f"{page}.html").read_text(encoding="utf-8")
-        source = re.sub(r'<style id="navigation-transition">.*?</style>\s*', "", source, flags=re.S)
-        source = source.replace("<head>", "<head>\n" + transition, 1)
         source = re.sub(r'<nav class="elpa-nav".*?</nav>', lambda _: selected, source, count=1, flags=re.S)
         source = re.sub(r'<footer class="elpa-footer".*?</footer>', lambda _: footer, source, count=1, flags=re.S)
         (destination / f"{page}.html").write_text(source, encoding="utf-8")

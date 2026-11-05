@@ -493,19 +493,10 @@ const serve=http.createServer((request,response)=>{
         await page.goto(base+'/index.html',{waitUntil:'networkidle'});
         await page.locator('.elpa-nav-links a[href="./guide.html"]').click();
         await page.waitForLoadState('networkidle');
-        if(reducedMotion==='reduce') assert.equal(await page.evaluate(()=>window.__documentTransition),false,
-          'Reduced-motion navigation must not create a document transition');
-        const navigation=await page.evaluate(()=>{
-          let value;
-          const visit=rules=>{for(const rule of rules){
-            if(rule.conditionText && !matchMedia(rule.conditionText).matches) continue;
-            if(rule.cssRules) visit(rule.cssRules);
-            else if(rule.cssText.startsWith('@view-transition')) value=rule.navigation;
-          }};
-          for(const sheet of document.styleSheets) visit(sheet.cssRules);
-          return value;
-        });
-        assert.equal(navigation,reducedMotion==='reduce'?'none':'auto');
+        assert.equal(await page.evaluate(()=>Boolean(window.__documentTransition)),false,
+          'Navigation must not retain old-document snapshots');
+        assert.equal(await page.locator('main').evaluate(el=>getComputedStyle(el).animationName),
+          reducedMotion==='reduce'?'none':'elpa-enter');
         await page.locator('#guideFastTab').click();
         await page.locator('#fastGuide .elpa-guide-practice').click();
         await page.waitForLoadState('networkidle');
@@ -545,62 +536,65 @@ const serve=http.createServer((request,response)=>{
       const mobileBrowser=await engine.launch({headless:true});
       try{
         for(const prefix of ['', '/HKUST-ELPA']){
-          const page=await mobileBrowser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
-          const errors=[];
-          page.on('pageerror',error=>errors.push(error.message));
-          await page.route('https://img.shields.io/**',route=>route.fulfill({
-            contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="17" height="20"/>'
-          }));
-          await page.addInitScript(()=>{
-            window.__navFrames=[];
-            addEventListener('DOMContentLoaded',()=>{
-              const start=performance.now();
-              const sample=()=>{
-                const nav=document.querySelector('.elpa-nav');
-                if(nav) window.__navFrames.push(nav.getBoundingClientRect().top);
-                if(performance.now()-start<1500) requestAnimationFrame(sample);
-              };
-              requestAnimationFrame(sample);
-            },{once:true});
-          });
-          const assertStable=async()=>{
-            await page.waitForLoadState('networkidle');
-            await page.bringToFront();
-            await page.waitForFunction(()=>window.__navFrames.length>0);
-            const state=await page.evaluate(()=>({
-              root:getComputedStyle(document.documentElement).viewTransitionName,
-              content:getComputedStyle(document.querySelector('main')).viewTransitionName,
-              nav:getComputedStyle(document.querySelector('.elpa-nav')).viewTransitionName,
-              frames:window.__navFrames
+          for(const width of [390,1440]){
+            const page=await mobileBrowser.newPage({viewport:{width,height:width===390?844:1800},isMobile:width===390,hasTouch:width===390});
+            const errors=[];
+            page.on('pageerror',error=>errors.push(error.message));
+            await page.route('https://img.shields.io/**',route=>route.fulfill({
+              contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="17" height="20"/>'
             }));
-            assert.equal(state.root,'none','The complete page must not be captured or animated');
-            assert.equal(state.content,'elpa-content','Only changing page content participates in transitions');
-            assert.equal(state.nav,'none','Shared navigation must remain outside content transitions');
-            assert.ok(state.frames.length>0 && state.frames.every(top=>Math.abs(top)<1),
-              'Navigation must stay at the top during mobile load: '+JSON.stringify(state.frames));
-          };
-          await page.goto('http://127.0.0.1:'+serve.address().port+prefix+'/sources.html');
-          await assertStable();
-          await page.reload();
-          await assertStable();
-          await page.evaluate(()=>{window.__sourcesDocument=true;});
-          for(let repeat=0;repeat<3;repeat++){
-            await page.locator('.elpa-nav-links a[href="./sources.html"]').click();
-            assert.equal(await page.evaluate(()=>window.__sourcesDocument),true,
-              'Repeated navigation to the current Sources page must not reload the document');
-          }
-          await page.evaluate(()=>window.scrollTo({top:500,behavior:'instant'}));
-          await page.locator('.elpa-nav-links a[href="./sources.html"]').click();
-          await page.waitForFunction(()=>scrollY<1);
-          assert.equal(await page.evaluate(()=>window.__sourcesDocument),true,
-            'Current-page navigation returns to the top without losing the document');
-          for(const route of ['guide','sources','practice','sources','index','sources']){
-            await page.locator('.elpa-nav-links a[href="./'+route+'.html"]').click();
+            await page.addInitScript(()=>{
+              window.__navFrames=[];
+              addEventListener('pagereveal',event=>{window.__documentTransition=Boolean(event.viewTransition);});
+              addEventListener('DOMContentLoaded',()=>{
+                const start=performance.now();
+                const sample=()=>{
+                  const nav=document.querySelector('.elpa-nav');
+                  if(nav) window.__navFrames.push(nav.getBoundingClientRect().top);
+                  if(performance.now()-start<1500) requestAnimationFrame(sample);
+                };
+                requestAnimationFrame(sample);
+              },{once:true});
+            });
+            const assertStable=async()=>{
+              await page.waitForLoadState('networkidle');
+              await page.bringToFront();
+              await page.waitForFunction(()=>window.__navFrames.length>0);
+              const state=await page.evaluate(()=>({
+                snapshot:Boolean(window.__documentTransition),
+                content:getComputedStyle(document.querySelector('main')).viewTransitionName,
+                nav:getComputedStyle(document.querySelector('.elpa-nav')).viewTransitionName,
+                frames:window.__navFrames
+              }));
+              assert.equal(state.snapshot,false,'Old-page snapshots must never overlay the new document');
+              assert.equal(state.content,'none','Long page content must not become a retained snapshot');
+              assert.equal(state.nav,'none','Shared navigation must remain outside content transitions');
+              assert.ok(state.frames.length>0 && state.frames.every(top=>Math.abs(top)<1),
+                'Navigation must stay at the top during mobile load: '+JSON.stringify(state.frames));
+            };
+            await page.goto('http://127.0.0.1:'+serve.address().port+prefix+'/sources.html');
             await assertStable();
+            await page.reload();
+            await assertStable();
+            await page.evaluate(()=>{window.__sourcesDocument=true;});
+            for(let repeat=0;repeat<3;repeat++){
+              await page.locator('.elpa-nav-links a[href="./sources.html"]').click();
+              assert.equal(await page.evaluate(()=>window.__sourcesDocument),true,
+                'Repeated navigation to the current Sources page must not reload the document');
+            }
+            await page.evaluate(()=>window.scrollTo({top:500,behavior:'instant'}));
+            await page.locator('.elpa-nav-links a[href="./sources.html"]').click();
+            await page.waitForFunction(()=>scrollY<1);
+            assert.equal(await page.evaluate(()=>window.__sourcesDocument),true,
+              'Current-page navigation returns to the top without losing the document');
+            for(const route of ['guide','sources','practice','sources','index','sources']){
+              await page.locator('.elpa-nav-links a[href="./'+route+'.html"]').click();
+              await assertStable();
+            }
+            assert.deepEqual(errors,[],engine.name()+' mobile navigation errors');
+            await page.close();
+            console.log(engine.name()+' Sources reload and navigation passed: '+(prefix||'/')+' at '+width+'px');
           }
-          assert.deepEqual(errors,[],engine.name()+' mobile navigation errors');
-          await page.close();
-          console.log(engine.name()+' mobile Sources reload and navigation passed: '+(prefix||'/'));
         }
       }finally{await mobileBrowser.close();}
     }
