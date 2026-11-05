@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python preview.py --build-only
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:browser
         env:
           ELPA_SITE_ROOT: _site
