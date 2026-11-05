@@ -21,6 +21,7 @@ test('Pages handles manual pushes and owner-approved Issue publication without u
   assert.match(workflow,/workflow_run:\n    workflows: \["Publish completed ELPA submissions"\]/);
   assert.match(workflow,/workflow_run\.conclusion == 'success'/);
   assert.match(workflow,/workflow_run\.event == 'issues'/);
+  assert.match(workflow,/github\.sha != github\.event\.workflow_run\.head_sha/);
   assert.match(workflow,/ref: main/);
   assert.doesNotMatch(workflow,/ref:\s*\$\{\{.*head_sha/);
   assert.match(workflow,/pages: write\n  id-token: write/);

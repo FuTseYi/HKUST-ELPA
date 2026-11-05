@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Render reviewed JSON question data into standalone browser scripts.
 
-The input files will become canonical only at the final migration cutover.
-Until then this is exercised against temporary, losslessly exported fixtures.
+The reviewed JSON files are the canonical source for browser question data.
 """
 import argparse
 import json
