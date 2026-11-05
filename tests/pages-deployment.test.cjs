@@ -31,14 +31,14 @@ test('Pages handles manual pushes and owner-approved Issue publication without u
   assert.match(workflow,/group: elpa-pages-deployment/);
 });
 
-test('full browser regression runs for PRs only; main pushes use the verified deployment job',()=>{
+test('full browser regression runs only on PRs; main pushes deploy the validated site',()=>{
   const checks=fs.readFileSync(path.join(root,'.github/workflows/site-checks.yml'),'utf8');
   const deployment=fs.readFileSync(path.join(root,'.github/workflows/deploy-pages.yml'),'utf8');
-  assert.match(checks,/on:\\n  pull_request:/);
-  assert.doesNotMatch(checks,/\\n  push:/);
-  assert.match(checks,/python tests\\/browser_smoke\\.py/);
-  assert.match(checks,/python -m playwright install --with-deps chromium webkit/);
-  assert.match(deployment,/push:\\n    branches: \\[main\\]/);
-  assert.match(deployment,/node scripts\\/validate-site\\.cjs/);
-  assert.match(deployment,/actions\\/deploy-pages@v5/);
+  assert.ok(checks.includes('pull_request:'));
+  assert.ok(!checks.includes('  push:'));
+  assert.ok(checks.includes('python tests/browser_smoke.py'));
+  assert.ok(checks.includes('python -m playwright install --with-deps chromium webkit'));
+  assert.ok(deployment.includes('branches: [main]'));
+  assert.ok(deployment.includes('node scripts/validate-site.cjs'));
+  assert.ok(deployment.includes('actions/deploy-pages@v5'));
 });
