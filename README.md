@@ -80,7 +80,8 @@ Linux CI 使用 `npx playwright install --with-deps chromium webkit` 安装系�
 ```text
 HKUST-ELPA/
 ├── preview.py                     # 本地预览与静态构建唯一入口
-├── index.html / guide.html / practice.html / sources.html / submit.html
+├── index.html / practice.html / submit.html  # 三个页面入口源文件
+├── content/pages/                  # 指南与来源正文，构建保留旧 URL
 ├── assets/                        # css/、js/、images/、icons/、demos/ 统一静态资源
 ├── submission-config.js           # 公开投稿端点与 Turnstile Site Key
 ├── elpa_data.json                 # 空的初始记录文件，非个人备份
@@ -98,7 +99,7 @@ HKUST-ELPA/
 ### 文件维护边界
 
 - **页面与代码分离**：HTML 保留语义内容及真实导航；交互在 `assets/js/` 中，样式在 `assets/css/`。保持经典脚本的加载顺序和现有事件绑定，未经迁移不要改成模块或异步加载。
-- **页面维护**：直接编辑根目录各 HTML 的页面内容。公共导航与页脚以 `index.html` 为准，构建时应用到其他页面；不需要手动同步或单独维护模板目录。
+- **页面维护**：直接编辑根目录三个页面入口；指南和来源分别编辑 `content/pages/guide.html` 与 `content/pages/sources.html` 的正文。公共导航与页脚只在 `index.html` 定义，构建产生五个完整页面并保留旧链接及锚点。
 - **页面切换**：普通 HTML 链接直接切换页面，新正文仅做短暂透明度淡入，不保留或混合旧页快照；重复点击当前页导航只回到顶部，不重新加载；减少动态效果时关闭过渡。保留原生前进、后退和直接访问。
 - **双语排版**：保留中文主体和简短英文标签；放得下时并排，空间不足时将英文放在下方。题目翻译与用户输入不自动改写。
 - **题库与记录兼容**：不重编号已发布题目，不改变既有 localStorage 键。提示小问笔记按位置关联，已发布小问不随意重排；需要调整时必须设计记录迁移。
