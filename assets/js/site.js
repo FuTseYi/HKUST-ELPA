@@ -19,14 +19,15 @@ const elpaRoute = url => {
   return pathname.startsWith(elpaBase) && elpaRoutes.has(name) && !name.includes('/') ? name : null;
 };
 const elpaCurrentRoute = () => elpaRoute(new URL(location.href));
+let elpaActiveRoute = elpaCurrentRoute();
 const elpaCache = new Map();
 const elpaLoadedScripts = new Set([...document.querySelectorAll('script[src]')].map(tag => new URL(tag.src).href));
 const elpaPracticeStyle = document.querySelector('link[rel="stylesheet"][href*="practice.css"]') || null;
 let elpaPracticeSheet = elpaPracticeStyle;
 let elpaNavigating = false;
 
-if (elpaCurrentRoute()) {
-  elpaCache.set(elpaCurrentRoute(), {
+if (elpaActiveRoute) {
+  elpaCache.set(elpaActiveRoute, {
     main: document.getElementById('main'),
     bodyClass: document.body.className,
     title: document.title,
@@ -110,7 +111,7 @@ function elpaSetCurrentNav(route) {
 }
 
 async function elpaActivate(page, route, scroll) {
-  const current = elpaCurrentRoute();
+  const current = elpaActiveRoute;
   if (current === 'practice.html' && route !== current)
     window.dispatchEvent(new Event('elpa:practice-leave'));
   if (elpaPracticeSheet) elpaPracticeSheet.media = route === 'practice.html' ? 'all' : 'not all';
@@ -122,6 +123,7 @@ async function elpaActivate(page, route, scroll) {
   elpaSetCurrentNav(route);
   for (const src of page.scripts) await elpaLoadScript(src);
   if (route === 'practice.html') await elpaWaitForPractice();
+  elpaActiveRoute = route;
   requestAnimationFrame(() => scrollTo({top:scroll, behavior:'instant'}));
 }
 
@@ -153,13 +155,13 @@ document.addEventListener('click', event => {
       link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
   const url = new URL(link.href);
   const route = elpaRoute(url);
-  if (!route || url.origin !== location.origin || url.search || url.hash ||
-      route === elpaCurrentRoute() || elpaNavigating) return;
+  if (!elpaActiveRoute || !route || url.origin !== location.origin || url.search || url.hash ||
+      route === elpaActiveRoute || elpaNavigating) return;
   event.preventDefault();
   void elpaNavigate(url);
 });
 window.addEventListener('popstate', event => {
   const url = new URL(location.href);
-  if (elpaRoute(url) && !url.search && !url.hash)
+  if (elpaActiveRoute && elpaRoute(url) && elpaRoute(url) !== elpaActiveRoute)
     void elpaNavigate(url, {pop:true, scroll:event.state?.elpaScroll || 0});
 });
