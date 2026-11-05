@@ -47,7 +47,7 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 
 ## Verification and documentation
 
-- Run the common Python suite `python -m unittest discover -s tests -t . -p 'test_*.py'`, `npm run check`, `npm test`, and, for user-facing changes, `npm run test:browser`. For Worker changes, include Worker security and contract tests. Report exactly what ran.
+- Run the common Python suite `python -m unittest discover -s tests -t . -p 'test_*.py'`, `node scripts/validate-site.cjs`, `node --test`, and, for user-facing changes, `python tests/browser_smoke.py` (install `requirements-dev.txt` and browser engines first). For Worker changes, include Worker security and contract tests. Report exactly what ran.
 - `preview.py` is the single Python build and local preview entry point: Windows `py -3 preview.py`, otherwise `python3 preview.py`. Vercel, Pages and CI must use `preview.py --build-only` to publish the same `_site/` build, without a parallel build wrapper. Verify root and `/HKUST-ELPA/` paths; keep deployment secrets external.
 - Test old backup restore, existing note keys, linked/supplement submission semantics, duplicate/failed publication, mobile layouts, keyboard interactions, and timer behavior whenever related code changes.
 - `README.md` describes project usage. `question-bank/README.md` owns question sources and editorial provenance. `question-bank/MODERATION.md` owns approval and recovery operations. `docs/submission-v2-spec.md` owns the submission data contract; `worker/README.md` owns Worker operations. Reference these documents rather than copying their full rules into multiple places.

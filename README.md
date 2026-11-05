@@ -58,22 +58,22 @@ Windows 使用 `py -3 preview.py`；macOS / Linux 使用 `python3 preview.py`。
 
 ### 自动化检查
 
-需要 **Node.js 22 或更新版本**。结构、语法与单元测试使用 Node 内置功能，不依赖浏览器安装：
+结构、安全和 JavaScript 单元测试使用 Node.js 22+ 内置功能，**无需 npm 依赖清单**：
 
 ```bash
-npm run check
-npm test
+node scripts/validate-site.cjs
+node --test
 ```
 
-浏览器回归需要安装锁定版本的 Playwright 及其 Chromium、WebKit：
+浏览器回归统一使用 Python Playwright，开发依赖只在 `requirements-dev.txt` 中声明：
 
 ```bash
-npm ci
-npx playwright install chromium webkit
-npm run test:browser
+python -m pip install -r requirements-dev.txt
+python -m playwright install chromium webkit
+python tests/browser_smoke.py
 ```
 
-Linux CI 使用 `npx playwright install --with-deps chromium webkit` 安装系统依赖。浏览器测试使用独立测试上下文和本地服务，覆盖 320–1280px 的八种宽度，以及 Chromium、WebKit 下的 Sources 刷新与重复导航；外部星数、人机验证与投稿请求被隔离，**不会创建公开投稿**。真实 Turnstile、Worker 部署及原生文件夹选择器仍需单独验证。
+Linux CI 使用 `python -m playwright install --with-deps chromium webkit` 安装系统依赖。浏览器测试使用独立测试上下文和本地服务，覆盖 320–1280px 的八种宽度，以及 Chromium、WebKit 下的 Sources 刷新与重复导航；外部星数、人机验证与投稿请求被隔离，**不会创建公开投稿**。真实 Turnstile、Worker 部署及原生文件夹选择器仍需单独验证。
 
 ## 项目结构
 
@@ -90,7 +90,7 @@ HKUST-ELPA/
 ├── tests/                         # Worker、导入器、页面逻辑与浏览器回归
 ├── worker/                        # 独立部署的 Cloudflare 投稿接口
 ├── docs/                          # 投稿数据约定及维护说明
-├── package.json / package-lock.json # 统一检查命令与锁定的测试依赖
+├── requirements-dev.txt             # Python 浏览器测试开发依赖
 └── .github/workflows/             # 网站校验、Completed 后自动审核发布
 ```
 
