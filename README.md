@@ -65,15 +65,15 @@ npm run check
 npm test
 ```
 
-浏览器回归需要安装锁定版本的 Playwright 及其 Chromium：
+浏览器回归需要安装锁定版本的 Playwright 及其 Chromium、WebKit：
 
 ```bash
 npm ci
-npx playwright install chromium
+npx playwright install chromium webkit
 npm run test:browser
 ```
 
-Linux CI 使用 `npx playwright install --with-deps chromium` 安装系统依赖。浏览器测试使用独立测试上下文和本地服务，覆盖 320–1280px 的八种宽度；外部星数、人机验证与投稿请求被隔离，**不会创建公开投稿**。真实 Turnstile、Worker 部署及原生文件夹选择器仍需单独验证。
+Linux CI 使用 `npx playwright install --with-deps chromium webkit` 安装系统依赖。浏览器测试使用独立测试上下文和本地服务，覆盖 320–1280px 的八种宽度，以及 Chromium、WebKit 下的 Sources 刷新与重复导航；外部星数、人机验证与投稿请求被隔离，**不会创建公开投稿**。真实 Turnstile、Worker 部署及原生文件夹选择器仍需单独验证。
 
 ## 项目结构
 
@@ -99,7 +99,7 @@ HKUST-ELPA/
 
 - **页面与代码分离**：HTML 保留语义内容及真实导航；交互在 `assets/js/` 中，样式在 `assets/css/`。保持经典脚本的加载顺序和现有事件绑定，未经迁移不要改成模块或异步加载。
 - **页面维护**：直接编辑根目录各 HTML 的页面内容。公共导航与页脚以 `index.html` 为准，构建时应用到其他页面；不需要手动同步或单独维护模板目录。
-- **页面切换**：普通 HTML 链接配合浏览器原生跨页过渡；减少动态效果时关闭过渡。首屏等待正文解析完成，保留原生前进、后退和直接访问。
+- **页面切换**：普通 HTML 链接配合仅作用于正文的浏览器原生跨页过渡，公共导航不参与整页快照；重复点击当前页导航只回到顶部，不重新加载；减少动态效果时关闭过渡。首屏等待正文解析完成，保留原生前进、后退和直接访问。
 - **双语排版**：保留中文主体和简短英文标签；放得下时并排，空间不足时将英文放在下方。题目翻译与用户输入不自动改写。
 - **题库与记录兼容**：不重编号已发布题目，不改变既有 localStorage 键。提示小问笔记按位置关联，已发布小问不随意重排；需要调整时必须设计记录迁移。
 - **数据与来源分离**：结构化数据负责显示和关联；Markdown 负责来源、场次背景与不确定性，不是自动生成的数据副本。

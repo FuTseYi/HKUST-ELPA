@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
-const {chromium}=require('playwright');
+const {chromium,webkit}=require('playwright');
 const root=path.resolve(process.env.ELPA_SITE_ROOT || path.join(__dirname,'../_site'));
 const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8',
   '.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.jpg':'image/jpeg','.png':'image/png'};
@@ -541,6 +541,69 @@ const serve=http.createServer((request,response)=>{
     assert.deepEqual(pagesErrors,[],'GitHub Pages subpath must load generated bank scripts');
     assert.ok((await pages.locator('#bankD .qcard').count())>0);
     await pages.close();
+    for(const engine of [chromium,webkit]){
+      const mobileBrowser=await engine.launch({headless:true});
+      try{
+        for(const prefix of ['', '/HKUST-ELPA']){
+          const page=await mobileBrowser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+          const errors=[];
+          page.on('pageerror',error=>errors.push(error.message));
+          await page.route('https://img.shields.io/**',route=>route.fulfill({
+            contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="17" height="20"/>'
+          }));
+          await page.addInitScript(()=>{
+            window.__navFrames=[];
+            addEventListener('DOMContentLoaded',()=>{
+              const start=performance.now();
+              const sample=()=>{
+                const nav=document.querySelector('.elpa-nav');
+                if(nav) window.__navFrames.push(nav.getBoundingClientRect().top);
+                if(performance.now()-start<1500) requestAnimationFrame(sample);
+              };
+              requestAnimationFrame(sample);
+            },{once:true});
+          });
+          const assertStable=async()=>{
+            await page.waitForLoadState('networkidle');
+            await page.bringToFront();
+            await page.waitForFunction(()=>window.__navFrames.length>0);
+            const state=await page.evaluate(()=>({
+              root:getComputedStyle(document.documentElement).viewTransitionName,
+              content:getComputedStyle(document.querySelector('main')).viewTransitionName,
+              nav:getComputedStyle(document.querySelector('.elpa-nav')).viewTransitionName,
+              frames:window.__navFrames
+            }));
+            assert.equal(state.root,'none','The complete page must not be captured or animated');
+            assert.equal(state.content,'elpa-content','Only changing page content participates in transitions');
+            assert.equal(state.nav,'none','Shared navigation must remain outside content transitions');
+            assert.ok(state.frames.length>0 && state.frames.every(top=>Math.abs(top)<1),
+              'Navigation must stay at the top during mobile load: '+JSON.stringify(state.frames));
+          };
+          await page.goto('http://127.0.0.1:'+serve.address().port+prefix+'/sources.html');
+          await assertStable();
+          await page.reload();
+          await assertStable();
+          await page.evaluate(()=>{window.__sourcesDocument=true;});
+          for(let repeat=0;repeat<3;repeat++){
+            await page.locator('.elpa-nav-links a[href="./sources.html"]').click();
+            assert.equal(await page.evaluate(()=>window.__sourcesDocument),true,
+              'Repeated navigation to the current Sources page must not reload the document');
+          }
+          await page.evaluate(()=>window.scrollTo({top:500,behavior:'instant'}));
+          await page.locator('.elpa-nav-links a[href="./sources.html"]').click();
+          await page.waitForFunction(()=>scrollY<1);
+          assert.equal(await page.evaluate(()=>window.__sourcesDocument),true,
+            'Current-page navigation returns to the top without losing the document');
+          for(const route of ['guide','sources','practice','sources','index','sources']){
+            await page.locator('.elpa-nav-links a[href="./'+route+'.html"]').click();
+            await assertStable();
+          }
+          assert.deepEqual(errors,[],engine.name()+' mobile navigation errors');
+          await page.close();
+          console.log(engine.name()+' mobile Sources reload and navigation passed: '+(prefix||'/'));
+        }
+      }finally{await mobileBrowser.close();}
+    }
   }finally{
     if(browser)await browser.close();
     await new Promise(resolve=>serve.close(resolve));
