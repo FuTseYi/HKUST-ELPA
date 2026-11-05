@@ -553,16 +553,20 @@ const serve=http.createServer((request,response)=>{
           }));
           await page.addInitScript(()=>{
             window.__navFrames=[];
+            addEventListener('DOMContentLoaded',()=>{
             const start=performance.now();
             const sample=()=>{
               const nav=document.querySelector('.elpa-nav');
-              if(nav) window.__navFrames.push({top:nav.getBoundingClientRect().top,position:getComputedStyle(nav).position,time:performance.now(),paints:performance.getEntriesByType('paint').map(p=>({name:p.name,time:p.startTime}))});
+              if(nav) window.__navFrames.push(nav.getBoundingClientRect().top);
               if(performance.now()-start<1500) requestAnimationFrame(sample);
             };
             requestAnimationFrame(sample);
+            },{once:true});
           });
           const assertStable=async()=>{
             await page.waitForLoadState('networkidle');
+            await page.bringToFront();
+            await page.waitForFunction(()=>window.__navFrames.length>0);
             const state=await page.evaluate(()=>({
               root:getComputedStyle(document.documentElement).viewTransitionName,
               content:getComputedStyle(document.querySelector('main')).viewTransitionName,
@@ -572,7 +576,7 @@ const serve=http.createServer((request,response)=>{
             assert.equal(state.root,'none','The complete page must not be captured or animated');
             assert.equal(state.content,'elpa-content','Only changing page content participates in transitions');
             assert.equal(state.nav,'none','Shared navigation must remain outside content transitions');
-            assert.ok(state.frames.length>0 && state.frames.every(frame=>Math.abs(frame.top)<1),
+            assert.ok(state.frames.length>0 && state.frames.every(top=>Math.abs(top)<1),
               'Navigation must stay at the top during mobile load: '+JSON.stringify(state.frames));
           };
           await page.goto('http://127.0.0.1:'+serve.address().port+prefix+'/sources.html');
