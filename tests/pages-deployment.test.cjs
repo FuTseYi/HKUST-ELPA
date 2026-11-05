@@ -30,3 +30,15 @@ test('Pages handles manual pushes and owner-approved Issue publication without u
   assert.match(workflow,/pages: write\n  id-token: write/);
   assert.match(workflow,/group: elpa-pages-deployment/);
 });
+
+test('full browser regression runs for PRs only; main pushes use the verified deployment job',()=>{
+  const checks=fs.readFileSync(path.join(root,'.github/workflows/site-checks.yml'),'utf8');
+  const deployment=fs.readFileSync(path.join(root,'.github/workflows/deploy-pages.yml'),'utf8');
+  assert.match(checks,/on:\\n  pull_request:/);
+  assert.doesNotMatch(checks,/\\n  push:/);
+  assert.match(checks,/python tests\\/browser_smoke\\.py/);
+  assert.match(checks,/python -m playwright install --with-deps chromium webkit/);
+  assert.match(deployment,/push:\\n    branches: \\[main\\]/);
+  assert.match(deployment,/node scripts\\/validate-site\\.cjs/);
+  assert.match(deployment,/actions\\/deploy-pages@v5/);
+});
