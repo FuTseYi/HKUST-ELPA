@@ -8,7 +8,7 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 
 ## Architecture and ownership
 
-- Root HTML files own their respective page UI. Public output is built into `_site/`. `assets/css/` and `assets/js/` own browser styles and scripts; `assets/images/`, `assets/icons/`, and `assets/demos/` own media. `index.html` owns shared navigation and footer, which are reused during the build. CSS and browser JavaScript implement presentation and interactions. Avoid introducing a frontend framework or runtime dependency without a demonstrated need.
+- The root `index.html`, `practice.html`, and `submit.html` own page entrypoints; `content/pages/guide.html` and `content/pages/sources.html` own only page-specific main content. Public output is built into `_site/`. `assets/css/` and `assets/js/` own browser styles and scripts; `assets/images/`, `assets/icons/`, and `assets/demos/` own media. `index.html` owns shared navigation and footer, which are reused during the build. CSS and browser JavaScript implement presentation and interactions. Avoid introducing a frontend framework or runtime dependency without a demonstrated need.
 - `question-bank/` owns canonical questions, reported encounters, reviewed advice, stable taxonomy, and source provenance. The same question must not be recreated for each appearance.
 - Browser learning records are local to the current origin; no account or server database is required.
 - `worker/` accepts untrusted submissions and creates GitHub Issues. It never publishes questions directly. Cloudflare secrets must never enter the website or repository.
@@ -43,7 +43,7 @@ Treat the website, question bank, submission protocol, moderation, and deploymen
 - Keep substantial structural changes in a reviewable PR. Make coherent, verified commits; avoid repeated deployment-triggering pushes and never rewrite shared history without explicit authorization.
 
 
-- Edit each root HTML page directly. Shared navigation and footer follow `index.html` during the build. Keep site-specific organization simple; no external shared package, generated source synchronization or separate template directory is required.
+- Edit the three root HTML entrypoints and the two guide/source content fragments. Shared navigation and footer live only in `index.html` and are generated into all five published URLs. Preserve anchors; do not introduce client-side routing or a parallel template system.
 
 ## Verification and documentation
 
