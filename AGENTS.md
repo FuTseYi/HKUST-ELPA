@@ -12,7 +12,7 @@ HKUST-ELPA is a student-maintained static ELPA preparation website built with HT
 - `assets/` holds front-end CSS, JavaScript and media; `data/` holds the public submission configuration and initial record template.
 - `question-bank/` is the canonical source for questions, appearances, reviewed advice, taxonomy and provenance. Python generates browser-ready resources.
 - `worker/` validates untrusted submissions and creates public Issues. Owner-approved Issue closures trigger the importer in `scripts/`, which updates canonical question data.
-- `.github/workflows/` runs checks, publication and deployment. `tests/` covers data, user interactions, publication and Worker security.
+- `.github/workflows/` runs PR-only full validation, trusted-main deployment and reviewed-Issue publication. `tests/` covers data, user interactions, publication and Worker security.
 
 ## Engineering principles
 
@@ -33,7 +33,7 @@ HKUST-ELPA is a student-maintained static ELPA preparation website built with HT
 - Build: `preview.py --build-only` through the matching Python launcher; publish `_site/` on Vercel and GitHub Pages.
 - JavaScript/site checks: `node scripts/validate-site.cjs` and `node --test` (Node.js 22+). Publish to Pages only after the same validation and Python tests succeed.
 - Python tests: `python -m unittest discover -s tests -t . -p 'test_*.py'`.
-- Browser regression: install `requirements-dev.txt` and Chromium/WebKit, then run `python tests/browser_smoke.py`.
+- Browser regression: install `requirements-dev.txt` and Chromium/WebKit, then run `python tests/browser_smoke.py`. Run full browser regression on PRs; main pushes publish through the existing validated Pages build without repeating browser tests.
 - Verify root and `/HKUST-ELPA/` deployment paths and maintain all data and URL contracts.
 - Report what was tested, what changed, and the outcome. CI success is distinct from production deployment success.
 
