@@ -554,13 +554,13 @@ const serve=http.createServer((request,response)=>{
           await page.addInitScript(()=>{
             window.__navFrames=[];
             addEventListener('DOMContentLoaded',()=>{
-            const start=performance.now();
-            const sample=()=>{
-              const nav=document.querySelector('.elpa-nav');
-              if(nav) window.__navFrames.push(nav.getBoundingClientRect().top);
-              if(performance.now()-start<1500) requestAnimationFrame(sample);
-            };
-            requestAnimationFrame(sample);
+              const start=performance.now();
+              const sample=()=>{
+                const nav=document.querySelector('.elpa-nav');
+                if(nav) window.__navFrames.push(nav.getBoundingClientRect().top);
+                if(performance.now()-start<1500) requestAnimationFrame(sample);
+              };
+              requestAnimationFrame(sample);
             },{once:true});
           });
           const assertStable=async()=>{

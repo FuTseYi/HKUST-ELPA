@@ -65,15 +65,15 @@ npm run check
 npm test
 ```
 
-浏览器回归需要安装锁定版本的 Playwright 及其 Chromium：
+浏览器回归需要安装锁定版本的 Playwright 及其 Chromium、WebKit：
 
 ```bash
 npm ci
-npx playwright install chromium
+npx playwright install chromium webkit
 npm run test:browser
 ```
 
-Linux CI 使用 `npx playwright install --with-deps chromium` 安装系统依赖。浏览器测试使用独立测试上下文和本地服务，覆盖 320–1280px 的八种宽度；外部星数、人机验证与投稿请求被隔离，**不会创建公开投稿**。真实 Turnstile、Worker 部署及原生文件夹选择器仍需单独验证。
+Linux CI 使用 `npx playwright install --with-deps chromium webkit` 安装系统依赖。浏览器测试使用独立测试上下文和本地服务，覆盖 320–1280px 的八种宽度，以及 Chromium、WebKit 下的 Sources 刷新与重复导航；外部星数、人机验证与投稿请求被隔离，**不会创建公开投稿**。真实 Turnstile、Worker 部署及原生文件夹选择器仍需单独验证。
 
 ## 项目结构
 
