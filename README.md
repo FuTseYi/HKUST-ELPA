@@ -68,7 +68,6 @@ HKUST-ELPA/
 ├── scripts/            # 静态构建、验证与自动入库
 ├── tests/              # 单元与浏览器测试
 ├── worker/             # Cloudflare 投稿接口
-├── docs/               # 数据协议文档
 ├── requirements-dev.txt
 └── .github/workflows/ # CI、部署和投稿审核
 ```
@@ -81,7 +80,7 @@ HKUST-ELPA/
 
 投稿由 Cloudflare Worker 校验并创建 GitHub Issue。仓库所有者审核后，使用 **Close as completed** 触发自动入库；`submission:published` 表示数据已写入 `main`，上线状态以部署结果为准。
 
-相关文档：[题库说明](./question-bank/README.md) · [投稿审核](./question-bank/MODERATION.md) · [投稿数据规范](./docs/submission-v2-spec.md) · [Worker 部署](./worker/README.md)
+相关文档：[题库说明](./question-bank/README.md) · [投稿审核](./question-bank/MODERATION.md) · [Worker 部署](./worker/README.md)
 
 欢迎通过 [Issues](https://github.com/FuTseYi/HKUST-ELPA/issues) 反馈资料问题，或通过 [Pull Requests](https://github.com/FuTseYi/HKUST-ELPA/pulls) 参与共建。投稿请勿包含姓名、学号或联系方式等个人信息。
 
