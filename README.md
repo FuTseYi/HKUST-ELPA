@@ -83,8 +83,7 @@ HKUST-ELPA/
 ├── index.html / practice.html / submit.html  # 三个页面入口源文件
 ├── content/pages/                  # 指南与来源正文，构建保留旧 URL
 ├── assets/                        # css/、js/、images/、icons/、demos/ 统一静态资源
-├── submission-config.js           # 公开投稿端点与 Turnstile Site Key
-├── elpa_data.json                 # 空的初始记录文件，非个人备份
+├── data/                          # 公开投稿配置和空白记录模板的权威源文件
 ├── question-bank/                 # 稳定题目、场次、经验及来源文档
 ├── scripts/                       # 网站构建、校验、投稿导入及发布白名单
 ├── tests/                         # Worker、导入器、页面逻辑与浏览器回归
