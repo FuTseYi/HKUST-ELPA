@@ -48,3 +48,8 @@ test('three source entrypoints generate five complete published pages',()=>{
   assert.ok(read('guide.html').includes('src="./question-bank/taxonomy.js"'));
   assert.ok(!read('sources.html').includes('src="./assets/js/index.js"'));
 });
+
+test('native page navigation has no artificial opacity flash',()=>{
+  const css=read('assets/css/site.css');
+  assert.doesNotMatch(css,/@keyframes elpa-enter|main\{animation:elpa-enter/);
+});
