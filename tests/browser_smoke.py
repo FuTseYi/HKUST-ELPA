@@ -160,6 +160,29 @@ def check_navigation(browser, origin):
                             "getComputedStyle(document.querySelector('main')).viewTransitionName === 'none'"
                         )
                     assert not errors, (prefix, width, motion, errors)
+                    page.goto(base + "/guide.html", wait_until="load")
+                    page.evaluate("window.__persistentShell = document.querySelector('.elpa-nav')")
+                    page.evaluate("window.__persistentFooter = document.querySelector('.elpa-footer')")
+                    page.locator('.elpa-nav-links a[href="./practice.html"]').click()
+                    page.wait_for_url("**/practice.html")
+                    page.locator("#bankD .qcard").first.wait_for(timeout=20000)
+                    assert page.evaluate("""() => document.querySelector('.elpa-nav') === window.__persistentShell
+                        && document.querySelector('.elpa-footer') === window.__persistentFooter""")
+                    page.go_back()
+                    page.wait_for_url("**/guide.html")
+                    assert page.locator("#regularGuide").is_visible()
+                    assert page.evaluate("document.querySelector('.elpa-nav') === window.__persistentShell")
+                    page.reload(wait_until="load")
+                    assert page.locator("#regularGuide").is_visible()
+                    assert_layout(page, "guide reload")
+                    if width == 1440:
+                        for name in ("guide", "practice"):
+                            page.goto(base + "/" + name + ".html", wait_until="domcontentloaded")
+                            before = page.locator(".elpa-footer").evaluate("node => node.getBoundingClientRect().top")
+                            page.wait_for_load_state("load")
+                            page.wait_for_timeout(100)
+                            after = page.locator(".elpa-footer").evaluate("node => node.getBoundingClientRect().top")
+                            assert abs(after - before) < 8, (name, "footer shifted after initial render", before, after)
                 finally:
                     context.close()
 
@@ -171,6 +194,9 @@ def check_without_scripts(browser, origin):
         page.locator('.elpa-nav-links a[href="./sources.html"]').click()
         page.wait_for_url("**/sources.html")
         assert page.locator("#official-sources").is_visible()
+        page.goto(origin + "/guide.html", wait_until="load")
+        assert page.locator("#guideAdviceList article").count() == 3
+        assert page.locator("#sec-advice").is_visible()
     finally:
         context.close()
 

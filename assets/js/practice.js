@@ -871,14 +871,14 @@ document.querySelectorAll('[data-campus]').forEach(b=>b.addEventListener('click'
 document.querySelectorAll('[data-track]').forEach(b=>b.addEventListener('click',()=>setExamChoice('track',b.dataset.track)));
 
 /* ============ 初始化：先读取同目录 JSON，再渲染 ============ */
-(async function init() {
+(function init() {
   const route=new URLSearchParams(location.search);
   if(['nansha','clear-water-bay'].includes(route.get('campus')))activeCampus=route.get('campus');
   if(['regular','fast-track'].includes(route.get('track')))activeTrack=route.get('track');
   document.querySelectorAll('[data-campus]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.campus===activeCampus)));
   document.querySelectorAll('[data-track]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.track===activeTrack)));
   renderTOC();
-  await initStorage();
+  initStorage();
   populateExamFilters();
   renderAll();
   if (location.hash) {

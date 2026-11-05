@@ -206,3 +206,8 @@ function drawPractice(){
 }
 document.getElementById('timerDrill').addEventListener('click',drawPractice);
 renderTimer();
+
+window.addEventListener('elpa:practice-leave', () => {
+  resetTimer();
+  openTimerPanel(false);
+});

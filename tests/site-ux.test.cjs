@@ -124,7 +124,7 @@ function newTimerFixture(){
    return elements.get(id);
  };
  const document={getElementById:el,querySelectorAll:()=>[],addEventListener:(name,fn)=>listeners.set('document:'+name,fn),hidden:false};
- const window={confirm:()=>true,matchMedia:()=>({matches:true})};
+ const window={confirm:()=>true,matchMedia:()=>({matches:true}),addEventListener:(name,fn)=>listeners.set('window:'+name,fn)};
  let clock=100000,notice='';
  const fakeDate={now:()=>clock};
  const timerFactory=new Function('document','window','Date','setInterval',
@@ -134,8 +134,18 @@ function newTimerFixture(){
  const api=timerFactory(document,window,fakeDate,()=>7,()=>{},()=>{},
     ()=>['A-1'],{fall:1,past:1},()=>[card],()=>{},txt=>{notice=txt;},8);
  const click=id=>{const fn=listeners.get(id+':click');assert.ok(fn,'missing click '+id);fn();};
- return {api,el,click,card,advance:ms=>{clock+=ms;},notice:()=>notice};
+ return {api,el,click,card,advance:ms=>{clock+=ms;},notice:()=>notice,
+   leave:()=>listeners.get('window:elpa:practice-leave')?.()};
 }
+test('leaving practice ends the current timer and closes the dock',()=>{
+  const fixture=newTimerFixture();
+  fixture.click('practiceLauncher');
+  fixture.click('timerStartPause');
+  assert.equal(fixture.api.read().timerRunning,true);
+  fixture.leave();
+  assert.equal(fixture.api.read().timerRunning,false);
+  assert.equal(fixture.el('timerPanel').classList.contains('show'),false);
+});
 test('opening exercise panel does not draw or start timer; random drawing is independent',()=>{
  const f=newTimerFixture();
  assert.equal(f.api.read().timerRunning,false);
@@ -381,7 +391,7 @@ test('latest bank advances by complete term and stage while older sessions remai
 test('guide switch preserves accessible state and works without a second page',()=>{
  const html=readPageSource('guide.html');
  const code=section(html,'/* Single choice; no extra filters, accounts or persistent state. */',
-   '/* Show only filters that have reviewed entries for the selected assessment. */');
+   '/* Filter pre-rendered reviewed cards; no duplicate browser-side HTML renderer. */');
  const events=new Map();
  const btn=id=>({id,attributes:{},classList:{toggle(name,val){this[name]=val;}},setAttribute(k,v){this.attributes[k]=v;},
    addEventListener(name,cb){events.set(id+':'+name,cb);}});

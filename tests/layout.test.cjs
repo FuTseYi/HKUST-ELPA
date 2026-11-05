@@ -44,7 +44,13 @@ test('three source entrypoints generate five complete published pages',()=>{
     const pattern=new RegExp('<template data-page="'+page+'">\\s*(<main id="main">[\\s\\S]*?<\\/main>)\\s*<\\/template>');
     const fragment=homepage.match(pattern)?.[1];
     assert.ok(fragment,'Missing authored '+page+' template in homepage');
-    assert.ok(read(page+'.html').includes(fragment));
+    if(page==='guide'){
+      assert.ok(read('guide.html').includes(fragment.split('<section class="elpa-advice-section"')[0]));
+      assert.match(read('guide.html'),/class="elpa-advice-card" data-track="regular"/);
+      assert.doesNotMatch(read('guide.html'),/id="sec-advice" hidden/);
+    }else{
+      assert.ok(read(page+'.html').includes(fragment));
+    }
   }
   assert.doesNotMatch(read('index.html'),/<template data-page=/);
   assert.ok(read('guide.html').includes('src="./assets/js/guide.js"'));
@@ -52,7 +58,20 @@ test('three source entrypoints generate five complete published pages',()=>{
   assert.ok(!read('sources.html').includes('src="./assets/js/index.js"'));
 });
 
-test('native page navigation has no artificial opacity flash',()=>{
+test('persistent shell navigation has no artificial opacity flash',()=>{
   const css=read('assets/css/site.css');
   assert.doesNotMatch(css,/@keyframes elpa-enter|main\{animation:elpa-enter/);
+});
+
+test('public shell handles reading and practice routes with native fallbacks',()=>{
+  const source=fs.readFileSync(path.join(root,'assets/js/site.js'),'utf8');
+  assert.match(source,/history\.pushState/);
+  assert.match(source,/popstate/);
+  assert.match(source,/DOMParser/);
+  assert.match(source,/new URL\('\.\/'/);
+  assert.doesNotMatch(source,/swup|Swup|npm install/i);
+  const css=read('assets/css/site.css');
+  assert.match(css,/min-height:100svh/);
+  assert.match(css,/\.elpa-body > #main \{ flex:1 0 auto/);
+  assert.match(css,/\.page-practice > #main \{ min-height:100svh/);
 });
