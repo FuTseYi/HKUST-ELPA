@@ -81,10 +81,6 @@ function stopTimer(){
   timerInterval=null;
   timerRunning=false;
   renderTimer();
-window.addEventListener('elpa:practice-leave', () => {
-  resetTimer();
-  openTimerPanel(false);
-});
 }
 function resetTimer(clearSelection=false){
   stopTimer();
@@ -210,3 +206,8 @@ function drawPractice(){
 }
 document.getElementById('timerDrill').addEventListener('click',drawPractice);
 renderTimer();
+
+window.addEventListener('elpa:practice-leave', () => {
+  resetTimer();
+  openTimerPanel(false);
+});

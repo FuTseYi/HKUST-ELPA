@@ -391,7 +391,7 @@ test('latest bank advances by complete term and stage while older sessions remai
 test('guide switch preserves accessible state and works without a second page',()=>{
  const html=readPageSource('guide.html');
  const code=section(html,'/* Single choice; no extra filters, accounts or persistent state. */',
-   '/* Show only filters that have reviewed entries for the selected assessment. */');
+   '/* Filter pre-rendered reviewed cards; no duplicate browser-side HTML renderer. */');
  const events=new Map();
  const btn=id=>({id,attributes:{},classList:{toggle(name,val){this[name]=val;}},setAttribute(k,v){this.attributes[k]=v;},
    addEventListener(name,cb){events.set(id+':'+name,cb);}});
