@@ -21,6 +21,9 @@ test('Pages handles manual pushes and owner-approved Issue publication without u
   assert.match(workflow,/workflow_run:\n    workflows: \["Publish completed ELPA submissions"\]/);
   assert.match(workflow,/workflow_run\.conclusion == 'success'/);
   assert.match(workflow,/workflow_run\.event == 'issues'/);
+  assert.ok(workflow.includes('REVIEW_BASE_SHA: ${{ github.event.workflow_run.head_sha }}'));
+  assert.match(workflow,/git rev-parse HEAD/);
+  assert.equal((workflow.match(/steps\.reviewed-change\.outputs\.updated == 'true'/g)||[]).length,5);
   assert.match(workflow,/ref: main/);
   assert.doesNotMatch(workflow,/ref:\s*\$\{\{.*head_sha/);
   assert.match(workflow,/pages: write\n  id-token: write/);
