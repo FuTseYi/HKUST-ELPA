@@ -205,7 +205,7 @@ function markDirty() {
   updateSaveBtn();
   scheduleFileSync();
 }
-async function initStorage() {
+function initStorage() {
   restoreBrowser();
   // Existing local progress remains authoritative; legacy folder sync is no longer automatic.
   const notice=document.getElementById('storageTip');

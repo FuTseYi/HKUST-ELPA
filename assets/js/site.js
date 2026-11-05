@@ -82,24 +82,6 @@ function elpaLoadScript(src) {
   });
 }
 
-function elpaWaitForPractice() {
-  const main = document.getElementById('main');
-  if (!main || main.dataset.elpaReady === 'true') return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const observer = new MutationObserver(() => {
-      if (main.dataset.elpaReady !== 'true') return;
-      observer.disconnect();
-      clearTimeout(timeout);
-      resolve();
-    });
-    observer.observe(main, {attributes:true, attributeFilter:['data-elpa-ready']});
-    const timeout = setTimeout(() => {
-      observer.disconnect();
-      reject(new Error('Practice content did not initialize'));
-    }, 10000);
-  });
-}
-
 function elpaSetCurrentNav(route) {
   for (const link of document.querySelectorAll('.elpa-nav a[href]')) {
     const active = elpaRoute(new URL(link.href)) === route;
@@ -121,7 +103,6 @@ async function elpaActivate(page, route, scroll) {
   if (description) description.content = page.description;
   elpaSetCurrentNav(route);
   for (const src of page.scripts) await elpaLoadScript(src);
-  if (route === 'practice.html') await elpaWaitForPractice();
   elpaActiveRoute = route;
   requestAnimationFrame(() => scrollTo({top:scroll, behavior:'instant'}));
 }
@@ -135,7 +116,6 @@ async function elpaNavigate(url, {pop=false, scroll=0}={}) {
   elpaNavigating = true;
   try {
     const page = await elpaLoadRoute(url, route);
-    if (elpaActiveRoute === 'practice.html') await elpaWaitForPractice();
     if (!pop) {
       history.replaceState({...history.state, elpaScroll:scrollY}, '', location.href);
       history.pushState({elpaScroll:0}, '', url.href);
