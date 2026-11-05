@@ -83,17 +83,16 @@ function elpaLoadScript(src) {
 }
 
 function elpaWaitForPractice() {
-  if (document.querySelector('#bankD .qcard') || !document.getElementById('bankD'))
-    return Promise.resolve();
+  const main = document.getElementById('main');
+  if (!main || main.dataset.elpaReady === 'true') return Promise.resolve();
   return new Promise((resolve, reject) => {
-    const bank = document.getElementById('bankD');
     const observer = new MutationObserver(() => {
-      if (!bank.querySelector('.qcard')) return;
+      if (main.dataset.elpaReady !== 'true') return;
       observer.disconnect();
       clearTimeout(timeout);
       resolve();
     });
-    observer.observe(bank, {childList:true});
+    observer.observe(main, {attributes:true, attributeFilter:['data-elpa-ready']});
     const timeout = setTimeout(() => {
       observer.disconnect();
       reject(new Error('Practice content did not initialize'));
@@ -136,6 +135,7 @@ async function elpaNavigate(url, {pop=false, scroll=0}={}) {
   elpaNavigating = true;
   try {
     const page = await elpaLoadRoute(url, route);
+    if (elpaActiveRoute === 'practice.html') await elpaWaitForPractice();
     if (!pop) {
       history.replaceState({...history.state, elpaScroll:scrollY}, '', location.href);
       history.pushState({elpaScroll:0}, '', url.href);

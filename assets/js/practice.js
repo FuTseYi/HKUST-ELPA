@@ -881,6 +881,7 @@ document.querySelectorAll('[data-track]').forEach(b=>b.addEventListener('click',
   await initStorage();
   populateExamFilters();
   renderAll();
+  document.getElementById('main').dataset.elpaReady = 'true';
   if (location.hash) {
     const target = document.getElementById(location.hash.slice(1));
     if (target) requestAnimationFrame(() => target.scrollIntoView({ behavior: 'instant', block: 'start' }));
