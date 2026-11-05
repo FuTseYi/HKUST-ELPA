@@ -9,7 +9,10 @@ test('Pages and Vercel publish the identical Python-built site directory',()=>{
   const workflow=fs.readFileSync(path.join(root,'.github/workflows/deploy-pages.yml'),'utf8');
   const vercel=JSON.parse(fs.readFileSync(path.join(root,'vercel.json'),'utf8'));
   assert.equal(vercel.outputDirectory,'_site');
-  assert.match(workflow,/python preview\.py --build-only/);
+  assert.match(workflow,/node scripts\/validate-site\.cjs/);
+  assert.match(workflow,/node --test/);
+  assert.match(workflow,/python -m unittest discover/);
+  assert.match(fs.readFileSync(path.join(root,'scripts/validate-site.cjs'),'utf8'),/preview\.py','--build-only'/);
   assert.match(workflow,/actions\/upload-pages-artifact@v5[\s\S]*?path: _site/);
   assert.match(workflow,/actions\/deploy-pages@v5/);
 });

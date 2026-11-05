@@ -31,11 +31,17 @@ jobs:
         with:
           ref: main
           persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - name: Build portable site
-        run: python preview.py --build-only
+      - name: Build and validate portable site
+        run: |
+          node scripts/validate-site.cjs
+          node --test
+          python -m unittest discover -s tests -t . -p 'test_*.py'
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

@@ -31,7 +31,7 @@ HKUST-ELPA is a student-maintained static ELPA preparation website built with HT
 
 - Local preview: `py -3 preview.py` on Windows or `python3 preview.py` elsewhere.
 - Build: `preview.py --build-only` through the matching Python launcher; publish `_site/` on Vercel and GitHub Pages.
-- JavaScript/site checks: `node scripts/validate-site.cjs` and `node --test` (Node.js 22+).
+- JavaScript/site checks: `node scripts/validate-site.cjs` and `node --test` (Node.js 22+). Publish to Pages only after the same validation and Python tests succeed.
 - Python tests: `python -m unittest discover -s tests -t . -p 'test_*.py'`.
 - Browser regression: install `requirements-dev.txt` and Chromium/WebKit, then run `python tests/browser_smoke.py`.
 - Verify root and `/HKUST-ELPA/` deployment paths and maintain all data and URL contracts.
