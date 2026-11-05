@@ -116,7 +116,7 @@ if(require.main===module){
   const pythonArgs=process.platform==='win32'?['-3']:[];
   execFileSync(python,[...pythonArgs,'preview.py','--build-only'],{cwd:root,stdio:'inherit'});
   validateSite();
-  const files=['submission-config.js'];
+  const files=['data/submission-config.js'];
   for(const dir of ['assets/js','question-bank','scripts','tests']){
     for(const file of fs.readdirSync(path.join(root,dir)))
       if(/\.(?:js|cjs)$/.test(file))files.push(path.join(dir,file));
