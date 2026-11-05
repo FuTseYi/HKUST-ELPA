@@ -4,6 +4,7 @@ html { scroll-behavior:smooth; scroll-padding-top:90px; }
 body { margin:0; }
 .elpa-body { min-height:100vh; min-height:100svh; display:flex; flex-direction:column; }
 .elpa-body > #main { flex:1 0 auto; width:100%; }
+.page-practice > #main { min-height:100svh; }
 .elpa-body > .elpa-footer { flex-shrink:0; }
 .elpa-nav { position:sticky; top:0; z-index:100; background:rgba(255,255,255,.97); border-bottom:1px solid rgba(17,58,100,.12); box-shadow:0 5px 24px rgba(6,41,77,.06); backdrop-filter:blur(14px); }
 .elpa-nav-inner { max-width:1210px; margin:0 auto; padding:0 25px; min-height:72px; display:flex; align-items:center; gap:32px; }

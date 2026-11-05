@@ -73,4 +73,5 @@ test('public shell handles reading and practice routes with native fallbacks',()
   const css=read('assets/css/site.css');
   assert.match(css,/min-height:100svh/);
   assert.match(css,/\.elpa-body > #main \{ flex:1 0 auto/);
+  assert.match(css,/\.page-practice > #main \{ min-height:100svh/);
 });
