@@ -52,7 +52,19 @@ test('three source entrypoints generate five complete published pages',()=>{
   assert.ok(!read('sources.html').includes('src="./assets/js/index.js"'));
 });
 
-test('native page navigation has no artificial opacity flash',()=>{
+test('persistent shell navigation has no artificial opacity flash',()=>{
   const css=read('assets/css/site.css');
   assert.doesNotMatch(css,/@keyframes elpa-enter|main\{animation:elpa-enter/);
+});
+
+test('public shell handles reading and practice routes with native fallbacks',()=>{
+  const source=fs.readFileSync(path.join(root,'assets/js/site.js'),'utf8');
+  assert.match(source,/history\.pushState/);
+  assert.match(source,/popstate/);
+  assert.match(source,/DOMParser/);
+  assert.match(source,/new URL\('\.\/'/);
+  assert.doesNotMatch(source,/swup|Swup|npm install/i);
+  const css=read('assets/css/site.css');
+  assert.match(css,/min-height:100svh/);
+  assert.match(css,/\.elpa-body > #main \{ flex:1 0 auto/);
 });

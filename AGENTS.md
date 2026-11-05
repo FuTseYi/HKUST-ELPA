@@ -17,7 +17,7 @@ HKUST-ELPA is a student-maintained static ELPA preparation website built with HT
 ## Engineering principles
 
 - Design changes holistically. Reuse shared components and authoritative data instead of accumulating patches or independent copies.
-- Keep plain, accessible HTML and browser-native navigation. Prefer small, direct implementations with clear ownership and no unnecessary runtime dependencies.
+- Keep plain, accessible HTML and native links as the fallback. Shared site navigation preserves the document shell for home, guide, practice and sources, while the submission form remains an independent document. Prefer small, direct implementations with clear ownership and no unnecessary runtime dependencies.
 - Make directory structure reflect maintenance responsibilities. Consolidate a feature when it genuinely reduces source and coordination cost.
 - Preserve question IDs, legacy aliases, query parameters, published URLs, and existing note/backup behavior. Follow-up positions identify users' saved notes.
 - Keep the browser record keys `elpa-q-status-v1`, `elpa-notes-v1`, `elpa-data-snapshot-v2` and `elpa-autosave`, plus the IndexedDB folder-handle storage contract, unless a tested migration is introduced.

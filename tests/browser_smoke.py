@@ -160,6 +160,21 @@ def check_navigation(browser, origin):
                             "getComputedStyle(document.querySelector('main')).viewTransitionName === 'none'"
                         )
                     assert not errors, (prefix, width, motion, errors)
+                    page.goto(base + "/guide.html", wait_until="load")
+                    page.evaluate("window.__persistentShell = document.querySelector('.elpa-nav')")
+                    page.evaluate("window.__persistentFooter = document.querySelector('.elpa-footer')")
+                    page.locator('.elpa-nav-links a[href="./practice.html"]').click()
+                    page.wait_for_url("**/practice.html")
+                    page.locator("#bankD .qcard").first.wait_for(timeout=20000)
+                    assert page.evaluate("""() => document.querySelector('.elpa-nav') === window.__persistentShell
+                        && document.querySelector('.elpa-footer') === window.__persistentFooter""")
+                    page.go_back()
+                    page.wait_for_url("**/guide.html")
+                    assert page.locator("#regularGuide").is_visible()
+                    assert page.evaluate("document.querySelector('.elpa-nav') === window.__persistentShell")
+                    page.reload(wait_until="load")
+                    assert page.locator("#regularGuide").is_visible()
+                    assert_layout(page, "guide reload")
                 finally:
                     context.close()
 
