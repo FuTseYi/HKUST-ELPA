@@ -44,7 +44,7 @@ test('three source entrypoints generate five complete published pages',()=>{
     assert.ok(fragment.startsWith('<main id="main">')&&fragment.endsWith('</main>'));
     assert.ok(read(page+'.html').includes(fragment));
   }
-  assert.ok(read('guide.html').includes('src="./assets/js/guide.js?v='));
+  assert.ok(read('guide.html').includes('src="./assets/js/guide.js"'));
   assert.ok(read('guide.html').includes('src="./question-bank/taxonomy.js"'));
   assert.ok(!read('sources.html').includes('src="./assets/js/index.js"'));
 });
